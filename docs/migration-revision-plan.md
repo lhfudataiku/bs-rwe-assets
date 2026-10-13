@@ -6,19 +6,19 @@ Sep 23, 2026 · @Li-Heng Fu
 
 The suite goes from 11 in-scope projects to 10. Three S3 canonical projects and four connection variants replace seven prep projects, and `DEMO_DB_RWD2` is retired once `DEMO_SF_RWE` no longer depends on it.
 
-Proposed keys use the pattern `RWD_PREP_<storage>_<size>`; the names are open to change.
+New project keys use the pattern `PREP_RWD_<storage>_<size>`.
 
 | Current project | Decision | Target | Why |
 | --- | --- | --- | --- |
-| `SYNPUFOMOP1KDATAPREPRWDV11` | Rebuild | `RWD_PREP_S3_1K` + `RWD_PREP_SF_1K`, `RWD_PREP_DB_1K`, `RWD_PREP_RS_1K` | Reference workflow; all 15 tables pass on S3, RS and DB, but its Snowflake tables are unbuilt |
-| `RWD1KDATAPREPDEMO` | Retire after rebuild | — | Same 1K data, S3 only; superseded by `RWD_PREP_S3_1K` |
-| `SYNPUFOMOP1KREDSHIFTDATAPREPARATION` | Retire | — | Ancestor of the RWDV11 project; superseded by `RWD_PREP_RS_1K` |
-| `SYNPUFOMOP100KDATAPREPARATION` | Rebuild | `RWD_PREP_S3_100K` | Its Snowflake set passes but is unbuilt; its Redshift set is incomplete |
-| `SYNPUFOMOP23DATAPREPARATION` | Rebuild | `RWD_PREP_S3_2M3` | Reference 2.3M download workflow; exports use the legacy `date` type |
+| `SYNPUFOMOP1KDATAPREPRWDV11` | Rebuild | `PREP_RWD_S3_1K` + `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K`, `PREP_RWD_RS_1K` | Reference workflow; all 15 tables pass on S3, RS and DB, but its Snowflake tables are unbuilt |
+| `RWD1KDATAPREPDEMO` | Retire after rebuild | — | Same 1K data, S3 only; superseded by `PREP_RWD_S3_1K` |
+| `SYNPUFOMOP1KREDSHIFTDATAPREPARATION` | Retire | — | Ancestor of the RWDV11 project; superseded by `PREP_RWD_RS_1K` |
+| `SYNPUFOMOP100KDATAPREPARATION` | Rebuild | `PREP_RWD_S3_100K` | Its Snowflake set passes but is unbuilt; its Redshift set is incomplete |
+| `SYNPUFOMOP23DATAPREPARATION` | Rebuild | `PREP_RWD_S3_2M3` | Reference 2.3M download workflow; exports use the legacy `date` type |
 | `DATABRICKSSYNPUFOMOP23DATAPREPERATION` | Retire | — | Legacy `date` type on 13 of 15 tables; no Databricks variant is needed at 2.3M |
-| `DEMO_SF_OMOP2M_DATAPREP` | Replace | `RWD_PREP_SF_2M3` | Legacy `date` type on 13 of 15 mapped tables; its tables are unbuilt |
-| `SOL_RWD_COHORT_DISCOVERY` | Keep, repoint | Reads `RWD_PREP_SF_1K` | Release reference |
-| `DEMO_SF_RWD` | Upgrade v1.0 → v1.1 | Reads `RWD_PREP_SF_2M3` and gets the 45-script cohort library | Demo Part 2 |
+| `DEMO_SF_OMOP2M_DATAPREP` | Replace | `PREP_RWD_SF_2M3` | Legacy `date` type on 13 of 15 mapped tables; its tables are unbuilt |
+| `SOL_RWD_COHORT_DISCOVERY` | Keep, repoint | Reads `PREP_RWD_SF_1K` | Release reference |
+| `DEMO_SF_RWD` | Upgrade v1.0 → v1.1 | Reads `PREP_RWD_SF_2M3` and gets the 45-script cohort library | Demo Part 2 |
 | `DEMO_SF_RWE` | Keep, repoint | Reads 9 datasets from `DEMO_SF_RWD` | Demo Part 3 |
 | `DEMO_DB_RWD2` | Retire (last) | — | Duplicate of the solution; its prep project is missing and its Snowflake tables are dropped |
 | `TMP_RWD_SF_COLCASE_TEST` | Delete after review | — | Scratch project created for the column-case test in this review |
@@ -84,20 +84,20 @@ Build three S3 canonical projects from the two reference workflows, gate them on
 
 ```mermaid
 flowchart LR
-  A[RWD_PREP_S3_1K] --> SF1[RWD_PREP_SF_1K]
-  A --> DB1[RWD_PREP_DB_1K]
-  A --> RS1[RWD_PREP_RS_1K]
-  B[RWD_PREP_S3_100K]
-  C[RWD_PREP_S3_2M3] --> SF2[RWD_PREP_SF_2M3]
+  A[PREP_RWD_S3_1K] --> SF1[PREP_RWD_SF_1K]
+  A --> DB1[PREP_RWD_DB_1K]
+  A --> RS1[PREP_RWD_RS_1K]
+  B[PREP_RWD_S3_100K]
+  C[PREP_RWD_S3_2M3] --> SF2[PREP_RWD_SF_2M3]
 ```
 
 **B1. Canonical S3 projects**
 
 | Project | Base workflow | Source | Main work |
 | --- | --- | --- | --- |
-| `RWD_PREP_S3_1K` | Duplicate `SYNPUFOMOP1KDATAPREPRWDV11`, keep the `input` and `OMP CDM` zones, drop the `SF` / `RS` / `DB` / `redshift` zones | Uploaded 1K files + Athena vocabularies on `hls-synth-patient` | Cast `concept` / `concept_ancestor` ids from string to int (`ATHENA_CONCEPT` is all string today) |
-| `RWD_PREP_S3_100K` | Same 1K workflow, pointed at the 100K raw files | 100K raw files on `hls-synth-patient` (currently all string-typed) | Reuse the 1K prepare steps; add `concept_ancestor`, which the S3 set is missing |
-| `RWD_PREP_S3_2M3` | Duplicate `SYNPUFOMOP23DATAPREPARATION` | lzo archives downloaded to a managed folder, CDM v5.2 | Replace the string-typed Python schemas with `dateonly` / `datetimenotz` / `int`; map v5.2 → v5.3 column differences; check id ranges for `bigint` |
+| `PREP_RWD_S3_1K` | Duplicate `SYNPUFOMOP1KDATAPREPRWDV11`, keep the `input` and `OMP CDM` zones, drop the `SF` / `RS` / `DB` / `redshift` zones | Uploaded 1K files + Athena vocabularies on `hls-synth-patient` | Cast `concept` / `concept_ancestor` ids from string to int (`ATHENA_CONCEPT` is all string today) |
+| `PREP_RWD_S3_100K` | Same 1K workflow, pointed at the 100K raw files | 100K raw files on `hls-synth-patient` (currently all string-typed) | Reuse the 1K prepare steps; add `concept_ancestor`, which the S3 set is missing |
+| `PREP_RWD_S3_2M3` | Duplicate `SYNPUFOMOP23DATAPREPARATION` | lzo archives downloaded to a managed folder, CDM v5.2 | Replace the string-typed Python schemas with `dateonly` / `datetimenotz` / `int`; map v5.2 → v5.3 column differences; check id ranges for `bigint` |
 
 Every canonical project exposes exactly the 15 tables with lowercase names `<omop_table>` and a zone named `OMOP CDM export`.
 
@@ -105,9 +105,9 @@ Every canonical project exposes exactly the 15 tables with lowercase names `<omo
 
 **B3. Connection variants.** Each variant is a new project that shares in the 15 canonical tables and has 15 sync recipes and nothing else. Names follow `<omop_table>_<conn>`, for example `person_sf`.
 
-- `RWD_PREP_SF_1K` and `RWD_PREP_SF_2M3`: pick one Snowflake connection. `bs-snowflake` is the one that works today; `managed-snowflake` has only unbuilt tables.
-- `RWD_PREP_DB_1K`: use a service-account connection, not `bs-databricks-per-user`. The per-user OAuth token expiry made it unreadable during this audit.
-- `RWD_PREP_RS_1K`: `redshift-solutions`.
+- `PREP_RWD_SF_1K` and `PREP_RWD_SF_2M3`: pick one Snowflake connection. `bs-snowflake` is the one that works today; `managed-snowflake` has only unbuilt tables.
+- `PREP_RWD_DB_1K`: use a service-account connection, not `bs-databricks-per-user`. The per-user OAuth token expiry made it unreadable during this audit.
+- `PREP_RWD_RS_1K`: `redshift-solutions`.
 - Keep variant columns lowercase. The solution's import step uppercases them (see Workstream C), so the variant layer stays a faithful copy of the canonical one.
 
 **B4. Verify.** Row counts in each variant equal the canonical ones, and the solution's "Check OMOP CDM Schema" scenario passes against every variant.
@@ -156,7 +156,7 @@ Upgrade `DEMO_SF_RWD` to v1.1 and move the cohort library into it, repoint `DEMO
 1. Export a bundle of `DEMO_SF_RWD` as a rollback point.
 2. Switch the library Git references: `python/solution` from `revise-get-sql-table-path` to `v1-1-1`, and `python/ds_common` from `v2-3-0` to `v2-3-1`.
 3. Diff its recipes and scenarios against `SOL_RWD_COHORT_DISCOVERY` and bring the 46 v1.1 recipe definitions across. `DEMO_DB_RWD2` shows a clean v1.1 copy differs from the solution only in connections, run-as user and generated recipes.
-4. Set `data_preparation_project_key = RWD_PREP_SF_2M3`, the 15 table variables, and `main_connection`. Run "Import Datasets from DataPrep Project" (it runs the schema check first).
+4. Set `data_preparation_project_key = PREP_RWD_SF_2M3`, the 15 table variables, and `main_connection`. Run "Import Datasets from DataPrep Project" (it runs the schema check first).
 5. Copy the 45 original scripts (folder `PqOBn6B3`) and the cohort metadata from `DEMO_DB_RWD2`. Run "Create Cohort Scripts" then "Write Cohort to Datasets".
 6. Check `cohort_building_log` against the counts `DEMO_DB_RWD2` recorded on 2025-10-06, for example heart failure 188,113, stroke 57,077, AMI 30,784. Only the cached preview sample survives, so export it before retiring the project.
 7. Update the wiki to Version 1.1.0 and the Release Notes.
@@ -172,10 +172,10 @@ Upgrade `DEMO_SF_RWD` to v1.1 and move the cohort library into it, repoint `DEMO
 | Order | Project | Precondition | Before deleting |
 | --- | --- | --- | --- |
 | 1 | `DEMO_DB_RWD2` | D2 done; `DEMO_SF_RWE` has no shares from it | Bundle export; save the cohort library and the log sample |
-| 2 | `DEMO_SF_OMOP2M_DATAPREP` | `DEMO_SF_RWD` reads `RWD_PREP_SF_2M3` | Bundle export (licence-restricted: keep it internal) |
+| 2 | `DEMO_SF_OMOP2M_DATAPREP` | `DEMO_SF_RWD` reads `PREP_RWD_SF_2M3` | Bundle export (licence-restricted: keep it internal) |
 | 3 | `DATABRICKSSYNPUFOMOP23DATAPREPERATION` | No consumers | Bundle export |
-| 4 | `SYNPUFOMOP1KREDSHIFTDATAPREPARATION`, `RWD1KDATAPREPDEMO` | `RWD_PREP_S3_1K` and `RWD_PREP_RS_1K` pass B4 | Bundle export |
-| 5 | `SYNPUFOMOP1KDATAPREPRWDV11`, `SYNPUFOMOP100KDATAPREPARATION`, `SYNPUFOMOP23DATAPREPARATION` | The solution and demo read only from `RWD_PREP_*` | Bundle export; keep the 2.3M lzo folder until `RWD_PREP_S3_2M3` is verified |
+| 4 | `SYNPUFOMOP1KREDSHIFTDATAPREPARATION`, `RWD1KDATAPREPDEMO` | `PREP_RWD_S3_1K` and `PREP_RWD_RS_1K` pass B4 | Bundle export |
+| 5 | `SYNPUFOMOP1KDATAPREPRWDV11`, `SYNPUFOMOP100KDATAPREPARATION`, `SYNPUFOMOP23DATAPREPARATION` | The solution and demo read only from `PREP_RWD_*` | Bundle export; keep the 2.3M lzo folder until `PREP_RWD_S3_2M3` is verified |
 | 6 | `TMP_RWD_SF_COLCASE_TEST` | Workstream C fix merged | None |
 
 The project owner deletes each project; deletion also drops the managed data, so each bundle is the only way back. The lineage index must show zero broken shares after every step.
@@ -188,8 +188,8 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 | --- | --- | --- |
 | 1. Index | Workstream A steps 1–3 | Registry covers 11 projects; compliance and lineage TSVs reproduce this audit |
 | 2. Fix | Workstream C code changes, released as a patch on a new library branch | Tests 1, 3 and 6 behave as documented; missing prep project now fails the scenario |
-| 3. Data | Workstream B: canonical S3 projects, then 4 variants | 15/15 pass and row counts match on all 7 `RWD_PREP_*` projects |
-| 4. Consumers | Repoint the solution to `RWD_PREP_SF_1K` and test it on DB and RS; D1 and D2 | 3 sample cohorts match across SF, DB and RS; 45 cohorts rebuilt on 2.3M; RWE dashboard renders |
+| 3. Data | Workstream B: canonical S3 projects, then 4 variants | 15/15 pass and row counts match on all 7 `PREP_RWD_*` projects |
+| 4. Consumers | Repoint the solution to `PREP_RWD_SF_1K` and test it on DB and RS; D1 and D2 | 3 sample cohorts match across SF, DB and RS; 45 cohorts rebuilt on 2.3M; RWE dashboard renders |
 | 5. Retire | D3 in order; Workstream A steps 4–6 | Zero broken shares; retired projects archived as bundles; CI green |
 
 **Risks and mitigations**
@@ -197,9 +197,9 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 | Risk | Mitigation |
 | --- | --- |
 | Dropping `DEMO_DB_RWD2` early breaks `DEMO_SF_RWE` | Retirement is gated on D2 and on the lineage check |
-| CDM v5.2 → v5.3 differences in the 2.3M source | Map columns in `RWD_PREP_S3_2M3` and let the schema gate catch gaps |
+| CDM v5.2 → v5.3 differences in the 2.3M source | Map columns in `PREP_RWD_S3_2M3` and let the schema gate catch gaps |
 | Id overflow at 2.3M after `bigint` → `int` | Code change C4; check max ids per table in B2 |
-| Databricks per-user OAuth expiry blocks builds and checks | Service-account connection for `RWD_PREP_DB_1K` |
+| Databricks per-user OAuth expiry blocks builds and checks | Service-account connection for `PREP_RWD_DB_1K` |
 | Unclear Snowflake connection (`bs-snowflake` vs `managed-snowflake`) | Decide before phase 3 and record as a decision |
 | SYNPUF licence: data must not leave internal instances | Licence banner on every Part 1 wiki; bundles stored internally only |
 
