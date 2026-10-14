@@ -1,0 +1,700 @@
+project	dataset	type	connection	managed	columns	omop_set	omop_table	built	rows	row_source	probe_error
+SYNPUFOMOP1KDATAPREPRWDV11	ATHENA_CONCEPT	S3	hls-synth-patient	no	10			-			
+SYNPUFOMOP1KDATAPREPRWDV11	ATHENA_CONCEPT_ANCESTOR	S3	hls-synth-patient	no	4			-			
+SYNPUFOMOP1KDATAPREPRWDV11	ATHENA_CONCEPT_RELATIONSHIP	S3	hls-synth-patient	no	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE	UploadedFiles	dataiku-managed-storage	no	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_db	Databricks	bs-databricks-per-user	yes	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_prepared	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_rs	Redshift	redshift-solutions	yes	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_sf	Snowflake	managed-snowflake	yes	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA	UploadedFiles	dataiku-managed-storage	no	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_1k	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes	121386	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	yes	121386	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_rs	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_sf	Snowflake	managed-snowflake	yes	6	snowflake	condition_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	13			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes	160322	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	yes	160322	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_rs	Redshift	redshift-solutions	yes	16	redshift	condition_occurrence	yes	160322	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	16	snowflake	condition_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH	UploadedFiles	dataiku-managed-storage	no	7			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_1k	S3	dataiku-managed-storage	yes	7	s3	death	yes	45	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	yes	45	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_rs	Redshift	redshift-solutions	yes	7	redshift	death	yes	45	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_sf	Snowflake	managed-snowflake	yes	7	snowflake	death	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	14			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_1k	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes	1622	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	yes	1622	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_rs	Redshift	redshift-solutions	yes	15	redshift	device_exposure	yes	1622	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_sf	Snowflake	managed-snowflake	yes	15	snowflake	device_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA	UploadedFiles	dataiku-managed-storage	no	7			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_1k	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes	52714	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	yes	52714	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_rs	Redshift	redshift-solutions	yes	7	redshift	drug_era	yes	52714	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_sf	Snowflake	managed-snowflake	yes	7	snowflake	drug_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	21			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_1k	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes	49542	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	yes	49542	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_rs	Redshift	redshift-solutions	yes	23	redshift	drug_exposure	yes	49542	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_sf	Snowflake	managed-snowflake	yes	23	snowflake	drug_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION	UploadedFiles	dataiku-managed-storage	no	8			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_1k	S3	dataiku-managed-storage	yes	10	s3	location	yes	626	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	yes	626	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_rs	Redshift	redshift-solutions	yes	10	redshift	location	yes	626	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_sf	Snowflake	managed-snowflake	yes	10	snowflake	location	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT	UploadedFiles	dataiku-managed-storage	no	18			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_1k	S3	dataiku-managed-storage	yes	20	s3	measurement	yes	2858	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	yes	2858	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_rs	Redshift	redshift-solutions	yes	20	redshift	measurement	yes	2858	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_sf	Snowflake	managed-snowflake	yes	20	snowflake	measurement	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION	UploadedFiles	dataiku-managed-storage	no	17			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_1k	S3	dataiku-managed-storage	yes	18	s3	observation	yes	13481	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD531	UploadedFiles	dataiku-managed-storage	no	5			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_1k	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes	1048	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	yes	1048	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_rs	Redshift	redshift-solutions	yes	5	redshift	observation_period	yes	1048	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_sf	Snowflake	managed-snowflake	yes	5	snowflake	observation_period	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	yes	13481	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_rs	Redshift	redshift-solutions	yes	18	redshift	observation	yes	13481	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_sf	Snowflake	managed-snowflake	yes	18	snowflake	observation	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON	UploadedFiles	dataiku-managed-storage	no	18			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_1k	S3	dataiku-managed-storage	yes	19	s3	person	yes	1000	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	yes	1000	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_rs	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_sf	Snowflake	managed-snowflake	yes	19	snowflake	person	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE531	UploadedFiles	dataiku-managed-storage	no	14			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes	62189	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	yes	62189	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_rs	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	14	snowflake	procedure_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_VISIT_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	12			-			
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_VISIT_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP1KDATAPREPRWDV11	US_States	UploadedFiles	dataiku-managed-storage	no	2			-			
+SYNPUFOMOP1KDATAPREPRWDV11	concept	S3	dataiku-managed-storage	yes	10	s3	concept	yes	6088813	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor	S3	dataiku-managed-storage	yes	4	s3	concept_ancestor	yes		head	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_db	Databricks	bs-databricks-per-user	yes	4	databricks	concept_ancestor	yes	72374967	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_rs	Redshift	redshift-solutions	yes	4	redshift	concept_ancestor	yes	72374967	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_sf	Snowflake	managed-snowflake	yes	4	snowflake	concept_ancestor	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	concept_for_db	Databricks	bs-databricks-per-user	yes	10	databricks	concept	yes	6088813	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_relationship	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	concept_relationship_sf	Snowflake	managed-snowflake	yes	6			-			
+SYNPUFOMOP1KDATAPREPRWDV11	concept_rs	Redshift	redshift-solutions	yes	10	redshift	concept	yes	6088813	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_sf	Snowflake	managed-snowflake	yes	10	snowflake	concept	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP1KDATAPREPRWDV11	encounter_concept_joined	S3	dataiku-managed-storage	yes	3			-			
+SYNPUFOMOP1KDATAPREPRWDV11	us_sdoh_county_measure	UploadedFiles	dataiku-managed-storage	no	63			-			
+SYNPUFOMOP1KDATAPREPRWDV11	us_states_geo	S3	dataiku-managed-storage	yes	5			-			
+SYNPUFOMOP1KDATAPREPRWDV11	visit_by_observation	S3	dataiku-managed-storage	yes	19			-			
+SYNPUFOMOP1KDATAPREPRWDV11	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-			
+SYNPUFOMOP1KDATAPREPRWDV11	visit_ip	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_db	Databricks	bs-databricks-per-user	yes	17	databricks	visit_occurrence	yes	17904	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_revised	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	17904	metric	
+SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_rs	Redshift	redshift-solutions	yes	17	redshift	visit_occurrence	yes	17904	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	17904	sql	
+RWD1KDATAPREPDEMO	AT_CONCEPT	UploadedFiles	dataiku-managed-storage	no	10			-			
+RWD1KDATAPREPDEMO	AT_CONCEPT_ANCESTOR	UploadedFiles	dataiku-managed-storage	no	4			-			
+RWD1KDATAPREPDEMO	AT_CONCEPT_RELATIONSHIP	UploadedFiles	dataiku-managed-storage	no	6			-			
+RWD1KDATAPREPDEMO	CDM_CARE_SITE	UploadedFiles	dataiku-managed-storage	no	6			-			
+RWD1KDATAPREPDEMO	CDM_CARE_SITE_prepared	S3	dataiku-managed-storage	yes	6			-			
+RWD1KDATAPREPDEMO	CDM_CONDITION_ERA	UploadedFiles	dataiku-managed-storage	no	6			-			
+RWD1KDATAPREPDEMO	CDM_CONDITION_ERA_1k	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes	121386	metric	
+RWD1KDATAPREPDEMO	CDM_CONDITION_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	13			-			
+RWD1KDATAPREPDEMO	CDM_CONDITION_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes	160322	metric	
+RWD1KDATAPREPDEMO	CDM_DEATH	UploadedFiles	dataiku-managed-storage	no	7			-			
+RWD1KDATAPREPDEMO	CDM_DEATH_1k	S3	dataiku-managed-storage	yes	7	s3	death	yes	45	metric	
+RWD1KDATAPREPDEMO	CDM_DEVICE_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	14			-			
+RWD1KDATAPREPDEMO	CDM_DEVICE_EXPOSURE_1k	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes	1622	metric	
+RWD1KDATAPREPDEMO	CDM_DRUG_ERA	UploadedFiles	dataiku-managed-storage	no	7			-			
+RWD1KDATAPREPDEMO	CDM_DRUG_ERA_1k	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes	52714	metric	
+RWD1KDATAPREPDEMO	CDM_DRUG_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	21			-			
+RWD1KDATAPREPDEMO	CDM_DRUG_EXPOSURE_1k	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes	49542	metric	
+RWD1KDATAPREPDEMO	CDM_LOCATION	UploadedFiles	dataiku-managed-storage	no	8			-			
+RWD1KDATAPREPDEMO	CDM_LOCATION_1k	S3	dataiku-managed-storage	yes	10	s3	location	yes	626	metric	
+RWD1KDATAPREPDEMO	CDM_MEASUREMENT	UploadedFiles	dataiku-managed-storage	no	18			-			
+RWD1KDATAPREPDEMO	CDM_MEASUREMENT_1k	S3	dataiku-managed-storage	yes	20	s3	measurement	yes	2858	metric	
+RWD1KDATAPREPDEMO	CDM_OBSERVATION	UploadedFiles	dataiku-managed-storage	no	17			-			
+RWD1KDATAPREPDEMO	CDM_OBSERVATION_1k	S3	dataiku-managed-storage	yes	18	s3	observation	yes	13481	metric	
+RWD1KDATAPREPDEMO	CDM_OBSERVATION_PERIOD531	UploadedFiles	dataiku-managed-storage	no	5			-			
+RWD1KDATAPREPDEMO	CDM_OBSERVATION_PERIOD_1k	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes	1048	metric	
+RWD1KDATAPREPDEMO	CDM_PERSON	UploadedFiles	dataiku-managed-storage	no	18			-			
+RWD1KDATAPREPDEMO	CDM_PERSON_1k	S3	dataiku-managed-storage	yes	19	s3	person	yes	1000	metric	
+RWD1KDATAPREPDEMO	CDM_PROCEDURE_OCCURRENCE531	UploadedFiles	dataiku-managed-storage	no	14			-			
+RWD1KDATAPREPDEMO	CDM_PROCEDURE_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes	62189	metric	
+RWD1KDATAPREPDEMO	CDM_VISIT_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	12			-			
+RWD1KDATAPREPDEMO	CDM_VISIT_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	17			-			
+RWD1KDATAPREPDEMO	US_States	UploadedFiles	dataiku-managed-storage	no	2			-			
+RWD1KDATAPREPDEMO	concept	S3	dataiku-managed-storage	yes	10	s3	concept	yes		head	
+RWD1KDATAPREPDEMO	concept_ancestor	S3	dataiku-managed-storage	yes	4	s3	concept_ancestor	yes		head	
+RWD1KDATAPREPDEMO	concept_relationship	S3	dataiku-managed-storage	yes	6			-			
+RWD1KDATAPREPDEMO	encounter_concept_joined	S3	dataiku-managed-storage	yes	3			-			
+RWD1KDATAPREPDEMO	us_sdoh_county_measure	UploadedFiles	dataiku-managed-storage	no	63			-			
+RWD1KDATAPREPDEMO	us_states_geo	S3	dataiku-managed-storage	yes	5			-			
+RWD1KDATAPREPDEMO	visit_by_observation	S3	dataiku-managed-storage	yes	19			-			
+RWD1KDATAPREPDEMO	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-			
+RWD1KDATAPREPDEMO	visit_ip	S3	dataiku-managed-storage	yes	17			-			
+RWD1KDATAPREPDEMO	visit_occurrence_revised	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	17904	metric	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_CARE_SITE	UploadedFiles	dataiku-managed-storage	no	6			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_CARE_SITE_prepared	Redshift	redshift-solutions	yes	6			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_CONDITION_ERA	UploadedFiles	dataiku-managed-storage	no	6			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_CONDITION_ERA_1k	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_CONDITION_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	13			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_CONDITION_OCCURRENCE_1k	Redshift	redshift-solutions	yes	16	redshift	condition_occurrence	yes	160322	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DEATH	UploadedFiles	dataiku-managed-storage	no	7			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DEATH_1k	Redshift	redshift-solutions	yes	7	redshift	death	yes	45	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DEVICE_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	14			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DEVICE_EXPOSURE_1k	Redshift	redshift-solutions	yes	15	redshift	device_exposure	yes	1622	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DRUG_ERA	UploadedFiles	dataiku-managed-storage	no	7			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DRUG_ERA_1k	Redshift	redshift-solutions	yes	7	redshift	drug_era	yes	52714	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DRUG_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	21			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_DRUG_EXPOSURE_1k	Redshift	redshift-solutions	yes	23	redshift	drug_exposure	yes	49542	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_LOCATION	UploadedFiles	dataiku-managed-storage	no	8			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_LOCATION_1k	Redshift	redshift-solutions	yes	10	redshift	location	yes	626	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_MEASUREMENT	UploadedFiles	dataiku-managed-storage	no	18			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_MEASUREMENT_1k	Redshift	redshift-solutions	yes	20	redshift	measurement	yes	2858	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_OBSERVATION	UploadedFiles	dataiku-managed-storage	no	17			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_OBSERVATION_1k	Redshift	redshift-solutions	yes	18	redshift	observation	yes	13481	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_OBSERVATION_PERIOD531	UploadedFiles	dataiku-managed-storage	no	5			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_OBSERVATION_PERIOD_1k	Redshift	redshift-solutions	yes	5	redshift	observation_period	yes	1048	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_PERSON	UploadedFiles	dataiku-managed-storage	no	18			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_PERSON_1k	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_PROCEDURE_OCCURRENCE531	UploadedFiles	dataiku-managed-storage	no	14			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_PROCEDURE_OCCURRENCE_1k	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_VISIT_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	12			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	CDM_VISIT_OCCURRENCE_1k	Redshift	redshift-solutions	yes	17			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	US_States	UploadedFiles	dataiku-managed-storage	no	2			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	concept	Redshift	redshift-solutions	yes	10			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	concept_ancestor	Redshift	redshift-solutions	yes	4	redshift	concept_ancestor	yes	72374967	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	concept_db	Redshift	redshift-solutions	yes	10	redshift	concept	yes	6088813	sql	
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	concept_relationship	Redshift	redshift-solutions	yes	6			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	condition_era_test	Redshift	redshift-solutions	yes	7			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	condition_occur_test	Redshift	redshift-solutions	yes	15			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	encounter_concept_joined	S3	dataiku-managed-storage	yes	3			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	us_sdoh_county_measure	UploadedFiles	dataiku-managed-storage	no	63			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	us_states_geo	S3	dataiku-managed-storage	yes	5			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	visit_by_observation	S3	dataiku-managed-storage	yes	19			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	visit_ip	Redshift	redshift-solutions	yes	17			-			
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	visit_occurrence_revised	Redshift	redshift-solutions	yes	17	redshift	visit_occurrence	yes	17904	sql	
+SYNPUFOMOP100KDATAPREPARATION	AT_CONCEPT	S3	hls-synth-patient	no	10			-			
+SYNPUFOMOP100KDATAPREPARATION	AT_CONCEPT_ANCESTOR	S3	hls-synth-patient	no	4			-			
+SYNPUFOMOP100KDATAPREPARATION	AT_CONCEPT_RELATIONSHIP	S3	hls-synth-patient	no	6			-			
+SYNPUFOMOP100KDATAPREPARATION	care_site	S3	hls-synth-patient	no	6			-			
+SYNPUFOMOP100KDATAPREPARATION	care_site_c100k_sf	Snowflake	managed-snowflake	yes	6			-			
+SYNPUFOMOP100KDATAPREPARATION	concept	S3	dataiku-managed-storage	yes	10	s3	concept	yes		head	
+SYNPUFOMOP100KDATAPREPARATION	concept_ancestor_sf	Snowflake	managed-snowflake	yes	4	snowflake	concept_ancestor	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	concept_relationship	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP100KDATAPREPARATION	concept_relationship_sf	Snowflake	managed-snowflake	yes	6			-			
+SYNPUFOMOP100KDATAPREPARATION	concept_sf	Snowflake	managed-snowflake	yes	10	snowflake	concept	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	condition_era	S3	hls-synth-patient	no	6			-			
+SYNPUFOMOP100KDATAPREPARATION	condition_era_100k_db	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes	9788262	metric	
+SYNPUFOMOP100KDATAPREPARATION	condition_era_100k_sf	Snowflake	managed-snowflake	yes	6	snowflake	condition_era	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	condition_occurrence	S3	hls-synth-patient	no	15			-			
+SYNPUFOMOP100KDATAPREPARATION	condition_occurrence_100k_db	S3	dataiku-managed-storage	yes	15	s3	condition_occurrence	yes		head	
+SYNPUFOMOP100KDATAPREPARATION	condition_occurrence_100k_sf	Snowflake	managed-snowflake	yes	15	snowflake	condition_occurrence	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	death	S3	hls-synth-patient	no	7			-			
+SYNPUFOMOP100KDATAPREPARATION	death_100k_db	S3	dataiku-managed-storage	yes	7	s3	death	yes	4635	metric	
+SYNPUFOMOP100KDATAPREPARATION	death_100k_sf	Snowflake	managed-snowflake	yes	7	snowflake	death	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	device_exposure	S3	hls-synth-patient	no	14			-			
+SYNPUFOMOP100KDATAPREPARATION	device_exposure_100k_db	S3	dataiku-managed-storage	yes	14	s3	device_exposure	yes	202805	metric	
+SYNPUFOMOP100KDATAPREPARATION	device_exposure_100k_sf	Snowflake	managed-snowflake	yes	14	snowflake	device_exposure	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	drug_era	S3	hls-synth-patient	no	7			-			
+SYNPUFOMOP100KDATAPREPARATION	drug_era_100k_db	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes	5365324	metric	
+SYNPUFOMOP100KDATAPREPARATION	drug_era_100k_sf	Snowflake	managed-snowflake	yes	7	snowflake	drug_era	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	drug_exposure	S3	hls-synth-patient	no	22			-			
+SYNPUFOMOP100KDATAPREPARATION	drug_exposure_100k_db	S3	dataiku-managed-storage	yes	22	s3	drug_exposure	yes	5423469	metric	
+SYNPUFOMOP100KDATAPREPARATION	drug_exposure_100k_sf	Snowflake	managed-snowflake	yes	22	snowflake	drug_exposure	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	drug_strength	S3	hls-synth-patient	no	12			-			
+SYNPUFOMOP100KDATAPREPARATION	drug_strength_100k_db	S3	dataiku-managed-storage	yes	12			-			
+SYNPUFOMOP100KDATAPREPARATION	drug_strength_100k_sf	Snowflake	managed-snowflake	yes	12			-			
+SYNPUFOMOP100KDATAPREPARATION	encounter_concepts_joined	S3	dataiku-managed-storage	yes	3			-			
+SYNPUFOMOP100KDATAPREPARATION	location	S3	hls-synth-patient	no	8			-			
+SYNPUFOMOP100KDATAPREPARATION	location_100k_sf	Snowflake	managed-snowflake	yes	10	snowflake	location	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	location_prepared	S3	dataiku-managed-storage	yes	10	s3	location	yes	3090	metric	
+SYNPUFOMOP100KDATAPREPARATION	measurement	S3	hls-synth-patient	no	18			-			
+SYNPUFOMOP100KDATAPREPARATION	measurement_100k_db	S3	dataiku-managed-storage	yes	18	s3	measurement	yes	2909229	metric	
+SYNPUFOMOP100KDATAPREPARATION	measurement_100k_sf	Snowflake	managed-snowflake	yes	18	snowflake	measurement	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	observation	S3	hls-synth-patient	no	17			-			
+SYNPUFOMOP100KDATAPREPARATION	observation_100k_db	S3	dataiku-managed-storage	yes	17	s3	observation	yes	1655312	metric	
+SYNPUFOMOP100KDATAPREPARATION	observation_100k_sf	Snowflake	managed-snowflake	yes	17	snowflake	observation	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	observation_period	S3	hls-synth-patient	no	5			-			
+SYNPUFOMOP100KDATAPREPARATION	observation_period_100k_db	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes	90217	metric	
+SYNPUFOMOP100KDATAPREPARATION	observation_period_100k_sf	Snowflake	managed-snowflake	yes	5	snowflake	observation_period	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	payer_plan_period	S3	hls-synth-patient	no	7			-			
+SYNPUFOMOP100KDATAPREPARATION	payer_plan_period_100k_db	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP100KDATAPREPARATION	payer_plan_period_100k_sf	Snowflake	managed-snowflake	yes	7			-			
+SYNPUFOMOP100KDATAPREPARATION	person	S3	hls-synth-patient	no	18			-			
+SYNPUFOMOP100KDATAPREPARATION	person_100k_db	S3	dataiku-managed-storage	yes	18	s3	person	yes	100000	metric	
+SYNPUFOMOP100KDATAPREPARATION	person_100k_sf	Snowflake	managed-snowflake	yes	18	snowflake	person	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	procedure_occurrence	S3	hls-synth-patient	no	13			-			
+SYNPUFOMOP100KDATAPREPARATION	procedure_occurrence_100k_db	S3	dataiku-managed-storage	yes	13	s3	procedure_occurrence	yes	11897410	metric	
+SYNPUFOMOP100KDATAPREPARATION	procedure_occurrence_100k_db_joined	S3	dataiku-managed-storage	yes	16			-			
+SYNPUFOMOP100KDATAPREPARATION	procedure_occurrence_100k_sf	Snowflake	managed-snowflake	yes	13	snowflake	procedure_occurrence	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	provider	S3	hls-synth-patient	no	13			-			
+SYNPUFOMOP100KDATAPREPARATION	provider_100k_rs	Redshift	redshift-solutions	yes	13			-			
+SYNPUFOMOP100KDATAPREPARATION	provider_100k_sf	Snowflake	managed-snowflake	yes	13			-			
+SYNPUFOMOP100KDATAPREPARATION	us_sdoh_county_measure	UploadedFiles	filesystem_managed	no	63			-			
+SYNPUFOMOP100KDATAPREPARATION	visit_by_observation	S3	dataiku-managed-storage	yes	19			-			
+SYNPUFOMOP100KDATAPREPARATION	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-			
+SYNPUFOMOP100KDATAPREPARATION	visit_occurrence	S3	hls-synth-patient	no	17			-			
+SYNPUFOMOP100KDATAPREPARATION	visit_occurrence_100k_db	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	4785453	metric	
+SYNPUFOMOP100KDATAPREPARATION	visit_occurrence_100k_rs	Redshift	redshift-solutions	yes	17			-			
+SYNPUFOMOP100KDATAPREPARATION	visit_occurrence_100k_sf	Snowflake	managed-snowflake	yes	17	snowflake	visit_occurrence	no		sql	1953178d-int2_node-f67415e3_SYNPUFOMOP100KDATAPREPARATION"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+SYNPUFOMOP100KDATAPREPARATION	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP100KDATAPREPARATION	visit_occurrence_revised	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	AT_CONCEPT	S3	hls-synth-patient	no	10			-			
+SYNPUFOMOP23DATAPREPARATION	AT_CONCEPT_ANCESTOR	S3	hls-synth-patient	no	4			-			
+SYNPUFOMOP23DATAPREPARATION	AT_CONCEPT_RELATIONSHIP	S3	hls-synth-patient	no	6			-			
+SYNPUFOMOP23DATAPREPARATION	care_site_2_3_pc	S3	dataiku-managed-storage	yes	6			yes	320545	metric	
+SYNPUFOMOP23DATAPREPARATION	care_site_2_3_pc_0	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	care_site_2_3_pc_1	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	care_site_2_3_pc_2	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	care_site_2_3_pc_3	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	care_site_2_3_pc_db	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	computed_visit_occurrence_stacked	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	concept_ancestor_db	S3	dataiku-managed-storage	yes	4	s3	concept_ancestor	yes		head	
+SYNPUFOMOP23DATAPREPARATION	concept_db	S3	dataiku-managed-storage	yes	10	s3	concept	yes	6088813	metric	
+SYNPUFOMOP23DATAPREPARATION	concept_relationship_db	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc	S3	dataiku-managed-storage	yes	6			yes		head	
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_1	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_2	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_3	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_4	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_5	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_6	S3	dataiku-managed-storage	yes	6			-			
+SYNPUFOMOP23DATAPREPARATION	condition_era_2_3_pc_db	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes		head	
+SYNPUFOMOP23DATAPREPARATION	condition_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	15			yes		head	
+SYNPUFOMOP23DATAPREPARATION	condition_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	15			-			
+SYNPUFOMOP23DATAPREPARATION	condition_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	15			-			
+SYNPUFOMOP23DATAPREPARATION	condition_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	15			-			
+SYNPUFOMOP23DATAPREPARATION	condition_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	15			-			
+SYNPUFOMOP23DATAPREPARATION	condition_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes		head	
+SYNPUFOMOP23DATAPREPARATION	death_2_3_pc	S3	dataiku-managed-storage	yes	7			yes	107644	metric	
+SYNPUFOMOP23DATAPREPARATION	death_2_3_pc_db	S3	dataiku-managed-storage	yes	7	s3	death	yes	107644	metric	
+SYNPUFOMOP23DATAPREPARATION	device_exposure_2_3_pc	S3	dataiku-managed-storage	yes	14			yes	4465485	metric	
+SYNPUFOMOP23DATAPREPARATION	device_exposure_2_3_pc_0	S3	dataiku-managed-storage	yes	14			-			
+SYNPUFOMOP23DATAPREPARATION	device_exposure_2_3_pc_1	S3	dataiku-managed-storage	yes	14			-			
+SYNPUFOMOP23DATAPREPARATION	device_exposure_2_3_pc_2	S3	dataiku-managed-storage	yes	14			-			
+SYNPUFOMOP23DATAPREPARATION	device_exposure_2_3_pc_3	S3	dataiku-managed-storage	yes	14			-			
+SYNPUFOMOP23DATAPREPARATION	device_exposure_2_3_pc_db	S3	dataiku-managed-storage	yes	15	s3	device_exposure	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc	S3	dataiku-managed-storage	yes	7			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_1	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_2	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_3	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_4	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_5	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_6	S3	dataiku-managed-storage	yes	7			-			
+SYNPUFOMOP23DATAPREPARATION	drug_era_2_3_pc_db	S3	dataiku-managed-storage	yes	7	s3	drug_era	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	drug_exposure_2_3_pc	S3	dataiku-managed-storage	yes	21			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	drug_exposure_2_3_pc_0	S3	dataiku-managed-storage	yes	21			-			
+SYNPUFOMOP23DATAPREPARATION	drug_exposure_2_3_pc_1	S3	dataiku-managed-storage	yes	21			-			
+SYNPUFOMOP23DATAPREPARATION	drug_exposure_2_3_pc_2	S3	dataiku-managed-storage	yes	21			-			
+SYNPUFOMOP23DATAPREPARATION	drug_exposure_2_3_pc_3	S3	dataiku-managed-storage	yes	21			-			
+SYNPUFOMOP23DATAPREPARATION	drug_exposure_2_3_pc_db	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	encounter_concepts	S3	dataiku-managed-storage	yes	4			-			
+SYNPUFOMOP23DATAPREPARATION	encounter_concepts_ns_joined	S3	dataiku-managed-storage	yes	3			-			
+SYNPUFOMOP23DATAPREPARATION	location_2_3_pc	S3	dataiku-managed-storage	yes	8			-			
+SYNPUFOMOP23DATAPREPARATION	location_2_3_pc_db	S3	dataiku-managed-storage	yes	10	s3	location	yes	3185	metric	
+SYNPUFOMOP23DATAPREPARATION	location_2_3_pc_prepared	S3	dataiku-managed-storage	yes	10			yes	3185	metric	
+SYNPUFOMOP23DATAPREPARATION	measurement_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	16			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	measurement_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	16			-			
+SYNPUFOMOP23DATAPREPARATION	measurement_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	16			-			
+SYNPUFOMOP23DATAPREPARATION	measurement_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	16			-			
+SYNPUFOMOP23DATAPREPARATION	measurement_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	16			-			
+SYNPUFOMOP23DATAPREPARATION	measurement_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	20	s3	measurement	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	observation_2_3_pc	S3	dataiku-managed-storage	yes	17			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	observation_2_3_pc_0	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	observation_2_3_pc_1	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	observation_2_3_pc_2	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	observation_2_3_pc_3	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	observation_2_3_pc_db	S3	dataiku-managed-storage	yes	18	s3	observation	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	observation_period_2_3_pc	S3	dataiku-managed-storage	yes	7			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	observation_period_2_3_pc_db	S3	dataiku-managed-storage	yes	7	s3	observation_period	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	payer_plan_period_2_3_pc	S3	dataiku-managed-storage	yes	7			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	payer_plan_period_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	person_2_3_pc	S3	dataiku-managed-storage	yes	18			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	person_2_3_pc_db	S3	dataiku-managed-storage	yes	18	s3	person	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	procedure_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	13			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	procedure_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	13			-			
+SYNPUFOMOP23DATAPREPARATION	procedure_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	13			-			
+SYNPUFOMOP23DATAPREPARATION	procedure_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	13			-			
+SYNPUFOMOP23DATAPREPARATION	procedure_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	13			-			
+SYNPUFOMOP23DATAPREPARATION	procedure_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	provider_2_3_pc	S3	dataiku-managed-storage	yes	13			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	provider_2_3_pc_db	S3	dataiku-managed-storage	yes	13			-			
+SYNPUFOMOP23DATAPREPARATION	us_sdoh_county_measure	UploadedFiles	dataiku-managed-storage	no	63			-			
+SYNPUFOMOP23DATAPREPARATION	visit_by_observation_occurrence	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	visit_by_procedure_occurrence	S3	dataiku-managed-storage	yes	17			-			
+SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	12			unknown		head	timeout after 240s
+SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	12			-			
+SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	12			-			
+SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	12			-			
+SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	12			-			
+SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	unknown		head	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	care_site_db	Databricks	bs-databricks	yes	6			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_ancestor_db	Databricks	bs-databricks	yes	4	databricks	concept_ancestor	yes	72374967	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	yes	6088813	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_relationship_db	Databricks	bs-databricks	yes	6			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_era_db	Databricks	bs-databricks	yes	6	databricks	condition_era	yes	223393336	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_occurrence_db	Databricks	bs-databricks	yes	16	databricks	condition_occurrence	yes	252664961	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_test	Databricks	bs-databricks	yes	16			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	death_db	Databricks	bs-databricks	yes	7	databricks	death	yes	107644	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	device_exposure_db	Databricks	bs-databricks	yes	15	databricks	device_exposure	yes	4465485	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_era_db	Databricks	bs-databricks	yes	7	databricks	drug_era	yes	125872351	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	yes	126048050	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	encounter_concepts_joined	S3	dataiku-managed-storage	yes	2			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	location_db	Databricks	bs-databricks	yes	10	databricks	location	yes	3185	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	measurement_occurrence_db	Databricks	bs-databricks	yes	20	databricks	measurement	yes	74128429	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	observation_db	Databricks	bs-databricks	yes	18	databricks	observation	yes	37531051	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	observation_period_db	Databricks	bs-databricks	yes	7	databricks	observation_period	yes	2098515	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	payer_plan_period_db	Databricks	bs-databricks	yes	17			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	person_db	Databricks	bs-databricks	yes	18	databricks	person	yes	2326856	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	procedure_occurrence_db	Databricks	bs-databricks	yes	14	databricks	procedure_occurrence	yes	278769529	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	provider_db	Databricks	bs-databricks	yes	13			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	visit_occurrence_rw	S3	dataiku-managed-storage	yes	17			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_by_observation	S3	dataiku-managed-storage	yes	18			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_by_procedure	S3	dataiku-managed-storage	yes	18			-			
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_occurrence_db	Databricks	bs-databricks	yes	17	databricks	visit_occurrence	yes	40713423	sql	
+DEMO_SF_OMOP2M_DATAPREP	CONCEPT_1	FilesInFolder		no	10			-			
+DEMO_SF_OMOP2M_DATAPREP	CONCEPT_ANCESTOR_1	FilesInFolder		no	4			-			
+DEMO_SF_OMOP2M_DATAPREP	CONCEPT_CLASS_1	FilesInFolder		no	3			-			
+DEMO_SF_OMOP2M_DATAPREP	CONCEPT_RELATIONSHIP_1	FilesInFolder		no	6			-			
+DEMO_SF_OMOP2M_DATAPREP	CONCEPT_SYNONYM_1	FilesInFolder		no	3			-			
+DEMO_SF_OMOP2M_DATAPREP	DOMAIN_1	FilesInFolder		no	3			-			
+DEMO_SF_OMOP2M_DATAPREP	DRUG_STRENGTH_1	FilesInFolder		no	12			-			
+DEMO_SF_OMOP2M_DATAPREP	RELATIONSHIP_1	FilesInFolder		no	6			-			
+DEMO_SF_OMOP2M_DATAPREP	VOCABULARY_1	FilesInFolder		no	5			-			
+DEMO_SF_OMOP2M_DATAPREP	care_site_2_3_pc	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	care_site_2_3_pc_0	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	care_site_2_3_pc_1	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	care_site_2_3_pc_2	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	care_site_2_3_pc_3	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	care_site_2_3_pc_db	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	computed_visit_occurrence_stacked	Snowflake	managed-snowflake	yes	17	snowflake	visit_occurrence	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	concept_ancestor_db	Snowflake	managed-snowflake	yes	4	snowflake	concept_ancestor	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	concept_class_db	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_OMOP2M_DATAPREP	concept_db	Snowflake	managed-snowflake	yes	10	snowflake	concept	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	concept_relationship_db	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	concept_synonym_db	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_1	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_2	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_3	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_4	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_5	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_6	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_era_2_3_pc_db	Snowflake	managed-snowflake	yes	6	snowflake	condition_era	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	condition_occurrence_2_3_pc	Snowflake	managed-snowflake	yes	15			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_occurrence_2_3_pc_0	Snowflake	managed-snowflake	yes	15			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_occurrence_2_3_pc_1	Snowflake	managed-snowflake	yes	15			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_occurrence_2_3_pc_2	Snowflake	managed-snowflake	yes	15			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_occurrence_2_3_pc_3	Snowflake	managed-snowflake	yes	15			-			
+DEMO_SF_OMOP2M_DATAPREP	condition_occurrence_2_3_pc_db	Snowflake	managed-snowflake	yes	16	snowflake	condition_occurrence	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	death_2_3_pc	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	death_2_3_pc_db	Snowflake	managed-snowflake	yes	7	snowflake	death	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	device_exposure_2_3_pc	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_OMOP2M_DATAPREP	device_exposure_2_3_pc_0	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_OMOP2M_DATAPREP	device_exposure_2_3_pc_1	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_OMOP2M_DATAPREP	device_exposure_2_3_pc_2	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_OMOP2M_DATAPREP	device_exposure_2_3_pc_3	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_OMOP2M_DATAPREP	device_exposure_2_3_pc_db	Snowflake	managed-snowflake	yes	15	snowflake	device_exposure	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	domain_db	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_1	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_2	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_3	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_4	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_5	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_6	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_era_2_3_pc_db	Snowflake	managed-snowflake	yes	7	snowflake	drug_era	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	drug_exposure_2_3_pc	Snowflake	managed-snowflake	yes	21			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_exposure_2_3_pc_0	Snowflake	managed-snowflake	yes	21			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_exposure_2_3_pc_1	Snowflake	managed-snowflake	yes	21			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_exposure_2_3_pc_2	Snowflake	managed-snowflake	yes	21			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_exposure_2_3_pc_3	Snowflake	managed-snowflake	yes	21			-			
+DEMO_SF_OMOP2M_DATAPREP	drug_exposure_2_3_pc_db	Snowflake	managed-snowflake	yes	25	snowflake	drug_exposure	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	drug_strength_db	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_OMOP2M_DATAPREP	encounter_concepts	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_OMOP2M_DATAPREP	encounter_concepts_ns_joined	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_OMOP2M_DATAPREP	location_2_3_pc	Snowflake	managed-snowflake	yes	8			-			
+DEMO_SF_OMOP2M_DATAPREP	location_2_3_pc_db	Snowflake	managed-snowflake	yes	10	snowflake	location	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	location_2_3_pc_prepared	Snowflake	managed-snowflake	yes	10			-			
+DEMO_SF_OMOP2M_DATAPREP	measurement_occurrence_2_3_pc	Snowflake	managed-snowflake	yes	16			-			
+DEMO_SF_OMOP2M_DATAPREP	measurement_occurrence_2_3_pc_0	Snowflake	managed-snowflake	yes	16			-			
+DEMO_SF_OMOP2M_DATAPREP	measurement_occurrence_2_3_pc_1	Snowflake	managed-snowflake	yes	16			-			
+DEMO_SF_OMOP2M_DATAPREP	measurement_occurrence_2_3_pc_2	Snowflake	managed-snowflake	yes	16			-			
+DEMO_SF_OMOP2M_DATAPREP	measurement_occurrence_2_3_pc_3	Snowflake	managed-snowflake	yes	16			-			
+DEMO_SF_OMOP2M_DATAPREP	measurement_occurrence_2_3_pc_db	Snowflake	managed-snowflake	yes	20	snowflake	measurement	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	observation_2_3_pc	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	observation_2_3_pc_0	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	observation_2_3_pc_1	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	observation_2_3_pc_2	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	observation_2_3_pc_3	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	observation_2_3_pc_db	Snowflake	managed-snowflake	yes	18	snowflake	observation	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	observation_period_2_3_pc	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	observation_period_2_3_pc_db	Snowflake	managed-snowflake	yes	7	snowflake	observation_period	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	payer_plan_period_2_3_pc	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_OMOP2M_DATAPREP	payer_plan_period_2_3_pc_db	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	person_2_3_pc	Snowflake	managed-snowflake	yes	18			-			
+DEMO_SF_OMOP2M_DATAPREP	person_2_3_pc_db	Snowflake	managed-snowflake	yes	18	snowflake	person	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	procedure_occurrence_2_3_pc	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	procedure_occurrence_2_3_pc_0	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	procedure_occurrence_2_3_pc_1	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	procedure_occurrence_2_3_pc_2	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	procedure_occurrence_2_3_pc_3	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	procedure_occurrence_2_3_pc_db	Snowflake	managed-snowflake	yes	14	snowflake	procedure_occurrence	no		sql	space-1953178d-int2_node-f67415e3_DEMO_SF_OMOP2M_DATAPREP"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
+DEMO_SF_OMOP2M_DATAPREP	provider_2_3_pc	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	provider_2_3_pc_db	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_OMOP2M_DATAPREP	relationship_db	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_OMOP2M_DATAPREP	us_sdoh_county_measure_1	UploadedFiles	filesystem_managed	no	63			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_by_observation_occurrence	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_by_procedure_occurrence	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_0	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_1	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_2	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_3	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_db	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_OMOP2M_DATAPREP	vocabulary_db	Snowflake	managed-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_concepts	Filesystem	filesystem_managed	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_score_occurrence	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_scoring_copy	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	cohort	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_building_log	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_count	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_events	Filesystem	filesystem_managed	yes	10			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_joint	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_prevalence	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_prevalence_prepared	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_count	Filesystem	filesystem_managed	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_definition	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_definition_filtered	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_demographics	Filesystem	filesystem_managed	yes	17			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_count	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_events	Filesystem	filesystem_managed	yes	10			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_joined	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_prevalence	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_prevalence_prepared	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_filtered	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_filtered_exploded_by_quarter	Filesystem	filesystem_managed	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_location	Filesystem	filesystem_managed	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_location_prepared	Filesystem	filesystem_managed	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_metadata_copy	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_observation	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_prevalence	Filesystem	filesystem_managed	yes	8			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_visit_events	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_visit_joined	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	concept	Filesystem	filesystem_managed	yes	10			-			
+SOL_RWD_COHORT_DISCOVERY	concept_ancestor	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	condition_era	Filesystem	filesystem_managed	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	condition_group_occurrence	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	condition_groups	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	condition_occurrence	Filesystem	filesystem_managed	yes	16			-			
+SOL_RWD_COHORT_DISCOVERY	death	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	demographic_covariates	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	device_exposure	Filesystem	filesystem_managed	yes	15			-			
+SOL_RWD_COHORT_DISCOVERY	drug_class_exposure	Filesystem	filesystem_managed	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	drug_era	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	drug_exposure	Filesystem	filesystem_managed	yes	23			-			
+SOL_RWD_COHORT_DISCOVERY	drug_groups	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	location	Filesystem	filesystem_managed	yes	10			-			
+SOL_RWD_COHORT_DISCOVERY	measurement	Filesystem	filesystem_managed	yes	20			-			
+SOL_RWD_COHORT_DISCOVERY	observation	Filesystem	filesystem_managed	yes	18			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period_joined	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period_quarter_exploded	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period_quarter_exploded_by_QUARTER	Filesystem	filesystem_managed	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	person	Filesystem	filesystem_managed	yes	19			-			
+SOL_RWD_COHORT_DISCOVERY	person_location_joined	Filesystem	filesystem_managed	yes	13			-			
+SOL_RWD_COHORT_DISCOVERY	popoulation_cohort_charlson_score	Filesystem	filesystem_managed	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	population_cohort_charlson_event_count	Filesystem	filesystem_managed	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	population_cohort_charlson_score_joined	Filesystem	filesystem_managed	yes	8			-			
+SOL_RWD_COHORT_DISCOVERY	population_cohort_charlson_score_prepared	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	population_cohort_demographic_prepared	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	population_cohort_race	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	population_cohort_sex	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	population_w_cohort_first_occurrence	Filesystem	filesystem_managed	yes	12			-			
+SOL_RWD_COHORT_DISCOVERY	population_w_cohort_prepared	Filesystem	filesystem_managed	yes	11			-			
+SOL_RWD_COHORT_DISCOVERY	procedure_occurrence	Filesystem	filesystem_managed	yes	14			-			
+SOL_RWD_COHORT_DISCOVERY	snomed_clinical	Filesystem	filesystem_managed	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	uploaded_cohort_definition	Filesystem	filesystem_managed	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	visit_occurrence	Filesystem	filesystem_managed	yes	17			-			
+SOL_RWD_COHORT_DISCOVERY	visit_occurrence_labeled	Filesystem	filesystem_managed	yes	6			-			
+DEMO_SF_RWD	charlson_concepts	Snowflake	managed-snowflake	yes	2			-			
+DEMO_SF_RWD	charlson_score_occurrence	Snowflake	bs-snowflake	yes	9			-			
+DEMO_SF_RWD	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
+DEMO_SF_RWD	charlson_scoring_copy	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	cohort	Snowflake	bs-snowflake	yes	4			-			
+DEMO_SF_RWD	cohort_building_log	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	cohort_condition_group_count	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	cohort_condition_group_events	Snowflake	managed-snowflake	yes	10			-			
+DEMO_SF_RWD	cohort_condition_group_joint	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	cohort_condition_group_prevalence	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWD	cohort_condition_group_prevalence_prepared	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	cohort_count	Snowflake	managed-snowflake	yes	2			-			
+DEMO_SF_RWD	cohort_definition	Snowflake	bs-snowflake	yes	7			-			
+DEMO_SF_RWD	cohort_definition_filtered	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	cohort_demographics	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_RWD	cohort_drug_group_count	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	cohort_drug_group_events	Snowflake	managed-snowflake	yes	10			-			
+DEMO_SF_RWD	cohort_drug_group_joined	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	cohort_drug_group_prevalence	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWD	cohort_drug_group_prevalence_prepared	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	cohort_filtered	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWD	cohort_filtered_exploded_by_quarter	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWD	cohort_location	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWD	cohort_location_prepared	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWD	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
+DEMO_SF_RWD	cohort_metadata_copy	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWD	cohort_observation	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWD	cohort_prevalence	Snowflake	managed-snowflake	yes	8			-			
+DEMO_SF_RWD	cohort_visit_events	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWD	cohort_visit_joined	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWD	concept	Snowflake	bs-snowflake	yes	10			-			
+DEMO_SF_RWD	concept_ancestor	Snowflake	bs-snowflake	yes	4			-			
+DEMO_SF_RWD	condition_era	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWD	condition_group_occurrence	Snowflake	bs-snowflake	yes	5			-			
+DEMO_SF_RWD	condition_groups	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	condition_occurrence	Snowflake	managed-snowflake	yes	16			-			
+DEMO_SF_RWD	death	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	demographic_covariates	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWD	device_exposure	Snowflake	managed-snowflake	yes	15			-			
+DEMO_SF_RWD	drug_era	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	drug_exposure	Snowflake	managed-snowflake	yes	23			-			
+DEMO_SF_RWD	drug_exposure_grouped	Snowflake	bs-snowflake	yes	6			-			
+DEMO_SF_RWD	drug_groups	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWD	location	Snowflake	managed-snowflake	yes	10			-			
+DEMO_SF_RWD	measurement	Snowflake	managed-snowflake	yes	20			-			
+DEMO_SF_RWD	observation	Snowflake	managed-snowflake	yes	18			-			
+DEMO_SF_RWD	observation_period	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	observation_period_joined	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWD	observation_period_quarter_exploded	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWD	observation_period_quarter_exploded_by_QUARTER	Snowflake	managed-snowflake	yes	2			-			
+DEMO_SF_RWD	person	Snowflake	managed-snowflake	yes	18			-			
+DEMO_SF_RWD	person_location_joined	Snowflake	bs-snowflake	yes	13			-			
+DEMO_SF_RWD	popoulation_cohort_charlson_score	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWD	population_cohort_charlson_event_count	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWD	population_cohort_charlson_score_joined	Snowflake	managed-snowflake	yes	8			-			
+DEMO_SF_RWD	population_cohort_charlson_score_prepared	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWD	population_cohort_demographic_prepared	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWD	population_cohort_race	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWD	population_cohort_sex	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWD	population_w_cohort_first_occurrence	Snowflake	managed-snowflake	yes	12			-			
+DEMO_SF_RWD	population_w_cohort_prepared	Snowflake	managed-snowflake	yes	11			-			
+DEMO_SF_RWD	procedure_occurrence	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_RWD	snomed_clinical	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWD	uploaded_cohort_definition	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWD	visit_occurrence	Snowflake	managed-snowflake	yes	17			-			
+DEMO_SF_RWD	visit_occurrence_labeled	Snowflake	bs-snowflake	yes	6			-			
+DEMO_SF_RWE	baseline_clinical_characteristics	Snowflake	managed-snowflake	yes	67			-			
+DEMO_SF_RWE	charlson_score_occurrence_db	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWE	cohort_data	Snowflake	managed-snowflake	yes	356			-			
+DEMO_SF_RWE	cohort_data_prepared	Snowflake	managed-snowflake	yes	356			-			
+DEMO_SF_RWE	cohort_data_propensity_scored	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	cohort_data_scored	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	cohort_data_scored_prepared	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	cohort_db	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWE	cohort_definition_db	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	cohort_w_characteristics	Snowflake	managed-snowflake	yes	55			-			
+DEMO_SF_RWE	cohort_w_characteristics_prepared	Snowflake	managed-snowflake	yes	55			-			
+DEMO_SF_RWE	cohort_w_characteristics_ps_adjusted	Snowflake	managed-snowflake	yes	48			-			
+DEMO_SF_RWE	cohort_w_characteristics_ps_adjusted_prepared	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWE	concept	Snowflake	managed-snowflake	yes	10			-			
+DEMO_SF_RWE	concept_ancestor	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWE	condition_group_occurrence_db	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWE	conditions_group_selected	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	drug_exposure_grouped_db	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	drug_group_selected	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	feature_cohorts	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWE	features_30d_visits_joined	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	features_30d_visits_piovted	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	features_365d_condition_group_joined	Snowflake	managed-snowflake	yes	8			-			
+DEMO_SF_RWE	features_365d_condition_group_pivoted	Snowflake	managed-snowflake	yes	251			-			
+DEMO_SF_RWE	features_365d_drug_group_joined	Snowflake	managed-snowflake	yes	9			-			
+DEMO_SF_RWE	features_365d_drug_group_pivoted	Snowflake	managed-snowflake	yes	84			-			
+DEMO_SF_RWE	features_365d_visits_joined	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	features_365d_visits_pivoted	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	features_charlson_score	Snowflake	managed-snowflake	yes	2			-			
+DEMO_SF_RWE	outcome_cohorts	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWE	outcome_cohorts_cv_first	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	outcome_cohorts_first	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	person_demo_geo	Snowflake	managed-snowflake	yes	13			-			
+DEMO_SF_RWE	person_demo_geo_prepared	Snowflake	managed-snowflake	yes	14			-			
+DEMO_SF_RWE	snomed_concept	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	target_cohort_conditions	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	target_cohort_conditions_group_counts	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWE	target_cohort_drug_group_counts	Snowflake	managed-snowflake	yes	3			-			
+DEMO_SF_RWE	target_cohort_features	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	target_cohort_medications	Snowflake	managed-snowflake	yes	6			-			
+DEMO_SF_RWE	target_cohorts	Snowflake	managed-snowflake	yes	5			-			
+DEMO_SF_RWE	target_cohorts_count	Snowflake	managed-snowflake	yes	2			-			
+DEMO_SF_RWE	target_cohorts_cs_occurrence	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	target_cohorts_cs_occurrence_distinct	Snowflake	managed-snowflake	yes	4			-			
+DEMO_SF_RWE	target_cohorts_excluded	Snowflake	managed-snowflake	yes	7			-			
+DEMO_SF_RWE	visit_occurrence_db	Snowflake	managed-snowflake	yes	6			-			
+DEMO_DB_RWD2	charlson_concepts	Snowflake	bs-snowflake	yes	2			-			
+DEMO_DB_RWD2	charlson_score_occurrence	Snowflake	bs-snowflake	yes	9			no		sql	N_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_CHARLSON_SCORE_OCCURRENCE' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
+DEMO_DB_RWD2	charlson_scoring_copy	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	cohort	Snowflake	bs-snowflake	yes	4			no		sql	Object 'DKU_SOLUTION_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_COHORT' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	cohort_building_log	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	cohort_condition_group_count	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	cohort_condition_group_events	Snowflake	bs-snowflake	yes	10			-			
+DEMO_DB_RWD2	cohort_condition_group_joint	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	cohort_condition_group_prevalence	Snowflake	bs-snowflake	yes	4			-			
+DEMO_DB_RWD2	cohort_condition_group_prevalence_prepared	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	cohort_count	Snowflake	bs-snowflake	yes	2			-			
+DEMO_DB_RWD2	cohort_definition	Snowflake	bs-snowflake	yes	7			no		sql	_SOLUTION_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_COHORT_DEFINITION' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	cohort_definition_filtered	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	cohort_demographics	Snowflake	bs-snowflake	yes	17			-			
+DEMO_DB_RWD2	cohort_drug_group_count	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	cohort_drug_group_events	Snowflake	bs-snowflake	yes	10			-			
+DEMO_DB_RWD2	cohort_drug_group_joined	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	cohort_drug_group_prevalence	Snowflake	bs-snowflake	yes	4			-			
+DEMO_DB_RWD2	cohort_drug_group_prevalence_prepared	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	cohort_filtered	Snowflake	bs-snowflake	yes	4			-			
+DEMO_DB_RWD2	cohort_filtered_exploded_by_quarter	Snowflake	bs-snowflake	yes	6			-			
+DEMO_DB_RWD2	cohort_location	Snowflake	bs-snowflake	yes	6			-			
+DEMO_DB_RWD2	cohort_location_prepared	Snowflake	bs-snowflake	yes	6			-			
+DEMO_DB_RWD2	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
+DEMO_DB_RWD2	cohort_metadata_copy	Snowflake	bs-snowflake	yes	4			-			
+DEMO_DB_RWD2	cohort_observation	Snowflake	bs-snowflake	yes	9			-			
+DEMO_DB_RWD2	cohort_prevalence	Snowflake	bs-snowflake	yes	8			-			
+DEMO_DB_RWD2	cohort_visit_events	Snowflake	bs-snowflake	yes	9			-			
+DEMO_DB_RWD2	cohort_visit_joined	Snowflake	bs-snowflake	yes	9			-			
+DEMO_DB_RWD2	concept	Snowflake	bs-snowflake	yes	10			no		sql	bject 'DKU_SOLUTION_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_CONCEPT' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	concept_ancestor	Snowflake	bs-snowflake	yes	4			no		sql	U_SOLUTION_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_CONCEPT_ANCESTOR' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	condition_era	Snowflake	bs-snowflake	yes	6			-			
+DEMO_DB_RWD2	condition_group_occurrence	Snowflake	bs-snowflake	yes	5			no		sql	_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_CONDITION_GROUP_OCCURRENCE' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	condition_groups	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	condition_occurrence	Snowflake	bs-snowflake	yes	16			-			
+DEMO_DB_RWD2	death	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	demographic_covariates	Snowflake	bs-snowflake	yes	4			-			
+DEMO_DB_RWD2	device_exposure	Snowflake	bs-snowflake	yes	15			-			
+DEMO_DB_RWD2	drug_class_exposure	Snowflake	bs-snowflake	yes	6			no		sql	OLUTION_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_DRUG_CLASS_EXPOSURE' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	drug_era	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	drug_exposure	Snowflake	bs-snowflake	yes	23			-			
+DEMO_DB_RWD2	drug_groups	Snowflake	bs-snowflake	yes	9			-			
+DEMO_DB_RWD2	location	Snowflake	bs-snowflake	yes	10			-			
+DEMO_DB_RWD2	measurement	Snowflake	bs-snowflake	yes	20			-			
+DEMO_DB_RWD2	observation	Snowflake	bs-snowflake	yes	18			-			
+DEMO_DB_RWD2	observation_period	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	observation_period_joined	Snowflake	bs-snowflake	yes	5			-			
+DEMO_DB_RWD2	observation_period_quarter_exploded	Snowflake	bs-snowflake	yes	9			-			
+DEMO_DB_RWD2	observation_period_quarter_exploded_by_QUARTER	Snowflake	bs-snowflake	yes	2			-			
+DEMO_DB_RWD2	person	Snowflake	bs-snowflake	yes	18			-			
+DEMO_DB_RWD2	person_location_joined	Snowflake	bs-snowflake	yes	13			no		sql	TION_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_PERSON_LOCATION_JOINED' does not exist or not authorized. Your primary role SYSADMIN must have at least
+DEMO_DB_RWD2	popoulation_cohort_charlson_score	Snowflake	bs-snowflake	yes	3			-			
+DEMO_DB_RWD2	population_cohort_charlson_event_count	Snowflake	bs-snowflake	yes	7			-			
+DEMO_DB_RWD2	population_cohort_charlson_score_joined	Snowflake	bs-snowflake	yes	8			-			
+DEMO_DB_RWD2	population_cohort_charlson_score_prepared	Snowflake	bs-snowflake	yes	9			-			
+DEMO_DB_RWD2	population_cohort_demographic_prepared	Snowflake	bs-snowflake	yes	5			-			
+DEMO_DB_RWD2	population_cohort_race	Snowflake	bs-snowflake	yes	5			-			
+DEMO_DB_RWD2	population_cohort_sex	Snowflake	bs-snowflake	yes	5			-			
+DEMO_DB_RWD2	population_w_cohort_first_occurrence	Snowflake	bs-snowflake	yes	12			-			
+DEMO_DB_RWD2	population_w_cohort_prepared	Snowflake	bs-snowflake	yes	11			-			
+DEMO_DB_RWD2	procedure_occurrence	Snowflake	bs-snowflake	yes	14			-			
+DEMO_DB_RWD2	snomed_clinical	Snowflake	bs-snowflake	yes	4			-			
+DEMO_DB_RWD2	uploaded_cohort_definition	Snowflake	bs-snowflake	yes	5			-			
+DEMO_DB_RWD2	visit_occurrence	Snowflake	bs-snowflake	yes	17			-			
+DEMO_DB_RWD2	visit_occurrence_labeled	Snowflake	bs-snowflake	yes	6			no		sql	ON_DESIGN.SOL_DESIGN.DEMO_DB_RWD2_VISIT_OCCURRENCE_LABELED' does not exist or not authorized. Your primary role SYSADMIN must have at least

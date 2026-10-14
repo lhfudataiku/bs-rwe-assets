@@ -1,0 +1,4 @@
+## Legal Disclaimer on Solution Data
+
+This Solution uses data pulled via the [CMS 2008-2010 Data Entrepreneurs’ Synthetic Public Use File (DE-SynPUF) in OMOP](https://registry.opendata.aws/cmsdesynpuf-omop/) and [Athena](https://athena.ohdsi.org/search-terms/start) for development and prepackages a small portion of data from both sources for visualization purpose. 
+These Organizations have not endorsed or certified this solution. By utilizing this project, you agree to abide by the terms set forth on these data sources. Dataiku makes no representations or warranties regarding the performance, availability, or results that may be obtained from using our Business Solution, including with your own data. The use of these projects is at your own risk.

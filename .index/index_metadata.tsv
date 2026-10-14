@@ -1,0 +1,10 @@
+path	owner	freshness	scope
+registry/projects.json	suite owner	hand-written; validated by --check	one entry per DSS project: part, role, lifecycle, owner, OMOP sets
+registry/known_issues.json	suite owner	hand-written; --check fails if it differs from issues.tsv	accepted problems the migration has still to fix
+.index/dss_snapshot.json	tools/build_index.py --refresh	as of refreshed_at inside the file	raw DSS state: variables, git references, flow sources, dataset schemas, probes
+.index/projects.tsv	tools/build_index.py	python3 tools/build_index.py --check	one row per registered project with live wiring
+.index/datasets.tsv	tools/build_index.py	python3 tools/build_index.py --check	every dataset of every registered project; built/rows for probed ones
+.index/schema_compliance.tsv	tools/build_index.py	python3 tools/build_index.py --check	each OMOP set table vs CDM_SCHEMA v1-1-1
+.index/lineage.tsv	tools/build_index.py	python3 tools/build_index.py --check	prep keys, table variables and shared-in datasets, with existence
+.index/issues.tsv	tools/build_index.py	python3 tools/build_index.py --check	every problem found, marked known or NEW against the baseline
+.index/SUMMARY.md	tools/build_index.py	python3 tools/build_index.py --check	counts and open issues for humans

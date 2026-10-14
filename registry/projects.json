@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "suite": "RWD/RWE solution demo assets",
+  "discovery_pattern": "RWD|RWE|SYNPUF|OMOP|COHORT|COLCASE",
+  "out_of_scope": {
+    "SYNTHEA1KOMOP": "Synthea OMOP sample, not part of the suite (project-scoping.md, Out of scope)",
+    "SYNPUF": "Workshop project on the raw SYNPUF claims (project-scoping.md, Out of scope)",
+    "COHORTICULTURE": "Separate cohort demo (project-scoping.md, Out of scope)"
+  },
+  "owners": {
+    "data-foundation": null,
+    "solution": null,
+    "rwe-demo": null,
+    "suite": null
+  },
+  "projects": [
+    {
+      "key": "SYNPUFOMOP1KDATAPREPRWDV11",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "1K",
+      "connections": [
+        "dataiku-managed-storage",
+        "managed-snowflake",
+        "bs-snowflake",
+        "redshift-solutions",
+        "bs-databricks-per-user"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "solution-developer",
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Rebuild as PREP_RWD_S3_1K plus the SF, DB and RS 1K variants; retire in D3 step 5",
+      "omop_sets": {
+        "s3": {
+          "person": "CDM_PERSON_1k",
+          "observation_period": "CDM_OBSERVATION_PERIOD_1k",
+          "visit_occurrence": "visit_occurrence_revised",
+          "condition_occurrence": "CDM_CONDITION_OCCURRENCE_1k",
+          "drug_exposure": "CDM_DRUG_EXPOSURE_1k",
+          "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_1k",
+          "device_exposure": "CDM_DEVICE_EXPOSURE_1k",
+          "measurement": "CDM_MEASUREMENT_1k",
+          "observation": "CDM_OBSERVATION_1k",
+          "death": "CDM_DEATH_1k",
+          "location": "CDM_LOCATION_1k",
+          "drug_era": "CDM_DRUG_ERA_1k",
+          "condition_era": "CDM_CONDITION_ERA_1k",
+          "concept": "concept",
+          "concept_ancestor": "concept_ancestor"
+        },
+        "redshift": {
+          "person": "CDM_PERSON_rs",
+          "observation_period": "CDM_OBSERVATION_PERIOD_rs",
+          "visit_occurrence": "visit_occurrence_rs",
+          "condition_occurrence": "CDM_CONDITION_OCCURRENCE_rs",
+          "drug_exposure": "CDM_DRUG_EXPOSURE_rs",
+          "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_rs",
+          "device_exposure": "CDM_DEVICE_EXPOSURE_rs",
+          "measurement": "CDM_MEASUREMENT_rs",
+          "observation": "CDM_OBSERVATION_rs",
+          "death": "CDM_DEATH_rs",
+          "location": "CDM_LOCATION_rs",
+          "drug_era": "CDM_DRUG_ERA_rs",
+          "condition_era": "CDM_CONDITION_ERA_rs",
+          "concept": "concept_rs",
+          "concept_ancestor": "concept_ancestor_rs"
+        },
+        "databricks": {
+          "person": "CDM_PERSON_db",
+          "observation_period": "CDM_OBSERVATION_PERIOD_db",
+          "visit_occurrence": "visit_occurrence_db",
+          "condition_occurrence": "CDM_CONDITION_OCCURRENCE_db",
+          "drug_exposure": "CDM_DRUG_EXPOSURE_db",
+          "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_db",
+          "device_exposure": "CDM_DEVICE_EXPOSURE_db",
+          "measurement": "CDM_MEASUREMENT_db",
+          "observation": "CDM_OBSERVATION_db",
+          "death": "CDM_DEATH_db",
+          "location": "CDM_LOCATION_db",
+          "drug_era": "CDM_DRUG_ERA_db",
+          "condition_era": "CDM_CONDITION_ERA_db",
+          "concept": "concept_for_db",
+          "concept_ancestor": "concept_ancestor_db"
+        },
+        "snowflake": {
+          "person": "CDM_PERSON_sf",
+          "observation_period": "CDM_OBSERVATION_PERIOD_sf",
+          "visit_occurrence": "visit_occurrence_sf",
+          "condition_occurrence": "CDM_CONDITION_OCCURRENCE_sf",
+          "drug_exposure": "CDM_DRUG_EXPOSURE_sf",
+          "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_sf",
+          "device_exposure": "CDM_DEVICE_EXPOSURE_sf",
+          "measurement": "CDM_MEASUREMENT_sf",
+          "observation": "CDM_OBSERVATION_sf",
+          "death": "CDM_DEATH_sf",
+          "location": "CDM_LOCATION_sf",
+          "drug_era": "CDM_DRUG_ERA_sf",
+          "condition_era": "CDM_CONDITION_ERA_sf",
+          "concept": "concept_sf",
+          "concept_ancestor": "concept_ancestor_sf"
+        }
+      }
+    },
+    {
+      "key": "RWD1KDATAPREPDEMO",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "1K",
+      "connections": [
+        "dataiku-managed-storage"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "demo-installer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Superseded by PREP_RWD_S3_1K; retire in D3 step 4",
+      "omop_sets": {
+        "s3": {
+          "person": "CDM_PERSON_1k",
+          "observation_period": "CDM_OBSERVATION_PERIOD_1k",
+          "visit_occurrence": "visit_occurrence_revised",
+          "condition_occurrence": "CDM_CONDITION_OCCURRENCE_1k",
+          "drug_exposure": "CDM_DRUG_EXPOSURE_1k",
+          "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_1k",
+          "device_exposure": "CDM_DEVICE_EXPOSURE_1k",
+          "measurement": "CDM_MEASUREMENT_1k",
+          "observation": "CDM_OBSERVATION_1k",
+          "death": "CDM_DEATH_1k",
+          "location": "CDM_LOCATION_1k",
+          "drug_era": "CDM_DRUG_ERA_1k",
+          "condition_era": "CDM_CONDITION_ERA_1k",
+          "concept": "concept",
+          "concept_ancestor": "concept_ancestor"
+        }
+      }
+    },
+    {
+      "key": "SYNPUFOMOP1KREDSHIFTDATAPREPARATION",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "1K",
+      "connections": [
+        "redshift-solutions"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Superseded by PREP_RWD_RS_1K; retire in D3 step 4",
+      "omop_sets": {
+        "redshift": {
+          "person": "CDM_PERSON_1k",
+          "observation_period": "CDM_OBSERVATION_PERIOD_1k",
+          "visit_occurrence": "visit_occurrence_revised",
+          "condition_occurrence": "CDM_CONDITION_OCCURRENCE_1k",
+          "drug_exposure": "CDM_DRUG_EXPOSURE_1k",
+          "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_1k",
+          "device_exposure": "CDM_DEVICE_EXPOSURE_1k",
+          "measurement": "CDM_MEASUREMENT_1k",
+          "observation": "CDM_OBSERVATION_1k",
+          "death": "CDM_DEATH_1k",
+          "location": "CDM_LOCATION_1k",
+          "drug_era": "CDM_DRUG_ERA_1k",
+          "condition_era": "CDM_CONDITION_ERA_1k",
+          "concept": "concept_db",
+          "concept_ancestor": "concept_ancestor"
+        }
+      }
+    },
+    {
+      "key": "SYNPUFOMOP100KDATAPREPARATION",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "100K",
+      "connections": [
+        "dataiku-managed-storage",
+        "managed-snowflake",
+        "redshift-solutions"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "solution-developer",
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Rebuild as PREP_RWD_S3_100K; retire in D3 step 5",
+      "omop_sets": {
+        "snowflake": {
+          "person": "person_100k_sf",
+          "observation_period": "observation_period_100k_sf",
+          "visit_occurrence": "visit_occurrence_100k_sf",
+          "condition_occurrence": "condition_occurrence_100k_sf",
+          "drug_exposure": "drug_exposure_100k_sf",
+          "procedure_occurrence": "procedure_occurrence_100k_sf",
+          "device_exposure": "device_exposure_100k_sf",
+          "measurement": "measurement_100k_sf",
+          "observation": "observation_100k_sf",
+          "death": "death_100k_sf",
+          "location": "location_100k_sf",
+          "drug_era": "drug_era_100k_sf",
+          "condition_era": "condition_era_100k_sf",
+          "concept": "concept_sf",
+          "concept_ancestor": "concept_ancestor_sf"
+        },
+        "s3": {
+          "person": "person_100k_db",
+          "observation_period": "observation_period_100k_db",
+          "visit_occurrence": "visit_occurrence_100k_db",
+          "condition_occurrence": "condition_occurrence_100k_db",
+          "drug_exposure": "drug_exposure_100k_db",
+          "procedure_occurrence": "procedure_occurrence_100k_db",
+          "device_exposure": "device_exposure_100k_db",
+          "measurement": "measurement_100k_db",
+          "observation": "observation_100k_db",
+          "death": "death_100k_db",
+          "location": "location_prepared",
+          "drug_era": "drug_era_100k_db",
+          "condition_era": "condition_era_100k_db",
+          "concept": "concept",
+          "concept_ancestor": null
+        }
+      }
+    },
+    {
+      "key": "SYNPUFOMOP23DATAPREPARATION",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "2.3M",
+      "connections": [
+        "dataiku-managed-storage"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "demo-installer",
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Rebuild as PREP_RWD_S3_2M3; retire in D3 step 5, keeping the lzo folder until PREP_RWD_S3_2M3 is verified",
+      "omop_sets": {
+        "s3": {
+          "person": "person_2_3_pc_db",
+          "observation_period": "observation_period_2_3_pc_db",
+          "visit_occurrence": "visit_occurrence_2_3_pc_db",
+          "condition_occurrence": "condition_occurrence_2_3_pc_db",
+          "drug_exposure": "drug_exposure_2_3_pc_db",
+          "procedure_occurrence": "procedure_occurrence_2_3_pc_db",
+          "device_exposure": "device_exposure_2_3_pc_db",
+          "measurement": "measurement_occurrence_2_3_pc_db",
+          "observation": "observation_2_3_pc_db",
+          "death": "death_2_3_pc_db",
+          "location": "location_2_3_pc_db",
+          "drug_era": "drug_era_2_3_pc_db",
+          "condition_era": "condition_era_2_3_pc_db",
+          "concept": "concept_db",
+          "concept_ancestor": "concept_ancestor_db"
+        }
+      }
+    },
+    {
+      "key": "DATABRICKSSYNPUFOMOP23DATAPREPERATION",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "2.3M",
+      "connections": [
+        "bs-databricks-per-user"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "No Databricks variant is needed at 2.3M; retire in D3 step 3",
+      "omop_sets": {
+        "databricks": {
+          "person": "person_db",
+          "observation_period": "observation_period_db",
+          "visit_occurrence": "visits_occurrence_db",
+          "condition_occurrence": "condition_occurrence_db",
+          "drug_exposure": "drug_exposure_db",
+          "procedure_occurrence": "procedure_occurrence_db",
+          "device_exposure": "device_exposure_db",
+          "measurement": "measurement_occurrence_db",
+          "observation": "observation_db",
+          "death": "death_db",
+          "location": "location_db",
+          "drug_era": "drug_era_db",
+          "condition_era": "condition_era_db",
+          "concept": "concept_db",
+          "concept_ancestor": "concept_ancestor_db"
+        }
+      }
+    },
+    {
+      "key": "DEMO_SF_OMOP2M_DATAPREP",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "2.3M",
+      "connections": [
+        "managed-snowflake"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "demo-installer"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Replaced by PREP_RWD_SF_2M3; retire in D3 step 2",
+      "omop_sets": {
+        "snowflake": {
+          "person": "person_2_3_pc_db",
+          "observation_period": "observation_period_2_3_pc_db",
+          "visit_occurrence": "computed_visit_occurrence_stacked",
+          "condition_occurrence": "condition_occurrence_2_3_pc_db",
+          "drug_exposure": "drug_exposure_2_3_pc_db",
+          "procedure_occurrence": "procedure_occurrence_2_3_pc_db",
+          "device_exposure": "device_exposure_2_3_pc_db",
+          "measurement": "measurement_occurrence_2_3_pc_db",
+          "observation": "observation_2_3_pc_db",
+          "death": "death_2_3_pc_db",
+          "location": "location_2_3_pc_db",
+          "drug_era": "drug_era_2_3_pc_db",
+          "condition_era": "condition_era_2_3_pc_db",
+          "concept": "concept_db",
+          "concept_ancestor": "concept_ancestor_db"
+        }
+      }
+    },
+    {
+      "key": "SOL_RWD_COHORT_DISCOVERY",
+      "part": 2,
+      "role": "release",
+      "sample_size": "1K",
+      "connections": [
+        "managed-snowflake"
+      ],
+      "upstream": [
+        "SYNPUFOMOP1KDATAPREPRWDV11"
+      ],
+      "owner": "solution",
+      "personas": [
+        "biomedical-informaticist",
+        "clinical-researcher"
+      ],
+      "library": {
+        "python/solution": {
+          "branch": "v1-1-1",
+          "hash": "329ff1cc3fc82258995ac247dad3e83ea889154e"
+        },
+        "python/ds_common": {
+          "branch": "v2-3-1",
+          "hash": "7c6d6c7a29bc4f0424d31289d84457e9e42c91bb"
+        }
+      },
+      "lifecycle": "active",
+      "decision": "Keep as the release reference; repoint to PREP_RWD_SF_1K and test on the DB and RS 1K variants",
+      "omop_sets": {}
+    },
+    {
+      "key": "DEMO_SF_RWD",
+      "part": 2,
+      "role": "demo",
+      "sample_size": "2.3M",
+      "connections": [
+        "managed-snowflake"
+      ],
+      "upstream": [
+        "DEMO_SF_OMOP2M_DATAPREP"
+      ],
+      "owner": "solution",
+      "personas": [
+        "biomedical-informaticist",
+        "clinical-researcher",
+        "account-team"
+      ],
+      "library": {
+        "python/solution": {
+          "branch": "revise-get-sql-table-path",
+          "hash": "2000e29"
+        },
+        "python/ds_common": {
+          "branch": "v2-3-0",
+          "hash": "6cdbd67"
+        }
+      },
+      "lifecycle": "active",
+      "decision": "Upgrade v1.0 to v1.1 (D1), read PREP_RWD_SF_2M3 and take over the 45-script cohort library",
+      "omop_sets": {}
+    },
+    {
+      "key": "DEMO_SF_RWE",
+      "part": 3,
+      "role": "demo",
+      "sample_size": "2.3M",
+      "connections": [
+        "managed-snowflake"
+      ],
+      "upstream": [
+        "DEMO_DB_RWD2"
+      ],
+      "owner": "rwe-demo",
+      "personas": [
+        "epidemiologist-heor",
+        "biostatistician",
+        "account-team"
+      ],
+      "library": null,
+      "lifecycle": "active",
+      "decision": "Keep; repoint its 9 inputs from DEMO_DB_RWD2 to DEMO_SF_RWD (D2)",
+      "omop_sets": {}
+    },
+    {
+      "key": "DEMO_DB_RWD2",
+      "part": 2,
+      "role": "demo",
+      "sample_size": "2.3M",
+      "connections": [
+        "bs-snowflake"
+      ],
+      "upstream": [],
+      "owner": "solution",
+      "personas": [
+        "epidemiologist-heor"
+      ],
+      "library": null,
+      "lifecycle": "retiring",
+      "decision": "Duplicate of the solution; retire last among the demos (D3 step 1), after D2 and after saving the cohort library and log sample",
+      "omop_sets": {}
+    },
+    {
+      "key": "TMP_RWD_SF_COLCASE_TEST",
+      "part": 2,
+      "role": "scratch",
+      "sample_size": null,
+      "connections": [
+        "bs-snowflake",
+        "managed-snowflake"
+      ],
+      "upstream": [],
+      "owner": "solution",
+      "personas": [],
+      "library": null,
+      "lifecycle": "deleted",
+      "decision": "Scratch project for the 2026-09-23 column-case test. The plan keeps it until the Workstream C fix lands, but it was already gone on 2026-10-13; the regression check must be rebuilt from the test table in the migration plan",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_S3_1K",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "1K",
+      "connections": [
+        "dataiku-managed-storage"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "solution-developer",
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B1: duplicate SYNPUFOMOP1KDATAPREPRWDV11, keep the input and OMOP CDM zones",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_S3_100K",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "100K",
+      "connections": [
+        "dataiku-managed-storage"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "solution-developer",
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B1: 1K workflow pointed at the 100K raw files",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_S3_2M3",
+      "part": 1,
+      "role": "canonical",
+      "sample_size": "2.3M",
+      "connections": [
+        "dataiku-managed-storage"
+      ],
+      "upstream": [],
+      "owner": "data-foundation",
+      "personas": [
+        "demo-installer",
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B1: duplicate SYNPUFOMOP23DATAPREPARATION, fix types and map CDM v5.2 to v5.3",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_SF_1K",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "1K",
+      "connections": [],
+      "upstream": [
+        "PREP_RWD_S3_1K"
+      ],
+      "owner": "data-foundation",
+      "personas": [
+        "solution-developer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B3: sync-only Snowflake variant (connection to be decided)",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_DB_1K",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "1K",
+      "connections": [],
+      "upstream": [
+        "PREP_RWD_S3_1K"
+      ],
+      "owner": "data-foundation",
+      "personas": [
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B3: sync-only Databricks variant on a service-account connection",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_RS_1K",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "1K",
+      "connections": [
+        "redshift-solutions"
+      ],
+      "upstream": [
+        "PREP_RWD_S3_1K"
+      ],
+      "owner": "data-foundation",
+      "personas": [
+        "qa-test-engineer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B3: sync-only Redshift variant",
+      "omop_sets": {}
+    },
+    {
+      "key": "PREP_RWD_SF_2M3",
+      "part": 1,
+      "role": "variant",
+      "sample_size": "2.3M",
+      "connections": [],
+      "upstream": [
+        "PREP_RWD_S3_2M3"
+      ],
+      "owner": "data-foundation",
+      "personas": [
+        "demo-installer"
+      ],
+      "library": null,
+      "lifecycle": "planned",
+      "decision": "Workstream B3: sync-only Snowflake variant feeding DEMO_SF_RWD",
+      "omop_sets": {}
+    }
+  ]
+}

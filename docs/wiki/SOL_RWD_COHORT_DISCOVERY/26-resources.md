@@ -1,0 +1,3 @@
+
+ 1. CMS 2008-2010 Data Entrepreneurs’ Synthetic Public Use File (DE-SynPUF) in OMOP Common Data Model was accessed on November 2024 from https://registry.opendata.aws/cmsdesynpuf-omop with [License](https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-claims-synthetic-public-use-files/cms-2008-2010-data-entrepreneurs-synthetic-public-use-file-de-synpuf).
+ 2. OHDSI [Software's (Atlas, Athena,  FeatureExtraction)](https://github.com/OHDSI) licenses are under Apache License 2.0.

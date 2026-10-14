@@ -2,6 +2,11 @@
 
 Sep 23, 2026 · @Li-Heng Fu
 
+> **Lifecycle:** Planning (active until phase 5 closes) · **Part:** all · **Audience:** asset owners and
+> contributors executing the migration · **Authority:** per-project decisions, step order and gates ·
+> **Update when:** a step completes, a gate changes or an open question is decided. Live state is in
+> `.index/`, not here.
+
 ## Summary and target end state
 
 The suite goes from 11 in-scope projects to 10. Three S3 canonical projects and four connection variants replace seven prep projects, and `DEMO_DB_RWD2` is retired once `DEMO_SF_RWE` no longer depends on it.
@@ -77,6 +82,14 @@ tools/push_wiki.py            # drift report by default, --push to write
 6. Wire `tools/build_index.py --check` into a pre-commit hook and GitHub Actions.
 
 **Done when:** the index regenerates from DSS in one command, and CI fails on a missing project, a failing schema row, or a broken share.
+
+**Status (2026-10-13): steps 1–6 built.** `registry/projects.json` covers the 12 projects above plus the 7 planned `PREP_RWD_*` keys; `tools/build_index.py --refresh` regenerates `.index/` from DSS; `--check` runs in CI and in `.githooks/pre-commit`. The 13 open problems are baselined in `registry/known_issues.json`, each with the step that clears it; the baseline only shrinks. Decisions recorded: `DEC-RWD-001` (uppercase normalisation), `002` (variant layout) and `003` (schema contract). The `2M3` naming did not meet the register's admission rule and stays in this plan. Differences from the 2026-09-23 audit:
+
+- `SOL_RWD_COHORT_DISCOVERY` is not wired to `SYNPUFOMOP1KDATAPREPRWDV11` as the code sees it: its `local` variables, which the solution code reads, name the non-existent `SNOWFLAKESYNPUFOMOP23DATAPREPERATION`.
+- `DEMO_SF_RWD`'s `local` scope overrides 5 table variables (`location`, `drug_era`, `condition_era`, `concept`, `concept_ancestor`) with names that do not exist in its prep project.
+- The compliant concept table in `SYNPUFOMOP1KREDSHIFTDATAPREPARATION` is `concept_db`; `concept` has string dates.
+- With a refreshed credential, both Databricks sets are built (15/15). The 1K set passes v1.1; the 2.3M set fails on the legacy `date` type, as audited.
+- `TMP_RWD_SF_COLCASE_TEST` no longer exists, so the Workstream C regression check has to be rebuilt from the test table below.
 
 ## Workstream B — Rebuild the data prep layer
 

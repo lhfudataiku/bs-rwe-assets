@@ -2,6 +2,10 @@
 
 Sep 23, 2026 · @Li-Heng Fu
 
+> **Lifecycle:** Canonical · **Part:** all · **Audience:** asset owners, account team, solution and RWE leads ·
+> **Authority:** what the revision covers, why, and for whom · **Update when:** scope, personas,
+> owners or success criteria change.
+
 ## Context and problem
 
 The RWD/RWE assets on the design instance have drifted apart: the released solution is on v1.1, the Snowflake demo suite is on v1.0, and three of the seven SYNPUF OMOP data prep projects fail the v1.1 schema check.

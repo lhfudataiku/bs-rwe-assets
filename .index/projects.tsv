@@ -1,0 +1,20 @@
+key	part	role	lifecycle	sample_size	on_dss	name	owner	owner_name	prep_key_standard	prep_key_local	main_connection	solution_lib	commons_lib	datasets	wiki_articles	wiki_version	omop_sets
+SYNPUFOMOP1KDATAPREPRWDV11	1	canonical	retiring	1K	yes	SYNPUF OMOP 1k Data Prep RWD v.1.1	data-foundation	unassigned						91	0		databricks,redshift,s3,snowflake
+RWD1KDATAPREPDEMO	1	canonical	retiring	1K	yes	RWD 1k Data Prep Demo	data-foundation	unassigned						42	0		s3
+SYNPUFOMOP1KREDSHIFTDATAPREPARATION	1	variant	retiring	1K	yes	SYNPUF OMOP 1k Redshift Data Preparation	data-foundation	unassigned						42	0		redshift
+SYNPUFOMOP100KDATAPREPARATION	1	canonical	retiring	100K	yes	SYNPUF OMOP 100K Data Preparation	data-foundation	unassigned						66	0		s3,snowflake
+SYNPUFOMOP23DATAPREPARATION	1	canonical	retiring	2.3M	yes	SYNPUF OMOP 2.3% Data Preparation	data-foundation	unassigned						89	0		s3
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	1	variant	retiring	2.3M	yes	Databricks SYNPUF OMOP 2.3% Data Preperation	data-foundation	unassigned						24	0		databricks
+DEMO_SF_OMOP2M_DATAPREP	1	variant	retiring	2.3M	yes	(Snowflake) SYNPUF OMOP 2M Data Prep	data-foundation	unassigned						101	4	0.1.0	snowflake
+SOL_RWD_COHORT_DISCOVERY	2	release	active	1K	yes	RWD Cohort Discovery	solution	unassigned	SYNPUFOMOP1KDATAPREPRWDV11	SNOWFLAKESYNPUFOMOP23DATAPREPERATION	managed-snowflake	v1-1-1@329ff1c	v2-3-1@7c6d6c7	66	28	1.1.0	
+DEMO_SF_RWD	2	demo	active	2.3M	yes	(SNOWFLAKE) RWD Cohort Discovery	solution	unassigned	DEMO_SF_OMOP2M_DATAPREP		managed-snowflake	revise-get-sql-table-path@2000e29	v2-3-0@6cdbd67	66	28	0.1.0	
+DEMO_SF_RWE	3	demo	active	2.3M	yes	(Snowflake) Real World Evidence	rwe-demo	unassigned						46	5	0.1.0	
+DEMO_DB_RWD2	2	demo	retiring	2.3M	yes	RWD Cohort Discovery	solution	unassigned	SNOWFLAKESYNPUFOMOP23DATAPREPERATION	SNOWFLAKESYNPUFOMOP23DATAPREPERATION	bs-snowflake	v1-1-1@329ff1c	v2-3-1@7c6d6c7	66	28	1.1.0	
+TMP_RWD_SF_COLCASE_TEST	2	scratch	deleted		no		solution	unassigned									
+PREP_RWD_S3_1K	1	canonical	planned	1K	no		data-foundation	unassigned									
+PREP_RWD_S3_100K	1	canonical	planned	100K	no		data-foundation	unassigned									
+PREP_RWD_S3_2M3	1	canonical	planned	2.3M	no		data-foundation	unassigned									
+PREP_RWD_SF_1K	1	variant	planned	1K	no		data-foundation	unassigned									
+PREP_RWD_DB_1K	1	variant	planned	1K	no		data-foundation	unassigned									
+PREP_RWD_RS_1K	1	variant	planned	1K	no		data-foundation	unassigned									
+PREP_RWD_SF_2M3	1	variant	planned	2.3M	no		data-foundation	unassigned									

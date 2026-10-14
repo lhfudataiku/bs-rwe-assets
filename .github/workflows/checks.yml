@@ -1,0 +1,28 @@
+name: checks
+
+# The suite's guarantees are generated: the .index/ tables, the issue baseline and the agent
+# instruction copies. CI rebuilds them from the committed DSS snapshot, so it needs no DSS
+# credentials. A change in DSS itself only shows up after someone runs --refresh and commits.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      # Fails on a stale index, a NEW issue (missing project, failing schema row, broken share),
+      # or a baseline entry that is fixed but not yet deleted.
+      - name: Index and issue baseline
+        run: python3 tools/build_index.py --check
+      - name: Harness copies
+        run: python3 tools/sync_harness.py --check
+      - name: Unit tests
+        run: python3 -m unittest discover -s tools/tests

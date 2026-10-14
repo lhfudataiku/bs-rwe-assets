@@ -1,0 +1,5 @@
+#!/bin/sh
+# Enable once per clone: git config core.hooksPath .githooks
+set -e
+python3 tools/build_index.py --check
+python3 tools/sync_harness.py --check
