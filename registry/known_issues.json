@@ -1,7 +1,7 @@
 {
   "MAPPING_BROKEN:DEMO_SF_RWD": {
     "plan": "D1 step 4",
-    "note": "Reads the unbuilt DEMO_SF_OMOP2M_DATAPREP tables; its local scope also overrides 5 table variables with names that do not exist there. Cleared when D1 points it at PREP_RWD_SF_2M3."
+    "note": "Reads the unbuilt DEMO_SF_OMOP2M_DATAPREP tables; its local scope also overrides 5 table variables with names that do not exist there. Cleared when D1 recreates it on DEMO_SF_PREP_OMOP_2M3."
   },
   "PREP_KEY_DANGLING:DEMO_DB_RWD2:local": {
     "plan": "D3 step 1",
@@ -21,7 +21,7 @@
   },
   "SCHEMA_FAIL:DEMO_SF_OMOP2M_DATAPREP:snowflake": {
     "plan": "D3 step 2",
-    "note": "Legacy date type. Replaced by PREP_RWD_SF_2M3, then retired."
+    "note": "Legacy date type. Replaced by DEMO_SF_PREP_OMOP_2M3, then retired."
   },
   "SCHEMA_FAIL:SYNPUFOMOP23DATAPREPARATION:s3": {
     "plan": "B1 (PREP_RWD_S3_2M3), then D3 step 5",
@@ -50,5 +50,9 @@
   "UNBUILT:SYNPUFOMOP1KDATAPREPRWDV11:snowflake": {
     "plan": "B3 (PREP_RWD_SF_1K), then D3 step 5",
     "note": "Only visit_occurrence_sf (bs-snowflake) has data; the 14 managed-snowflake tables do not exist."
+  },
+  "UNBUILT:SYNPUFOMOP23DATAPREPARATION:s3": {
+    "plan": "B1 (PREP_RWD_S3_2M3), then D3 step 5",
+    "note": "Found 2026-11-04, after build_index.py began reporting a managed file dataset whose root path does not exist as unbuilt rather than unknown. location has never been built on S3 (snapshot 2026-10-16). PREP_RWD_S3_2M3 must build all 15 tables; this project is retired after."
   }
 }

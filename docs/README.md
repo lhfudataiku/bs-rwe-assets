@@ -13,7 +13,7 @@ below for scope, method and rationale.
 | | |
 |---|---|
 | [`project-scoping.md`](project-scoping.md) | The three parts and the index: scope, business value, personas, owners, success criteria |
-| [`migration-revision-plan.md`](migration-revision-plan.md) | Per-project decisions, the 2026-09-23 audit, Workstreams A–D, phases and gates |
+| [`migration-revision-plan.md`](migration-revision-plan.md) | Per-project decisions, the 2026-09-23 audit, Workstreams A–E, phases and gates |
 | [`decisions/DECISION_REGISTER.md`](decisions/DECISION_REGISTER.md) | Durable choices only (`DEC-RWD-###`), with the admission rule |
 
 ## Part 1 — OMOP Data Foundation

@@ -2,7 +2,8 @@
 
 Suite repository for the RWD/RWE solution demo assets on the Dataiku design instance: the OMOP data
 prep projects (Part 1), the RWD Cohort Discovery solution and its demo copy (Part 2), and the Real
-World Evidence demo (Part 3). Solution code lives in `dataiku/bs-rwd-cohort-discovery`, not here.
+World Evidence demo (Part 3). Solution code lives in `dataiku/bs-rwd-cohort-discovery` until
+Workstream E of the migration plan moves it into this repo.
 Route documentation tasks through `docs/README.md`.
 
 ## Route before reading
@@ -28,8 +29,9 @@ Route documentation tasks through `docs/README.md`.
 - `registry/known_issues.json` only shrinks. Delete an entry when the index shows it fixed; add one
   only when the user accepts a newly found problem as migration work, naming the plan step.
 - Add to the decision register only when its admission rule is met. Open questions stay in the plan.
-- New project keys follow `PREP_RWD_<storage>_<size>` (storage `S3`, `SF`, `DB`, `RS`; size `1K`,
-  `100K`, `2M3`).
+- New prep project keys follow `PREP_RWD_<storage>_<size>` (storage `S3`, `SF`, `DB`, `RS`; size `1K`,
+  `100K`, `2M3`). The demo suite is the exception: `DEMO_SF_PREP_OMOP_2M3`,
+  `DEMO_SF_RWD`, `DEMO_SF_RWE`.
 
 ## Traps that return plausible results
 
@@ -46,6 +48,11 @@ Route documentation tasks through `docs/README.md`.
   `--check` and cannot be baselined. Rerun `--reprobe` later before reading anything into them.
 - Never use `dku dataset count` on a large non-SQL dataset: without a cached metric it starts a
   server-side computation that outlives the client timeout and stalls later reads of that project.
+- The solution imports in-database: its prep tables must sit on the same type of SQL connection as
+  `main_connection` (Snowflake prep tables for a Snowflake solution). Never test it against an S3 or
+  filesystem prep set: a project whose datasets were reset to filesystem storage then runs the Atlas
+  SQL filters in the DSS engine ("Incorrect formula"), and on Snowflake the S3 vocabulary is copied
+  by row-by-row JDBC inserts (72M `concept_ancestor` rows, about 5 hours).
 - The legacy DSS `date` type fails the v1.1 check. `bigint` is read as `int` and `double` as `float`,
   as the solution's `check_schema.py` does.
 

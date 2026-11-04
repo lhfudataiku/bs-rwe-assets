@@ -10,11 +10,12 @@ SOL_RWD_COHORT_DISCOVERY	2	release	active	1K	yes	RWD Cohort Discovery	solution	u
 DEMO_SF_RWD	2	demo	active	2.3M	yes	(SNOWFLAKE) RWD Cohort Discovery	solution	unassigned	DEMO_SF_OMOP2M_DATAPREP		managed-snowflake	revise-get-sql-table-path@2000e29	v2-3-0@6cdbd67	66	28	0.1.0	
 DEMO_SF_RWE	3	demo	active	2.3M	yes	(Snowflake) Real World Evidence	rwe-demo	unassigned						46	5	0.1.0	
 DEMO_DB_RWD2	2	demo	retiring	2.3M	yes	RWD Cohort Discovery	solution	unassigned	SNOWFLAKESYNPUFOMOP23DATAPREPERATION	SNOWFLAKESYNPUFOMOP23DATAPREPERATION	bs-snowflake	v1-1-1@329ff1c	v2-3-1@7c6d6c7	66	28	1.1.0	
-TMP_RWD_SF_COLCASE_TEST	2	scratch	deleted		no		solution	unassigned									
+TMP_RWD_SF_COLCASE_TEST	2	scratch	active		yes	TMP RWD SF column-case test	solution	unassigned						5	0		
+TMP_RWD_SOL_V112_TEST	2	scratch	active	1K	yes	TMP RWD solution v1.1.2 test	solution	unassigned	SYNPUFOMOP1KDATAPREPRWDV11	SYNPUFOMOP1KDATAPREPRWDV11	bs-snowflake	v1-1-2@fdfda6f	v2-3-1@7c6d6c7	66	28	1.1.0	
 PREP_RWD_S3_1K	1	canonical	planned	1K	no		data-foundation	unassigned									
 PREP_RWD_S3_100K	1	canonical	planned	100K	no		data-foundation	unassigned									
 PREP_RWD_S3_2M3	1	canonical	planned	2.3M	no		data-foundation	unassigned									
 PREP_RWD_SF_1K	1	variant	planned	1K	no		data-foundation	unassigned									
 PREP_RWD_DB_1K	1	variant	planned	1K	no		data-foundation	unassigned									
 PREP_RWD_RS_1K	1	variant	planned	1K	no		data-foundation	unassigned									
-PREP_RWD_SF_2M3	1	variant	planned	2.3M	no		data-foundation	unassigned									
+DEMO_SF_PREP_OMOP_2M3	1	variant	planned	2.3M	no		data-foundation	unassigned									

@@ -172,6 +172,8 @@ def probe(project, name, dtype):
     if ok and isinstance(out, list):
         return {"built": "yes" if out else "empty", "rows": rows if out else 0,
                 "source": "metric" if rows is not None else "head", "error": ""}
+    if "Root path of the dataset does not exist" in out:  # managed file dataset never built
+        return {"built": "no", "rows": None, "source": "head", "error": short_error(out)}
     return {"built": "unknown", "rows": None, "source": "head", "error": short_error(out)}
 
 

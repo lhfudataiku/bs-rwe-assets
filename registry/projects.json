@@ -322,7 +322,7 @@
       ],
       "library": null,
       "lifecycle": "retiring",
-      "decision": "Replaced by PREP_RWD_SF_2M3; retire in D3 step 2",
+      "decision": "Replaced by DEMO_SF_PREP_OMOP_2M3; retire in D3 step 2",
       "omop_sets": {
         "snowflake": {
           "person": "person_2_3_pc_db",
@@ -370,7 +370,7 @@
         }
       },
       "lifecycle": "active",
-      "decision": "Keep as the release reference; repoint to PREP_RWD_SF_1K and test on the DB and RS 1K variants",
+      "decision": "Keep as the release reference; revise in Workstream E (library from this repo, Project Setup errors fixed), test on every SQL PREP_RWD_* copy and end on PREP_RWD_SF_1K",
       "omop_sets": {}
     },
     {
@@ -401,7 +401,7 @@
         }
       },
       "lifecycle": "active",
-      "decision": "Upgrade v1.0 to v1.1 (D1), read PREP_RWD_SF_2M3 and take over the 45-script cohort library",
+      "decision": "Recreate from the released SOL_RWD_COHORT_DISCOVERY after Workstream E (D1), configured through Project Setup to read DEMO_SF_PREP_OMOP_2M3; take over the 45-script cohort library",
       "omop_sets": {}
     },
     {
@@ -450,15 +450,37 @@
       "role": "scratch",
       "sample_size": null,
       "connections": [
-        "bs-snowflake",
-        "managed-snowflake"
+        "bs-snowflake"
       ],
       "upstream": [],
       "owner": "solution",
       "personas": [],
       "library": null,
-      "lifecycle": "deleted",
-      "decision": "Scratch project for the 2026-09-23 column-case test. The plan keeps it until the Workstream C fix lands, but it was already gone on 2026-10-13; the regression check must be rebuilt from the test table in the migration plan",
+      "lifecycle": "active",
+      "decision": "Recreated 2026-10-15 (the original was deleted early): Workstream C regression tests 0-4 and 6 on bs-snowflake. Delete after phase 2 closes (D3 step 6)",
+      "omop_sets": {}
+    },
+    {
+      "key": "TMP_RWD_SOL_V112_TEST",
+      "part": 2,
+      "role": "scratch",
+      "sample_size": "1K",
+      "connections": [
+        "bs-snowflake"
+      ],
+      "upstream": [
+        "SYNPUFOMOP1KDATAPREPRWDV11"
+      ],
+      "owner": "solution",
+      "personas": [],
+      "library": {
+        "python/solution": {
+          "branch": "v1-1-2",
+          "hash": "fdfda6f"
+        }
+      },
+      "lifecycle": "active",
+      "decision": "Duplicate of SOL_RWD_COHORT_DISCOVERY on library v1-1-2 for the Workstream C tests. Its local variables point at the 1K S3 set, which the solution does not support (it imports in-database); repoint to PREP_RWD_SF_1K for the remaining Snowflake test, then delete",
       "omop_sets": {}
     },
     {
@@ -533,7 +555,7 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Snowflake variant (connection to be decided)",
+      "decision": "Workstream B3: sync-only Snowflake variant of PREP_RWD_S3_1K (DEC-RWD-002; connection to be decided)",
       "omop_sets": {}
     },
     {
@@ -551,7 +573,7 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Databricks variant on a service-account connection",
+      "decision": "Workstream B3: sync-only Databricks variant of PREP_RWD_S3_1K on a service-account connection (DEC-RWD-002)",
       "omop_sets": {}
     },
     {
@@ -571,11 +593,11 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Redshift variant",
+      "decision": "Workstream B3: sync-only Redshift variant of PREP_RWD_S3_1K (DEC-RWD-002)",
       "omop_sets": {}
     },
     {
-      "key": "PREP_RWD_SF_2M3",
+      "key": "DEMO_SF_PREP_OMOP_2M3",
       "part": 1,
       "role": "variant",
       "sample_size": "2.3M",
@@ -589,7 +611,7 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Snowflake variant feeding DEMO_SF_RWD",
+      "decision": "Workstream B3: full copy of PREP_RWD_S3_2M3 on Snowflake, the exception to DEC-RWD-002 (DEC-RWD-004); demo suite input for DEMO_SF_RWD",
       "omop_sets": {}
     }
   ]

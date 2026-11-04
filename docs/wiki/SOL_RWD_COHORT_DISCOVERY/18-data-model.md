@@ -13,6 +13,9 @@ We recommend that users conduct data preparation and feature engineering steps i
 | Date  | dateonly                                      | dateonly                                |
 | Datetime     | datetimenotz                                      | datetimenotz                                |
 
+## Column names
+Source column names may use any case: the schema check compares them case-insensitively. The "Import Datasets from DataPrep Project" step renames every column to **UPPERCASE** when it writes the tables into this project. This is required on Snowflake: the Atlas cohort SQL scripts and the Solution's recipes reference columns unquoted, which Snowflake resolves as uppercase, so lowercase (quoted) columns would fail with an "invalid identifier" error.
+
 
 
 

@@ -35,7 +35,7 @@ decision is superseded, never edited away: add the new record and fill both **Su
 - **Rationale:** Seven prep projects had drifted into at least two workflows, with copies of copies, and three fail the v1.1 schema check. A single transformation path per size means a failed solution run is a solution bug, not a data bug. Separate variant projects isolate sharing and can be dropped or rebuilt without touching the canonical layer.
 - **Alternatives rejected:** Connection variants as flow zones inside the canonical project, the layout `SYNPUFOMOP1KDATAPREPRWDV11` uses today. It couples every variant's build and permissions to the canonical project, and is how that project ended up with an unbuilt Snowflake zone.
 - **Evidence:** [Project scoping, Part 1](../project-scoping.md#part-1--omop-data-foundation); [migration plan, Workstream B](../migration-revision-plan.md#workstream-b--rebuild-the-data-prep-layer). Accepted with the migration plan on 2026-10-13.
-- **Consequences:** No transformation logic in a variant project. A canonical change is followed by rebuilding its variants. Consumers point `data_preparation_project_key` at a variant (or at the S3 project), never at a retired prep project.
+- **Consequences:** No transformation logic in a variant project. A canonical change is followed by rebuilding its variants. Consumers point `data_preparation_project_key` at a variant (or at the S3 project), never at a retired prep project. One exception: the demo suite's 2.3M Snowflake set is a full copy (DEC-RWD-004).
 - **Supersedes:** the seven overlapping prep projects listed in the migration plan.
 - **Superseded by:** —
 
@@ -47,6 +47,18 @@ decision is superseded, never edited away: add the new record and fill both **Su
 - **Rationale:** The legacy `date` type is why `SYNPUFOMOP23DATAPREPARATION`, `DATABRICKSSYNPUFOMOP23DATAPREPERATION` and `DEMO_SF_OMOP2M_DATAPREP` fail 13 of 15 tables. Making the solution's own check the contract, enforced by the index, stops the prep layer from drifting from the solution again.
 - **Alternatives rejected:** Relaxing the solution's schema check to accept `date`. The release and demo would then run on different column types, the drift this revision removes, and the legacy type carries a timezone where OMOP DATE has none.
 - **Evidence:** 2026-09-23 audit in the [migration plan](../migration-revision-plan.md#current-state-audit); `.index/schema_compliance.tsv`; `tools/vendor/cdm_schema.py`.
-- **Consequences:** CDM v5.2 sources (the 2.3M lzo files) are mapped to v5.3 columns in the canonical project. Ids that exceed 32-bit range stay `bigint`; the solution's check reads `bigint` as `int` and must keep doing so (Workstream C, change 4). A change to `CDM_SCHEMA` in the solution repo is re-vendored here in the same release.
+- **Consequences:** CDM v5.2 sources (the 2.3M lzo files) are mapped to v5.3 columns in the canonical project. Prep projects may store ids as `bigint`; the solution's check reads `bigint` as `int` and its import narrows them to `int`, as its Data Model article documents. The largest ids at 2.3M (289,182,385) and in the Athena vocabulary (46,369,944) fit in `int`. A change to `CDM_SCHEMA` in the solution repo is re-vendored here in the same release.
+- **Supersedes:** —
+- **Superseded by:** —
+
+## DEC-RWD-004 — The demo suite's 2.3M prep project is a full copy of `PREP_RWD_S3_2M3`
+
+- **Date:** 2026-10-16
+- **Status:** accepted
+- **Decision:** `DEMO_SF_PREP_OMOP_2M3`, the 2.3M Snowflake set that was planned as `PREP_RWD_SF_2M3`, is a duplicate of `PREP_RWD_S3_2M3`: the same zones, recipes and dataset names, with its managed datasets on Snowflake. It is the one exception to DEC-RWD-002. `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K` stay sync-only variants.
+- **Rationale:** The demo suite (`DEMO_SF_PREP_OMOP_2M3`, `DEMO_SF_RWD`, `DEMO_SF_RWE`) has to stand alone, so that it can be bundled, moved or rebuilt without its S3 canonical project. A sync-only variant always needs its canonical project next to it at run time.
+- **Alternatives rejected:** A sync-only `PREP_RWD_SF_2M3` (DEC-RWD-002), which ties the demo suite to `PREP_RWD_S3_2M3` at run time. Full copies for every database project, which would give up the single transformation path per size that the solution's test variants rely on.
+- **Evidence:** Owner's revision of the [migration plan](../migration-revision-plan.md#workstream-b--rebuild-the-data-prep-layer) on 2026-10-16 (Workstream B).
+- **Consequences:** This one copy can drift from its canonical project. It passes the schema gate itself (DEC-RWD-003), and its row counts must equal those of `PREP_RWD_S3_2M3`. A change to `PREP_RWD_S3_2M3` is applied to the copy, which is then rebuilt. The copy reruns the 2.3M download and parse. DEC-RWD-001 still holds: the copy keeps lowercase columns.
 - **Supersedes:** —
 - **Superseded by:** —

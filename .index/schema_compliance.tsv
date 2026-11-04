@@ -1,17 +1,17 @@
 project	omop_set	omop_table	dataset	result	built	reason
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	person	CDM_PERSON_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	observation_period	CDM_OBSERVATION_PERIOD_db	pass	yes	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	person	CDM_PERSON_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	observation_period	CDM_OBSERVATION_PERIOD_db	pass	unknown	
 SYNPUFOMOP1KDATAPREPRWDV11	databricks	visit_occurrence	visit_occurrence_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	condition_occurrence	CDM_CONDITION_OCCURRENCE_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	drug_exposure	CDM_DRUG_EXPOSURE_db	pass	yes	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	condition_occurrence	CDM_CONDITION_OCCURRENCE_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	drug_exposure	CDM_DRUG_EXPOSURE_db	pass	unknown	
 SYNPUFOMOP1KDATAPREPRWDV11	databricks	procedure_occurrence	CDM_PROCEDURE_OCCURRENCE_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	device_exposure	CDM_DEVICE_EXPOSURE_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	measurement	CDM_MEASUREMENT_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	observation	CDM_OBSERVATION_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	death	CDM_DEATH_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	location	CDM_LOCATION_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	drug_era	CDM_DRUG_ERA_db	pass	yes	
-SYNPUFOMOP1KDATAPREPRWDV11	databricks	condition_era	CDM_CONDITION_ERA_db	pass	yes	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	device_exposure	CDM_DEVICE_EXPOSURE_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	measurement	CDM_MEASUREMENT_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	observation	CDM_OBSERVATION_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	death	CDM_DEATH_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	location	CDM_LOCATION_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	drug_era	CDM_DRUG_ERA_db	pass	unknown	
+SYNPUFOMOP1KDATAPREPRWDV11	databricks	condition_era	CDM_CONDITION_ERA_db	pass	unknown	
 SYNPUFOMOP1KDATAPREPRWDV11	databricks	concept	concept_for_db	pass	yes	
 SYNPUFOMOP1KDATAPREPRWDV11	databricks	concept_ancestor	concept_ancestor_db	pass	yes	
 SYNPUFOMOP1KDATAPREPRWDV11	redshift	person	CDM_PERSON_rs	pass	yes	
@@ -119,25 +119,25 @@ SYNPUFOMOP100KDATAPREPARATION	snowflake	drug_era	drug_era_100k_sf	pass	no
 SYNPUFOMOP100KDATAPREPARATION	snowflake	condition_era	condition_era_100k_sf	pass	no	
 SYNPUFOMOP100KDATAPREPARATION	snowflake	concept	concept_sf	pass	no	
 SYNPUFOMOP100KDATAPREPARATION	snowflake	concept_ancestor	concept_ancestor_sf	pass	no	
-SYNPUFOMOP23DATAPREPARATION	s3	person	person_2_3_pc_db	fail	unknown	birth_datetime date≠datetimenotz
-SYNPUFOMOP23DATAPREPARATION	s3	observation_period	observation_period_2_3_pc_db	fail	unknown	observation_period_start_date date≠dateonly; observation_period_end_date date≠dateonly
-SYNPUFOMOP23DATAPREPARATION	s3	visit_occurrence	visit_occurrence_2_3_pc_db	fail	unknown	visit_start_date date≠dateonly; visit_start_datetime date≠datetimenotz (optional); visit_end_date date≠dateonly; visit_end_datetime date≠datetimenotz (optional)
+SYNPUFOMOP23DATAPREPARATION	s3	person	person_2_3_pc_db	fail	yes	birth_datetime date≠datetimenotz
+SYNPUFOMOP23DATAPREPARATION	s3	observation_period	observation_period_2_3_pc_db	fail	yes	observation_period_start_date date≠dateonly; observation_period_end_date date≠dateonly
+SYNPUFOMOP23DATAPREPARATION	s3	visit_occurrence	visit_occurrence_2_3_pc_db	fail	yes	visit_start_date date≠dateonly; visit_start_datetime date≠datetimenotz (optional); visit_end_date date≠dateonly; visit_end_datetime date≠datetimenotz (optional)
 SYNPUFOMOP23DATAPREPARATION	s3	condition_occurrence	condition_occurrence_2_3_pc_db	fail	yes	condition_start_date date≠dateonly; condition_start_datetime date≠datetimenotz (optional); condition_end_date date≠dateonly; condition_end_datetime date≠datetimenotz (optional)
-SYNPUFOMOP23DATAPREPARATION	s3	drug_exposure	drug_exposure_2_3_pc_db	fail	unknown	drug_exposure_start_date date≠dateonly; drug_exposure_start_datetime date≠datetimenotz (optional); drug_exposure_end_date date≠dateonly; drug_exposure_end_datetime date≠datetimenotz (optional); verbatim_end_date date≠dateonly (optional)
-SYNPUFOMOP23DATAPREPARATION	s3	procedure_occurrence	procedure_occurrence_2_3_pc_db	fail	unknown	procedure_date date≠dateonly; procedure_datetime date≠datetimenotz (optional)
-SYNPUFOMOP23DATAPREPARATION	s3	device_exposure	device_exposure_2_3_pc_db	fail	unknown	device_exposure_start_date date≠dateonly; device_exposure_start_datetime date≠datetimenotz (optional); device_exposure_end_date date≠dateonly (optional); device_exposure_end_datetime date≠datetimenotz (optional)
-SYNPUFOMOP23DATAPREPARATION	s3	measurement	measurement_occurrence_2_3_pc_db	fail	unknown	measurement_date date≠dateonly; measurement_datetime date≠datetimenotz (optional)
-SYNPUFOMOP23DATAPREPARATION	s3	observation	observation_2_3_pc_db	fail	unknown	observation_date date≠dateonly; observation_datetime date≠datetimenotz (optional)
+SYNPUFOMOP23DATAPREPARATION	s3	drug_exposure	drug_exposure_2_3_pc_db	fail	yes	drug_exposure_start_date date≠dateonly; drug_exposure_start_datetime date≠datetimenotz (optional); drug_exposure_end_date date≠dateonly; drug_exposure_end_datetime date≠datetimenotz (optional); verbatim_end_date date≠dateonly (optional)
+SYNPUFOMOP23DATAPREPARATION	s3	procedure_occurrence	procedure_occurrence_2_3_pc_db	fail	yes	procedure_date date≠dateonly; procedure_datetime date≠datetimenotz (optional)
+SYNPUFOMOP23DATAPREPARATION	s3	device_exposure	device_exposure_2_3_pc_db	fail	yes	device_exposure_start_date date≠dateonly; device_exposure_start_datetime date≠datetimenotz (optional); device_exposure_end_date date≠dateonly (optional); device_exposure_end_datetime date≠datetimenotz (optional)
+SYNPUFOMOP23DATAPREPARATION	s3	measurement	measurement_occurrence_2_3_pc_db	fail	yes	measurement_date date≠dateonly; measurement_datetime date≠datetimenotz (optional)
+SYNPUFOMOP23DATAPREPARATION	s3	observation	observation_2_3_pc_db	fail	yes	observation_date date≠dateonly; observation_datetime date≠datetimenotz (optional)
 SYNPUFOMOP23DATAPREPARATION	s3	death	death_2_3_pc_db	fail	yes	death_date date≠dateonly; death_datetime date≠datetimenotz (optional)
-SYNPUFOMOP23DATAPREPARATION	s3	location	location_2_3_pc_db	pass	yes	
-SYNPUFOMOP23DATAPREPARATION	s3	drug_era	drug_era_2_3_pc_db	fail	unknown	drug_era_start_date date≠dateonly; drug_era_end_date date≠dateonly
+SYNPUFOMOP23DATAPREPARATION	s3	location	location_2_3_pc_db	pass	no	
+SYNPUFOMOP23DATAPREPARATION	s3	drug_era	drug_era_2_3_pc_db	fail	yes	drug_era_start_date date≠dateonly; drug_era_end_date date≠dateonly
 SYNPUFOMOP23DATAPREPARATION	s3	condition_era	condition_era_2_3_pc_db	fail	yes	condition_era_start_date date≠dateonly; condition_era_end_date date≠dateonly
 SYNPUFOMOP23DATAPREPARATION	s3	concept	concept_db	pass	yes	
 SYNPUFOMOP23DATAPREPARATION	s3	concept_ancestor	concept_ancestor_db	pass	yes	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	person	person_db	fail	yes	birth_datetime date≠datetimenotz
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	observation_period	observation_period_db	fail	yes	observation_period_start_date date≠dateonly; observation_period_end_date date≠dateonly
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	visit_occurrence	visits_occurrence_db	fail	yes	visit_start_date date≠dateonly; visit_start_datetime date≠datetimenotz (optional); visit_end_date date≠dateonly; visit_end_datetime date≠datetimenotz (optional)
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	condition_occurrence	condition_occurrence_db	fail	yes	condition_start_date date≠dateonly; condition_start_datetime date≠datetimenotz (optional); condition_end_date date≠dateonly; condition_end_datetime date≠datetimenotz (optional)
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	condition_occurrence	condition_occurrence_db	fail	unknown	condition_start_date date≠dateonly; condition_start_datetime date≠datetimenotz (optional); condition_end_date date≠dateonly; condition_end_datetime date≠datetimenotz (optional)
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	drug_exposure	drug_exposure_db	fail	yes	drug_exposure_start_date date≠dateonly; drug_exposure_start_datetime date≠datetimenotz (optional); drug_exposure_end_date date≠dateonly; drug_exposure_end_datetime date≠datetimenotz (optional); verbatim_end_date date≠dateonly (optional)
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	procedure_occurrence	procedure_occurrence_db	fail	yes	procedure_date date≠dateonly; procedure_datetime date≠datetimenotz (optional)
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	databricks	device_exposure	device_exposure_db	fail	yes	device_exposure_start_date date≠dateonly; device_exposure_start_datetime date≠datetimenotz (optional); device_exposure_end_date date≠dateonly (optional); device_exposure_end_datetime date≠datetimenotz (optional)

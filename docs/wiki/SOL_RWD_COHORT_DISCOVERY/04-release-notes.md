@@ -1,3 +1,11 @@
+# Version 1.1.2 - Patch Release - [2026-10]
+- Import Datasets from DataPrep Project: fail immediately when the data preparation project does not exist
+- Import Datasets from DataPrep Project: rename every column that is not uppercase, mixed-case names included
+- Import Datasets from DataPrep Project: build all imported tables in one job and fail the step if the build fails
+- Read the main connection from the project setup (local) variables, like the other pipeline steps
+- Document the uppercase column-name contract in the Data Model article
+
+
 # Version 1.1.0 - Upgrade Release - [2025-07]
 - Expand SQL connection support to Redshift
 - Revise data type mapping between OMOP CDM and DSS schema. OMOP "date" : DSS "dateonly"; OMOP "datetime": DSS "datetimenotz"
