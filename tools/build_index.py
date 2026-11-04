@@ -57,6 +57,13 @@ OWNER_ROLES = {"data-foundation", "solution", "rwe-demo", "suite"}
 SQL_TYPES = {"Snowflake", "Redshift", "PostgreSQL", "Databricks", "BigQuery", "Synapse", "SQLServer"}
 WORKERS = 12
 TIMEOUT = 240
+# A Git remote can carry a token as URL userinfo (https://<token>@github.com/...). The snapshot is
+# committed, so userinfo is stripped before it is written, and --check fails if any is left.
+URL_USERINFO = re.compile(r'(?<=://)[^/@\s"]+@')
+
+
+def redact(text):
+    return URL_USERINFO.sub("", text)
 
 
 # ------------------------------------------------------------------------------------- registry
@@ -289,8 +296,7 @@ def write_probes(reg, snap):
             projects[project]["datasets"][name]["probe"] = result
     snap["refreshed_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
     with open(SNAP, "w") as fh:
-        json.dump(snap, fh, indent=1, sort_keys=True)
-        fh.write("\n")
+        fh.write(redact(json.dumps(snap, indent=1, sort_keys=True)) + "\n")
     print("wrote %s (%d projects, %d probes)" % (os.path.relpath(SNAP, ROOT), len(projects), len(targets)))
 
 
@@ -635,7 +641,9 @@ def main():
     if not os.path.exists(SNAP):
         raise SystemExit("no snapshot: run python3 tools/build_index.py --refresh")
     with open(SNAP) as fh:
-        snap = json.load(fh)
+        raw = fh.read()
+    leaked = redact(raw) != raw
+    snap = json.loads(redact(raw))
     missing = sorted({p["key"] for p in reg["projects"]} - set(snap["projects"]))
     if missing:
         raise SystemExit("snapshot predates registry entries %s: run --refresh" % ", ".join(missing))
@@ -644,6 +652,8 @@ def main():
 
     if args.check:
         failures = []
+        if leaked:
+            failures.append(".index/dss_snapshot.json holds URL credentials: run python3 tools/build_index.py")
         for fname, text in out.items():
             path = os.path.join(INDEX, fname)
             if not os.path.exists(path) or open(path).read() != text:
@@ -661,6 +671,9 @@ def main():
         print("index current; %d known issues, none new; %d informational" % (len(current), info))
         return 0
 
+    if leaked:
+        with open(SNAP, "w") as fh:
+            fh.write(redact(raw))
     for fname, text in out.items():
         with open(os.path.join(INDEX, fname), "w") as fh:
             fh.write(text)
