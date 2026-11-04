@@ -26,9 +26,10 @@ New prep project keys use the pattern `PREP_RWD_<storage>_<size>`. Projects of t
 | `DEMO_SF_OMOP2M_DATAPREP` | Replace | `DEMO_SF_PREP_OMOP_2M3` | Legacy `date` type on 13 of 15 mapped tables; its tables are unbuilt |
 | `SOL_RWD_COHORT_DISCOVERY` | Revise, repoint | Library from this repo; setup errors fixed; tested on every SQL `PREP_RWD_*`; reads `PREP_RWD_SF_1K` | Release reference |
 | `DEMO_SF_RWD` | Recreate from the revised solution | Copy of `SOL_RWD_COHORT_DISCOVERY`, configured through Project Setup to read `DEMO_SF_PREP_OMOP_2M3`, plus the 45-script cohort library | Demo Part 2 |
-| `DEMO_SF_RWE` | Keep, repoint | Reads 9 datasets from `DEMO_SF_RWD` | Demo Part 3 |
+| `DEMO_SF_RWE` | Keep, repoint; replace notebook dashboard insight | Reads 9 datasets from `DEMO_SF_RWD`; Python recipe publishes a static HTML Cox report | Demo Part 3 |
 | `DEMO_DB_RWD2` | Retire (last) | — | Duplicate of the solution; its prep project is missing and its Snowflake tables are dropped |
-| `TMP_RWD_SF_COLCASE_TEST` | Delete after review | — | Scratch project created for the column-case test in this review |
+| `TMP_RWD_SF_COLCASE_TEST` | Delete after E3 | — | Scratch project for the column-case test (DEC-RWD-001 evidence) |
+| `TMP_RWD_SOL_V112_TEST` | Delete after E4 | — | Scratch duplicate of the solution on `v1-1-2`, for the import fixes |
 
 ## Current-state audit
 
@@ -91,7 +92,7 @@ tools/push_wiki.py            # drift report by default, --push to write
 - `DEMO_SF_RWD`'s `local` scope overrides 5 table variables (`location`, `drug_era`, `condition_era`, `concept`, `concept_ancestor`) with names that do not exist in its prep project.
 - The compliant concept table in `SYNPUFOMOP1KREDSHIFTDATAPREPARATION` is `concept_db`; `concept` has string dates.
 - With a refreshed credential, both Databricks sets are built (15/15). The 1K set passes v1.1; the 2.3M set fails on the legacy `date` type, as audited.
-- `TMP_RWD_SF_COLCASE_TEST` no longer exists, so the Workstream C regression check has to be rebuilt from the test table below.
+- `TMP_RWD_SF_COLCASE_TEST` no longer exists, so the column-case regression check has to be rebuilt from the test table. *(Recreated 2026-10-15; see the appendix.)*
 
 ## Workstream B — Rebuild the data prep layer
 
@@ -128,36 +129,18 @@ Connections and rules for both:
 - `PREP_RWD_SF_1K` and `DEMO_SF_PREP_OMOP_2M3`: pick one Snowflake connection. `bs-snowflake` is the one that works today; `managed-snowflake` has only unbuilt tables. `DEMO_SF_PREP_OMOP_2M3` belongs to the demo suite.
 - `PREP_RWD_DB_1K`: use a service-account connection, not `bs-databricks-per-user`. The per-user OAuth token expiry made it unreadable during this audit.
 - `PREP_RWD_RS_1K`: `redshift-solutions`.
-- Keep columns lowercase. The solution's import step uppercases them (see Workstream C), so the variants and the demo copy stay faithful to the canonical layer.
+- Keep columns lowercase. The solution's import step uppercases them (DEC-RWD-001), so the variants and the demo copy stay faithful to the canonical layer.
 - A canonical change is followed by rebuilding its variants. A change to `PREP_RWD_S3_2M3` is also applied to `DEMO_SF_PREP_OMOP_2M3`, which is then rebuilt and rechecked against B2 and B4. Without a share nothing else keeps the copy in step.
 
 **B4. Verify.** Row counts in each variant and in the demo copy equal the canonical ones, and the solution's "Check OMOP CDM Schema" scenario passes against each of them.
 
-## Workstream C — `sync_omop_datasets` column-case investigation
+## Workstream E — `SOL_RWD_COHORT_DISCOVERY` revision
 
-The uppercase step is still needed. DSS no longer uppercases Snowflake columns by default, and Atlas-style cohort SQL with unquoted names fails against lowercase columns. Keep the normalisation, fix three silent-failure bugs, and record it as `DEC-RWD-001`.
+Release the next solution version from this repo, with the import fixes below and a working Project Setup, and prove it on every SQL prep project. Workstream D copies this release, so it waits for E's gate.
 
-**Test setup.** Scratch project `TMP_RWD_SF_COLCASE_TEST`, run 2026-09-23. A 3-row CSV with lowercase columns (`person_id`, `gender_concept_id`, `birth_date`) was written to Snowflake two ways: by a sync recipe (case kept) and by a prepare recipe with a ColumnRenamer to uppercase (what `sync_omop_datasets` does). Both were run on `bs-snowflake` and `managed-snowflake`.
+*Revised 2026-11-04:* the former Workstream C (the `sync_omop_datasets` column-case investigation) is folded in here. Its question is answered: the solution keeps uppercasing imported columns, so prep projects stay lowercase (DEC-RWD-001; evidence in the [appendix](#appendix--column-case-test-evidence-for-dec-rwd-001)). Its fixes ship in E3 and its last open test runs in E4.
 
-| # | Table | Query style | Result |
-| --- | --- | --- | --- |
-| 0 | Sync from lowercase schema | `information_schema.columns` | Stored as quoted lowercase (`person_id`) on both connections. DSS does **not** uppercase by default |
-| 1 | Lowercase | Unquoted, Atlas style: `select p.person_id …` | Fails: `invalid identifier 'P.PERSON_ID'` |
-| 2 | Lowercase | Quoted: `p."person_id"` | Works (2 rows) |
-| 3 | Uppercase | Unquoted, Atlas style | Works (2 rows) |
-| 4 | Uppercase | Quoted lowercase: `p."person_id"` | Fails: invalid identifier |
-| 6 | Lowercase | SQL script recipe, Atlas style (the solution's `create_cohort` path) | Job FAILED: `invalid identifier 'P.PERSON_ID'` |
-| 7 | Lowercase | Same script, preceded by `ALTER SESSION SET QUOTED_IDENTIFIERS_IGNORE_CASE = TRUE` | Works (2 rows, output columns uppercase) |
-
-**Why lowercase inputs would break the solution**
-
-- The Atlas cohort scripts reference columns unquoted (for example `co.person_id` in `cohort_1`). Snowflake resolves those as `PERSON_ID` (tests 1 and 6).
-- 36 of the 46 visual recipes in the solution hard-code uppercase names (77 references to `PERSON_ID`, 32 to `COHORT_DEFINITION_ID`, 25 to `SUBJECT_ID`).
-- The `@cohort` init scripts create unquoted columns, so the cohort tables are uppercase anyway.
-
-**Why not switch to `QUOTED_IDENTIFIERS_IGNORE_CASE`.** It works in test 7, but it makes every quoted identifier case-insensitive. `get_sql_path` quotes mixed-case table names such as `"SOL_RWD_COHORT_DISCOVERY_person"`, which would then resolve to an uppercase name that does not exist (reasoned from Snowflake's rules, not yet tested). Adopting it would mean renaming every dataset table, so it is a larger change than keeping the uppercase step.
-
-**Code changes in `pipelines/sync_omop_datasets.py`** (the solution repo (`dataiku/bs-rwd-cohort-discovery`); line numbers refer to `v1-1-1` @ `329ff1c`)
+**Import fixes in `pipelines/sync_omop_datasets.py`** (solution repo `dataiku/bs-rwd-cohort-discovery`; line numbers refer to `v1-1-1` @ `329ff1c`). The uppercase step stays; these fix its silent failures.
 
 1. Missing prep project is not caught up front (lines 141–144). The `except … return` there never runs, because `client.get_project()` returns a handle without contacting DSS. The function carries on, every share fails, and it raises only at the end, after starting builds and running the cleanup. This is `DEMO_DB_RWD2`'s state. Check the key exists and raise before changing anything. *(Corrected 2026-10-13: the original wording said the scenario reports success.)*
 2. Rename only fires for all-lowercase names (line 39, `islower()`). A mixed-case column such as `Person_Id` is uppercased in the declared schema but never renamed. Rename whenever `name != name.upper()`.
@@ -166,13 +149,7 @@ The uppercase step is still needed. DSS no longer uppercases Snowflake columns b
 5. `main_connection` is read from `variables['standard']` (line 129) while every other module reads `variables['local']`. Align them.
 6. Document the uppercase contract in the function docstring and in the wiki's Data Model article.
 
-**Regression test.** Keep `TMP_RWD_SF_COLCASE_TEST` until the fix lands, then turn tests 1, 3 and 6 into an index check and delete the project.
-
-**Status (2026-10-16): changes 1–3, 5 and 6 on branch `v1-1-2` of the solution repo (`fdfda6f`, from `main` @ `01f213f`); change 4 was made in `75791a0` and reverted in `fdfda6f` after a review against the Project Setup design.** The docstring and the Data Model draft no longer require lowercase source columns: the solution accepts any case and uppercases on import (lowercase prep columns are this suite's convention, DEC-RWD-001, not a solution rule). Verified on DSS: `TMP_RWD_SF_COLCASE_TEST` was recreated and tests 0–4 and 6 reproduce the 2026-09-23 results; in `TMP_RWD_SOL_V112_TEST` (a duplicate of the solution on `v1-1-2`) a missing prep project fails the import in 2 s before any share or recipe is created, and a valid import builds all 15 tables in one job with uppercase names (that run was on `75791a0`, which still kept `bigint`). Still open: the import plus covariate build on Snowflake. It needs a Snowflake prep set, since the solution imports in-database, so it runs against `PREP_RWD_SF_1K` in phase 3/4. A first attempt against the S3 set was wrong by design and was aborted. Earlier note, kept for history: Offline tests cover the rename rule, kept types, the up-front project check, the single build job and the `local` connection. Change 4 needs no edit in `check_schema.py`: it already reads `bigint` as `int` and `double` as `float`. The Data Model article and the v1.1.2 release notes are drafted in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`, not pushed. `TMP_RWD_SF_COLCASE_TEST` was already deleted, so the phase 2 gate needs a new scratch project. Out of scope but the same class of bug: `map_cohort_script_paths.py` line 155 reads `cdm_standard_tables_map` from `standard`.
-
-## Workstream E — `SOL_RWD_COHORT_DISCOVERY` revision
-
-Release the next solution version from this repo, with Workstream C's fixes and a working Project Setup, and prove it on every SQL prep project. Workstream D copies this release, so it waits for E's gate.
+**Status (2026-10-16):** fixes 1–3, 5 and 6 are on branch `v1-1-2` of the solution repo (`fdfda6f`, from `main` @ `01f213f`). Fix 4 was made in `75791a0` and reverted in `fdfda6f` after a review against the Project Setup design; it needs no edit in `check_schema.py`, which already reads `bigint` as `int` and `double` as `float`. Offline tests cover the rename rule, kept types, the up-front project check, the single build job and the `local` connection. Verified on DSS in `TMP_RWD_SOL_V112_TEST` (a duplicate of the solution on `v1-1-2`): a missing prep project fails the import in 2 s before any share or recipe is created, and a valid import builds all 15 tables in one job with uppercase names (that run was on `75791a0`, which still kept `bigint`). The docstring and the Data Model draft no longer require lowercase source columns: the solution accepts any case and uppercases on import; lowercase prep columns are this suite's convention (DEC-RWD-001), not a solution rule. The Data Model article and the v1.1.2 release notes are drafted in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`, not pushed. Still open: the import plus covariate build on Snowflake, which needs a Snowflake prep set because the solution imports in-database; it runs in E4 against `PREP_RWD_SF_1K`. A first attempt against the S3 set was wrong by design and was aborted. Same class of bug, not yet fixed: `map_cohort_script_paths.py` line 155 reads `cdm_standard_tables_map` from `standard`.
 
 **E1. Move the solution code into this repo**
 
@@ -197,9 +174,9 @@ Fix in the manifest code, not in one project's variables, because `DEMO_SF_RWD` 
 
 Before E4, run Reconfigure on Snowflake in the solution: all of its datasets are on Filesystem storage today. That is a DSS change and needs the owner's approval.
 
-**E3. Release.** Tag the release in this repo with Workstream C changes 1–3, 5 and 6 and the E2 fix. Pin `SOL_RWD_COHORT_DISCOVERY` to it, then update its wiki Release Notes and Data Model article (drafts in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`).
+**E3. Release.** Tag the release in this repo with import fixes 1–3, 5 and 6 and the E2 fix. Pin `SOL_RWD_COHORT_DISCOVERY` to it, then update its wiki Release Notes and Data Model article (drafts in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`). Rerun column-case tests 1, 3 and 6 in `TMP_RWD_SF_COLCASE_TEST` against the release and turn them into an index check ([appendix](#appendix--column-case-test-evidence-for-dec-rwd-001)).
 
-**E4. Test against every SQL prep project.** For each of `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K`, configure the solution through Project Setup with `main_connection` on the same connection type as the prep set. Then run "Check OMOP CDM Schema", the import, the 3 sample cohorts and the covariate build. Cohort counts must be identical across the three. The S3 canonical projects cannot be inputs: the import runs in-database, and the S3 attempt in Workstream C failed by design. They are covered through their copies. `DEMO_SF_PREP_OMOP_2M3` is tested through `DEMO_SF_RWD` in D1. The release project ends on `PREP_RWD_SF_1K`.
+**E4. Test against every SQL prep project.** For each of `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K`, configure the solution through Project Setup with `main_connection` on the same connection type as the prep set. Then run "Check OMOP CDM Schema", the import, the 3 sample cohorts and the covariate build. Cohort counts must be identical across the three. The S3 canonical projects cannot be inputs: the import runs in-database, and the earlier S3 attempt with `v1-1-2` failed by design. The `PREP_RWD_SF_1K` run is also the import fixes' open Snowflake test. They are covered through their copies. `DEMO_SF_PREP_OMOP_2M3` is tested through `DEMO_SF_RWD` in D1. The release project ends on `PREP_RWD_SF_1K`.
 
 **Done when:** `SOL_RWD_COHORT_DISCOVERY` runs the released library from this repo, Project Setup shows no errors, and E4 passes on all three variants.
 
@@ -218,11 +195,19 @@ Recreate `DEMO_SF_RWD` from the revised solution and move the cohort library int
 7. Check that the 9 datasets `DEMO_SF_RWE` reads now exist. `DEMO_DB_RWD2` had 3 generated SQL recipes the solution lacks, and some of the 9 may come from them.
 8. Start the wiki from the solution's, restore the demo's "Part 2 of 3" banner and demo articles from the step 1 bundle, and update the Release Notes.
 
-**D2. Repoint `DEMO_SF_RWE`**
+**D2. Repoint `DEMO_SF_RWE` and replace the notebook dashboard insight**
+
+Read-only review on 2026-11-04 against DSS 15.2: dashboard `DTIYxwM` ("Treatment Effect Analysis") uses Jupyter insight `k3k1hOV` ("survival (2025-02-10 11:16)") on its retrospective-analysis page. The insight references notebook `survival` with `loadLast=true`. The notebook reads `cohort_data_scored_prepared`, selects `event`, `time`, `TREATMENT` and `ipw`, and fits `lifelines.CoxPHFitter` in code environment `sol_rwd-survival`. No scenarios currently automate the report. These observations are separate from the index snapshot (`refreshed_at=2026-10-16T13:03Z`); no DSS changes or model runs were performed during the review.
 
 1. Share the 9 datasets from `DEMO_SF_RWD` and swap each recipe input from `DEMO_DB_RWD2.<name>` to `DEMO_SF_RWD.<name>`.
 2. Fix the walkthrough article: it lists `drug_exposure_grouped`, but the flow reads `drug_class_exposure`.
-3. Rebuild and check the survival analysis dashboard renders.
+3. Replace notebook-based report generation with a Python recipe using `sol_rwd-survival` and the existing package versions. Declare `cohort_data_scored_prepared` as input and a new dataset, `survival_cox_coefficients`, as output. Preserve the notebook's four-column selection and model specification: `CoxPHFitter().fit(train_df, duration_col='time', event_col='event', weights_col='ipw')`. Write `cph.summary.reset_index()` to the output dataset; this gives the report a build target in the Flow.
+4. In the same recipe, capture `cph.print_summary(style="html")` using `io.StringIO` and `contextlib.redirect_stdout`. Wrap the captured HTML in a UTF-8 HTML document and publish its encoded bytes with `dataiku.insights.save_data("survival_cox_summary", payload, content_type="text/html", label="Propensity Score Adjusted COX Model")`. This preserves the full summary, including model metadata and test statistics, rather than only its coefficient table. Use the contextual project key so project copies publish into themselves. Reusing the insight ID replaces its content on subsequent runs.
+5. Replace the dashboard tile referencing `k3k1hOV` with the new static HTML insight, preserving its title and placement. Validate the replacement before removing the old tile's notebook dependency. The notebook may remain for exploration; dashboard viewing must no longer depend on its exports or authorization. Dashboard access permissions and the recipe execution identity's data and code-environment permissions still apply.
+6. Define refresh and packaging behavior: build `survival_cox_coefficients` after upstream scoring/preparation completes; optionally automate that build in a scenario. Opening the dashboard does not rerun the recipe. For a project export that must render immediately after import, include static insight data (`exportInsightsData=True`, which defaults to false), keeping all SYNPUF-derived output internal. Otherwise regenerate the report on the target instance after its inputs and code environment are available. Validate the chosen packaging path in an internal project copy; Automation-node deployment remains out of scope.
+7. Rebuild and compare the recipe's coefficients, hazard ratios, confidence intervals and test statistics with the notebook fitted on the same input and package versions. Check that the dashboard renders the full report for a dashboard-only user without notebook authorization, and that a second recipe run updates the same insight without changing the tile. Confirm the report renders after the internal export/import or regeneration check. Update the walkthrough and technical requirements to describe the recipe, output dataset, static insight and refresh procedure.
+
+**D2 done when:** the 9 inputs read from `DEMO_SF_RWD`, the Cox report is reproducible through a Flow build, its results match the notebook baseline, and dashboard viewing and internal packaging no longer depend on a notebook export. Static insight publication is supported from code recipes by the [Dataiku static insights API](https://developer.dataiku.com/latest/api-reference/python/static-insights.html); HTML summary printing is supported by the pinned [lifelines 0.27.8 implementation](https://github.com/CamDavidsonPilon/lifelines/blob/v0.27.8/lifelines/utils/printer.py). See also [project export options](https://developer.dataiku.com/latest/api-reference/python/projects.html) and [dashboard object authorization](https://doc.dataiku.com/dss/latest/security/authorized-objects.html).
 
 **D3. Retire, in this order**
 
@@ -233,7 +218,7 @@ Recreate `DEMO_SF_RWD` from the revised solution and move the cohort library int
 | 3 | `DATABRICKSSYNPUFOMOP23DATAPREPERATION` | No consumers | Bundle export |
 | 4 | `SYNPUFOMOP1KREDSHIFTDATAPREPARATION`, `RWD1KDATAPREPDEMO` | `PREP_RWD_S3_1K` and `PREP_RWD_RS_1K` pass B4 | Bundle export |
 | 5 | `SYNPUFOMOP1KDATAPREPRWDV11`, `SYNPUFOMOP100KDATAPREPARATION`, `SYNPUFOMOP23DATAPREPARATION` | The solution and demo read only from `PREP_RWD_*` and `DEMO_SF_PREP_OMOP_2M3` | Bundle export; keep the 2.3M lzo folder until `PREP_RWD_S3_2M3` is verified |
-| 6 | `TMP_RWD_SF_COLCASE_TEST` | Workstream C fix merged | None |
+| 6 | `TMP_RWD_SF_COLCASE_TEST`, `TMP_RWD_SOL_V112_TEST` | E3 rerun done; E4 passed | None |
 
 The project owner deletes each project; deletion also drops the managed data, so each bundle is the only way back. The lineage index must show zero broken shares after every step.
 
@@ -244,9 +229,9 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 | Phase | Work | Gate to exit |
 | --- | --- | --- |
 | 1. Index | Workstream A steps 1–3 | Registry covers 11 projects; compliance and lineage TSVs reproduce this audit |
-| 2. Solution | Workstream C code changes; E1–E3: code moved here, Setup errors fixed, release tagged | Tests 1, 3 and 6 behave as documented; missing prep project now fails the scenario; Setup shows no errors; the solution's library points at this repo |
+| 2. Solution | E1–E3: code moved here, Setup errors fixed, release tagged with the import fixes | Column-case tests 1, 3 and 6 behave as documented; missing prep project now fails the scenario; Setup shows no errors; the solution's library points at this repo |
 | 3. Data | Workstream B: canonical S3 projects, then 3 variants and the demo copy | 15/15 pass on all 7 prep projects; row counts of each variant and of the demo copy match its canonical |
-| 4. Consumers | E4, then D1 and D2 (D depends on E) | 3 sample cohorts match across SF, DB and RS; 45 cohorts rebuilt on 2.3M; RWE dashboard renders |
+| 4. Consumers | E4, then D1 and D2 (D depends on E) | 3 sample cohorts match across SF, DB and RS; 45 cohorts rebuilt on 2.3M; RWE static Cox report matches the notebook baseline, renders without notebook authorization, and passes the internal packaging check |
 | 5. Retire | D3 in order; Workstream A steps 4–6 | Zero broken shares; retired projects archived as bundles; CI green |
 
 **Risks and mitigations**
@@ -271,3 +256,29 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 - [x] Variant layout: separate sync-only projects (DEC-RWD-002), except `DEMO_SF_PREP_OMOP_2M3`, a full copy of `PREP_RWD_S3_2M3` (DEC-RWD-004)
 - [ ] Where the solution code sits in this repo, and what happens to `dataiku/bs-rwd-cohort-discovery` after E3 (archive or read-only mirror)
 - [ ] 100K has no SQL variant, so E4 never tests the solution on it: add `PREP_RWD_SF_100K`, or accept
+
+## Appendix — Column-case test (evidence for DEC-RWD-001)
+
+The question: DSS no longer uppercases Snowflake columns by default, so could the solution's uppercase step go, or would the prep tables have to change case? The answer is to keep the step, which lets every prep project stay lowercase.
+
+**Test setup.** Scratch project `TMP_RWD_SF_COLCASE_TEST`, run 2026-09-23. A 3-row CSV with lowercase columns (`person_id`, `gender_concept_id`, `birth_date`) was written to Snowflake two ways: by a sync recipe (case kept) and by a prepare recipe with a ColumnRenamer to uppercase (what `sync_omop_datasets` does). Both were run on `bs-snowflake` and `managed-snowflake`. `TMP_RWD_SF_COLCASE_TEST` was deleted early and recreated on 2026-10-15 on `bs-snowflake`; tests 0–4 and 6 reproduce the 2026-09-23 results.
+
+| # | Table | Query style | Result |
+| --- | --- | --- | --- |
+| 0 | Sync from lowercase schema | `information_schema.columns` | Stored as quoted lowercase (`person_id`) on both connections. DSS does **not** uppercase by default |
+| 1 | Lowercase | Unquoted, Atlas style: `select p.person_id …` | Fails: `invalid identifier 'P.PERSON_ID'` |
+| 2 | Lowercase | Quoted: `p."person_id"` | Works (2 rows) |
+| 3 | Uppercase | Unquoted, Atlas style | Works (2 rows) |
+| 4 | Uppercase | Quoted lowercase: `p."person_id"` | Fails: invalid identifier |
+| 6 | Lowercase | SQL script recipe, Atlas style (the solution's `create_cohort` path) | Job FAILED: `invalid identifier 'P.PERSON_ID'` |
+| 7 | Lowercase | Same script, preceded by `ALTER SESSION SET QUOTED_IDENTIFIERS_IGNORE_CASE = TRUE` | Works (2 rows, output columns uppercase) |
+
+**Why lowercase inputs would break the solution**
+
+- The Atlas cohort scripts reference columns unquoted (for example `co.person_id` in `cohort_1`). Snowflake resolves those as `PERSON_ID` (tests 1 and 6).
+- 36 of the 46 visual recipes in the solution hard-code uppercase names (77 references to `PERSON_ID`, 32 to `COHORT_DEFINITION_ID`, 25 to `SUBJECT_ID`).
+- The `@cohort` init scripts create unquoted columns, so the cohort tables are uppercase anyway.
+
+**Why not switch to `QUOTED_IDENTIFIERS_IGNORE_CASE`.** It works in test 7, but it makes every quoted identifier case-insensitive. `get_sql_path` quotes mixed-case table names such as `"SOL_RWD_COHORT_DISCOVERY_person"`, which would then resolve to an uppercase name that does not exist (reasoned from Snowflake's rules, not yet tested). Adopting it would mean renaming every dataset table, so it is a larger change than keeping the uppercase step.
+
+**Regression check.** `TMP_RWD_SF_COLCASE_TEST` stays until E3, which reruns tests 1, 3 and 6 against the release and turns them into an index check. It is deleted in D3 step 6.

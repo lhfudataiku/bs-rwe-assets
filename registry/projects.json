@@ -457,7 +457,7 @@
       "personas": [],
       "library": null,
       "lifecycle": "active",
-      "decision": "Recreated 2026-10-15 (the original was deleted early): Workstream C regression tests 0-4 and 6 on bs-snowflake. Delete after phase 2 closes (D3 step 6)",
+      "decision": "Recreated 2026-10-15 (the original was deleted early): column-case regression tests 0-4 and 6 on bs-snowflake (DEC-RWD-001 evidence). Rerun tests 1, 3 and 6 in E3, then delete (D3 step 6)",
       "omop_sets": {}
     },
     {
@@ -480,7 +480,7 @@
         }
       },
       "lifecycle": "active",
-      "decision": "Duplicate of SOL_RWD_COHORT_DISCOVERY on library v1-1-2 for the Workstream C tests. Its local variables point at the 1K S3 set, which the solution does not support (it imports in-database); repoint to PREP_RWD_SF_1K for the remaining Snowflake test, then delete",
+      "decision": "Duplicate of SOL_RWD_COHORT_DISCOVERY on library v1-1-2 for the import-fix tests (Workstream E). Its local variables point at the 1K S3 set, which the solution does not support (it imports in-database); repoint to PREP_RWD_SF_1K for the remaining Snowflake test (E4), then delete (D3 step 6)",
       "omop_sets": {}
     },
     {

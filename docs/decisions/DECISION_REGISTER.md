@@ -19,11 +19,11 @@ decision is superseded, never edited away: add the new record and fill both **Su
 
 - **Date:** 2026-09-23
 - **Status:** accepted
-- **Decision:** `sync_omop_datasets` keeps renaming imported OMOP columns to uppercase. Prep projects and their connection variants keep lowercase names; the uppercase contract belongs to the solution's import step. The function's silent-failure bugs are fixed separately (migration plan, Workstream C).
+- **Decision:** `sync_omop_datasets` keeps renaming imported OMOP columns to uppercase. Prep projects and their connection variants keep lowercase names; the uppercase contract belongs to the solution's import step. The function's silent-failure bugs are fixed separately (migration plan, Workstream E import fixes).
 - **Rationale:** DSS stores lowercase source columns as quoted lowercase identifiers on Snowflake. Atlas cohort SQL references columns unquoted, which Snowflake resolves as uppercase, so it fails against lowercase tables. 36 of the 46 visual recipes also hard-code uppercase names.
 - **Alternatives rejected:** `QUOTED_IDENTIFIERS_IGNORE_CASE = TRUE` makes Atlas SQL work, but it also folds the quoted mixed-case table names that `get_sql_path` produces, so every dataset table would need renaming. Dropping the uppercase step breaks Atlas SQL outright.
-- **Evidence:** Column-case test of 2026-09-23 (tests 0–7) and the code review in the [migration plan, Workstream C](../migration-revision-plan.md#workstream-c--sync_omop_datasets-column-case-investigation).
-- **Consequences:** Any new connection variant or prep project must not uppercase columns itself. The uppercase contract is documented in the function docstring and the wiki's Data Model article. The scratch project behind the test, `TMP_RWD_SF_COLCASE_TEST`, was deleted before the fix landed, so the regression check must be rebuilt from the test table.
+- **Evidence:** Column-case test of 2026-09-23 (tests 0–7) and the code review in the [migration plan, appendix](../migration-revision-plan.md#appendix--column-case-test-evidence-for-dec-rwd-001).
+- **Consequences:** Any new connection variant or prep project must not uppercase columns itself. The uppercase contract is documented in the function docstring and the wiki's Data Model article. The scratch project behind the test, `TMP_RWD_SF_COLCASE_TEST`, was deleted early and recreated on 2026-10-15; tests 0–4 and 6 reproduce, and E3 turns tests 1, 3 and 6 into an index check.
 - **Supersedes:** —
 - **Superseded by:** —
 
