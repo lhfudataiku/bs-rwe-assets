@@ -9,6 +9,9 @@ approved step: `dku app-designer set-definition -P <KEY> <out.json>`.
 
     python3 tools/app_manifest.py manifest.json --out patched.json   # write the patched manifest
     python3 tools/app_manifest.py manifest.json --check              # exit 1 if any tile differs
+
+--inline embeds solution/setup/choices.py in each tile instead of importing it, for a project whose
+python/solution library does not include solution.setup yet (or where tiles cannot see the library).
 """
 import argparse
 import json
@@ -17,6 +20,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TILES_DIR = os.path.join(ROOT, "app_manifest", "tiles")
+CHOICES = os.path.join(ROOT, "solution", "setup", "choices.py")
+IMPORT = "from solution.setup.choices import "
 
 # (section index, tile index) -> (wrapper file, how the tile is recognised)
 TILES = {
@@ -41,13 +46,26 @@ def locate(manifest, section, tile, expect):
     return t
 
 
-def patch(manifest):
+def tile_code(fname, inline=False):
+    with open(os.path.join(TILES_DIR, fname)) as fh:
+        code = fh.read()
+    if not inline:
+        return code
+    lines = code.split("\n")
+    if not lines[0].startswith(IMPORT):
+        raise SystemExit("%s does not start with %r" % (fname, IMPORT))
+    with open(CHOICES) as fh:
+        library = fh.read()
+    return "# Inlined from solution/setup/choices.py by tools/app_manifest.py --inline\n" + library \
+        + "\n\n# Tile wrapper (" + fname + ")\n" + "\n".join(lines[1:]).lstrip("\n")
+
+
+def patch(manifest, inline=False):
     """Return the tiles whose Python differs from the repo wrappers, after replacing it."""
     changed = []
     for (section, tile), (fname, expect) in sorted(TILES.items()):
         t = locate(manifest, section, tile, expect)
-        with open(os.path.join(TILES_DIR, fname)) as fh:
-            code = fh.read()
+        code = tile_code(fname, inline)
         if t.get("python") != code:
             t["python"] = code
             changed.append("section %d tile %d (%s)" % (section, tile, fname))
@@ -60,10 +78,11 @@ def main():
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--out", help="write the patched manifest here")
     mode.add_argument("--check", action="store_true", help="exit 1 if any tile differs from the repo")
+    ap.add_argument("--inline", action="store_true", help="embed solution/setup/choices.py in each tile")
     args = ap.parse_args()
     with open(args.manifest) as fh:
         manifest = json.load(fh)
-    changed = patch(manifest)
+    changed = patch(manifest, args.inline)
     if args.check:
         print("\n".join("differs: " + c for c in changed) or "all Setup tiles match app_manifest/tiles/")
         return 1 if changed else 0

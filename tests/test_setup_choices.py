@@ -110,6 +110,19 @@ class ManifestTool(unittest.TestCase):
         with self.assertRaises(SystemExit):
             tool.patch(m)
 
+    def test_inline_tiles_run_without_the_library(self):
+        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
+        tool.patch(m, inline=True)
+        code = m["homepageSections"][8]["tiles"][1]["python"]
+        self.assertNotIn("from solution.setup", code)
+        ns = {}
+        exec(compile(code, "tile", "exec"), ns)
+        ds = mock.MagicMock()
+        ds.read_schema.return_value = [{"name": "COHORT_DEFINITION_ID"}]
+        ds.iter_tuples.return_value = iter([(3,)])
+        with mock.patch.dict(ns, {"_dataiku": lambda: mock.MagicMock(Dataset=lambda name: ds)}):
+            self.assertEqual(ns["do"]({}, {}, {}, []), {"choices": [{"value": 3, "label": 3}]})
+
     def test_wrappers_compile_and_name_real_functions(self):
         tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")
         for fname in os.listdir(tiles):
