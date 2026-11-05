@@ -1,5 +1,8 @@
 """Stand-ins for the DSS-only modules the solution imports, so its logic runs offline.
 
+`pandas` is stubbed too: the import code loads it but the tested logic does not use it, and CI
+installs no packages.
+
 `install()` puts MagicMock modules for `dataiku` and every `dku_utils` submodule the solution
 imports into sys.modules. Tests then patch the names they care about on the imported solution module.
 """
@@ -9,7 +12,7 @@ from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DSS_MODULES = [
-    "dataiku", "dataiku.pandasutils",
+    "pandas", "dataiku", "dataiku.pandasutils",
     "dku_utils", "dku_utils.projects", "dku_utils.projects.project_commons",
     "dku_utils.projects.recipes", "dku_utils.projects.recipes.recipe_commons",
     "dku_utils.projects.recipes.prepare_recipe", "dku_utils.projects.recipes.sql_recipes",

@@ -127,7 +127,8 @@ class ManifestTool(unittest.TestCase):
         tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")
         for fname in os.listdir(tiles):
             ns = {}
-            exec(compile(open(os.path.join(tiles, fname)).read(), fname, "exec"), ns)
+            with open(os.path.join(tiles, fname)) as fh:
+                exec(compile(fh.read(), fname, "exec"), ns)
             self.assertTrue(callable(ns["do"]), fname)
 
 
