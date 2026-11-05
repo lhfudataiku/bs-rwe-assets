@@ -10,8 +10,10 @@ approved step: `dku app-designer set-definition -P <KEY> <out.json>`.
     python3 tools/app_manifest.py manifest.json --out patched.json   # write the patched manifest
     python3 tools/app_manifest.py manifest.json --check              # exit 1 if any tile differs
 
---inline embeds solution/setup/choices.py in each tile instead of importing it, for a project whose
-python/solution library does not include solution.setup yet (or where tiles cannot see the library).
+Each tile gets solution/setup/choices.py inlined ahead of its wrapper: a tile's Python process does
+not see the project library (tested on DSS 15.2, 2026-11-05: wrappers that import solution.setup fail
+with "Failed to get test result for ui" even when the library has it). --import writes the bare
+wrappers instead, for re-testing that on a later DSS version.
 """
 import argparse
 import json
@@ -46,7 +48,7 @@ def locate(manifest, section, tile, expect):
     return t
 
 
-def tile_code(fname, inline=False):
+def tile_code(fname, inline=True):
     with open(os.path.join(TILES_DIR, fname)) as fh:
         code = fh.read()
     if not inline:
@@ -60,7 +62,7 @@ def tile_code(fname, inline=False):
         + "\n\n# Tile wrapper (" + fname + ")\n" + "\n".join(lines[1:]).lstrip("\n")
 
 
-def patch(manifest, inline=False):
+def patch(manifest, inline=True):
     """Return the tiles whose Python differs from the repo wrappers, after replacing it."""
     changed = []
     for (section, tile), (fname, expect) in sorted(TILES.items()):
@@ -78,11 +80,12 @@ def main():
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--out", help="write the patched manifest here")
     mode.add_argument("--check", action="store_true", help="exit 1 if any tile differs from the repo")
-    ap.add_argument("--inline", action="store_true", help="embed solution/setup/choices.py in each tile")
+    ap.add_argument("--import", dest="import_", action="store_true",
+                    help="write wrappers that import solution.setup (fails in DSS 15.2 tiles)")
     args = ap.parse_args()
     with open(args.manifest) as fh:
         manifest = json.load(fh)
-    changed = patch(manifest, args.inline)
+    changed = patch(manifest, inline=not args.import_)
     if args.check:
         print("\n".join("differs: " + c for c in changed) or "all Setup tiles match app_manifest/tiles/")
         return 1 if changed else 0

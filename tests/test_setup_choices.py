@@ -100,9 +100,9 @@ class ManifestTool(unittest.TestCase):
 
     def test_replaces_the_four_tiles_and_nothing_else(self):
         tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        self.assertEqual(len(tool.patch(m)), 4)
+        self.assertEqual(len(tool.patch(m, inline=False)), 4)
         self.assertIn("omop_table_choices()", m["homepageSections"][2]["tiles"][3]["python"])
-        self.assertEqual(tool.patch(m), [])  # idempotent
+        self.assertEqual(tool.patch(m, inline=False), [])  # idempotent
 
     def test_refuses_a_reordered_manifest(self):
         tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
@@ -112,7 +112,7 @@ class ManifestTool(unittest.TestCase):
 
     def test_inline_tiles_run_without_the_library(self):
         tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        tool.patch(m, inline=True)
+        tool.patch(m)  # inline is the default
         code = m["homepageSections"][8]["tiles"][1]["python"]
         self.assertNotIn("from solution.setup", code)
         ns = {}

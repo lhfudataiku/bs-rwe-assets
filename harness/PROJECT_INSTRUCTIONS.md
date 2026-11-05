@@ -4,7 +4,9 @@ Suite repository for the RWD/RWE solution demo assets on the Dataiku design inst
 prep projects (Part 1), the RWD Cohort Discovery solution and its demo copy (Part 2), and the Real
 World Evidence demo (Part 3). The solution library lives in `solution/` (moved from
 `dataiku/bs-rwd-cohort-discovery` at `v1-1-2`); DSS pulls it as `python/solution`. The Project
-Setup callbacks are thin wrappers in `app_manifest/tiles/` over `solution/setup/choices.py`.
+Setup callbacks are thin wrappers in `app_manifest/tiles/` over `solution/setup/choices.py`;
+`tools/app_manifest.py` inlines that module into each tile, because tiles cannot import the project
+library.
 Route documentation tasks through `docs/README.md`.
 
 ## Route before reading
