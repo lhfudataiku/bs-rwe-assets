@@ -545,7 +545,9 @@
       "part": 1,
       "role": "variant",
       "sample_size": "1K",
-      "connections": [],
+      "connections": [
+        "bs-snowflake"
+      ],
       "upstream": [
         "PREP_RWD_S3_1K"
       ],
@@ -555,7 +557,7 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Snowflake variant of PREP_RWD_S3_1K (DEC-RWD-002; connection to be decided)",
+      "decision": "Workstream B3: sync-only Snowflake variant of PREP_RWD_S3_1K on bs-snowflake (DEC-RWD-002, DEC-RWD-005)",
       "omop_sets": {}
     },
     {
@@ -563,7 +565,9 @@
       "part": 1,
       "role": "variant",
       "sample_size": "1K",
-      "connections": [],
+      "connections": [
+        "bs-databricks"
+      ],
       "upstream": [
         "PREP_RWD_S3_1K"
       ],
@@ -573,7 +577,7 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Databricks variant of PREP_RWD_S3_1K on a service-account connection (DEC-RWD-002)",
+      "decision": "Workstream B3: sync-only Databricks variant of PREP_RWD_S3_1K on bs-databricks, a global PAT connection (DEC-RWD-002)",
       "omop_sets": {}
     },
     {
@@ -601,7 +605,9 @@
       "part": 1,
       "role": "variant",
       "sample_size": "2.3M",
-      "connections": [],
+      "connections": [
+        "bs-snowflake"
+      ],
       "upstream": [
         "PREP_RWD_S3_2M3"
       ],
@@ -611,7 +617,7 @@
       ],
       "library": null,
       "lifecycle": "planned",
-      "decision": "Workstream B3: full copy of PREP_RWD_S3_2M3 on Snowflake, the exception to DEC-RWD-002 (DEC-RWD-004); demo suite input for DEMO_SF_RWD",
+      "decision": "Workstream B3: full copy of PREP_RWD_S3_2M3 on bs-snowflake (DEC-RWD-005), the exception to DEC-RWD-002 (DEC-RWD-004); demo suite input for DEMO_SF_RWD",
       "omop_sets": {}
     }
   ]

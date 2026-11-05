@@ -179,7 +179,7 @@ A = accountable, R = responsible, C = consulted, I = informed.
 - `DEMO_SF_RWE` depends on `DEMO_DB_RWD2` today. Dropping it before the repoint leaves Part 3 with no inputs.
 - The 2.3M source is OMOP CDM v5.2 lzo files (e.g. `death.5.2.csv.lzo`), while the solution checks v5.3 columns. Some columns need mapping.
 - ~~Id columns are normalised to `int` on import. 2.3M-row fact tables may hold ids above 2,147,483,647, which would need `bigint`.~~ Ruled out 2026-10-15: the largest 2.3M id is 289,182,385.
-- Snowflake connections: most `managed-snowflake` export tables are unbuilt, and `bs-snowflake` is the one that currently works. Which one hosts the variants must be decided.
+- Snowflake connections: `bs-snowflake` hosts the Snowflake variant and the demo suite (DEC-RWD-005). It uses per-user OAuth, so builds depend on the run-as user's grant.
 
 **Open questions**
 

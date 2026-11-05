@@ -62,3 +62,15 @@ decision is superseded, never edited away: add the new record and fill both **Su
 - **Consequences:** This one copy can drift from its canonical project. It passes the schema gate itself (DEC-RWD-003), and its row counts must equal those of `PREP_RWD_S3_2M3`. A change to `PREP_RWD_S3_2M3` is applied to the copy, which is then rebuilt. The copy reruns the 2.3M download and parse. DEC-RWD-001 still holds: the copy keeps lowercase columns.
 - **Supersedes:** —
 - **Superseded by:** —
+
+## DEC-RWD-005 — `bs-snowflake` hosts the suite's Snowflake prep data and demo suite
+
+- **Date:** 2026-11-05
+- **Status:** accepted
+- **Decision:** `PREP_RWD_SF_1K`, `DEMO_SF_PREP_OMOP_2M3` and the recreated `DEMO_SF_RWD` put their managed Snowflake datasets on `bs-snowflake` (database `DKU_SOLUTION_DESIGN`, schema `SOL_DESIGN`). `managed-snowflake` is not used for the suite.
+- **Rationale:** Owner's choice. `bs-snowflake` is the connection that held the suite's only built Snowflake table (`visit_occurrence_sf`) and that the column-case tests (DEC-RWD-001) and `TMP_RWD_SOL_V112_TEST` ran on. The solution imports in-database, so the prep sets and the consuming solution projects must share one Snowflake connection type.
+- **Alternatives rejected:** `managed-snowflake`, a global key-pair connection (database `BS_PLATFORM_DESIGN`). It tested as working on 2026-11-05 and does not depend on a user's OAuth grant, but none of the suite's tables on it were ever built.
+- **Evidence:** `dku connection get` and `dku connection test` on 2026-11-05 (DSS 15.2): `bs-snowflake` is `OAUTH2_APP` with per-user credentials; `managed-snowflake` is `KEY_PAIR` with global credentials; both work.
+- **Consequences:** Builds and scenarios on these projects run with the run-as user's Snowflake grant. An expired grant fails builds and makes the index report `UNREADABLE`, as with `bs-databricks-per-user`. Scenarios run as a named user with a current grant, and the grant is renewed before phase 3 and 4 builds. Moving to `managed-snowflake` later means rebuilding all three projects.
+- **Supersedes:** —
+- **Superseded by:** —
