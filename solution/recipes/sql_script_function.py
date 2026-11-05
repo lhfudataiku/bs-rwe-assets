@@ -7,7 +7,7 @@ from dku_utils.projects.datasets.dataset_commons import (
     get_dataset_settings_and_dictionary,
 )
 
-from variables import OMOP_CDM_KEYS, SQL_SCRIPT
+from solution.variables import OMOP_CDM_KEYS, SQL_SCRIPT
 
 # Configure logging
 logging.basicConfig(

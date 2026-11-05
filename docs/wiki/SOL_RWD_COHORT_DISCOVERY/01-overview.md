@@ -1,4 +1,4 @@
-<span id="version" style="color: grey; float: right"> Verson 1.1.0</span>
+<span id="version" style="color: grey; float: right"> Version 1.2.0</span>
 # Real-World Data (RWD) Cohort Discovery
 
 This solution provides a centralized repository to store and manage cohorts (clinical electronic phenotyping) from real-world data (e.g., electronic health records, medical claims data), adopting the [Observational Medical Outcomes Partnership (OMOP) Common Data Model (CDM)](https://www.ohdsi.org/data-standardization/) [Case Study & Walkthrough](article:2). It turns complex cohort SQL scripts into generalizable and reusable clinical electronic phenotyping for future advanced analytics. It also offers a quick dashboard to review the descriptive statistics and some of the clinical characterizations of a given cohort. 
