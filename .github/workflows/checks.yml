@@ -26,3 +26,5 @@ jobs:
         run: python3 tools/sync_harness.py --check
       - name: Unit tests
         run: python3 -m unittest discover -s tools/tests
+      - name: Solution tests
+        run: python3 -m unittest discover -s tests

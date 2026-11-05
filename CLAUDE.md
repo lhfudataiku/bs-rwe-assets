@@ -4,8 +4,9 @@
 
 Suite repository for the RWD/RWE solution demo assets on the Dataiku design instance: the OMOP data
 prep projects (Part 1), the RWD Cohort Discovery solution and its demo copy (Part 2), and the Real
-World Evidence demo (Part 3). Solution code lives in `dataiku/bs-rwd-cohort-discovery` until
-Workstream E of the migration plan moves it into this repo.
+World Evidence demo (Part 3). The solution library lives in `solution/` (moved from
+`dataiku/bs-rwd-cohort-discovery` at `v1-1-2`); DSS pulls it as `python/solution`. The Project
+Setup callbacks are thin wrappers in `app_manifest/tiles/` over `solution/setup/choices.py`.
 Route documentation tasks through `docs/README.md`.
 
 ## Route before reading
@@ -65,3 +66,5 @@ Route documentation tasks through `docs/README.md`.
     python3 tools/build_index.py --check     # offline; what CI and the pre-commit hook run
     python3 tools/push_wiki.py               # wiki drift report (read-only)
     python3 tools/sync_harness.py --write    # regenerate CLAUDE.md and AGENTS.md from this file
+    python3 -m unittest discover -s tests    # offline solution tests (DSS modules are stubbed)
+    python3 tools/app_manifest.py <fetched.json> --check   # do a project's Setup tiles match the repo?

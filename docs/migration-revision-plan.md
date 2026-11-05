@@ -159,6 +159,8 @@ Release the next solution version from this repo, with the import fixes below an
 4. Replace `tools/vendor/cdm_schema.py` with an import of the in-repo `CDM_SCHEMA`, so DEC-RWD-003's re-vendoring step goes away.
 5. Update the repo rule in `harness/PROJECT_INSTRUCTIONS.md` (solution code lives here) and rerun `tools/sync_harness.py --write`.
 
+**Status (2026-11-05): steps 1, 2, 4 and 5 done in the repo; step 3 is a DSS change, not done.** The token was purged from history and the snapshot redacted before the first push. The 9 library files are in `solution/` (Git reference path `solution`, so imports stay `solution.<module>`). The offline tests named in step 2 did not exist in either repo, so they were rewritten in `tests/` (DSS modules stubbed) and run in CI. `tools/build_index.py` imports `CDM_SCHEMA` from `solution/schema/`; `tools/vendor/` is gone. Not changed, to check before E3: `recipes/sql_script_function.py` imports `from variables import …`, not `solution.variables`, which only resolves if the project library has a top-level `variables` module.
+
 **E2. Fix the Project Setup errors.** The select boxes under "Connect OMOP Common Data Model Standard Tables" and "Create Cohort Dashboard" show errors. Cause found 2026-10-16, read-only against DSS:
 
 - The setup callbacks are inline Python in the project's app manifest (`dku app-designer get`), not in any Git repo. The manifest is identical in `TMP_RWD_SOL_V112_TEST`.
@@ -171,6 +173,8 @@ Fix in the manifest code, not in one project's variables, because `DEMO_SF_RWD` 
 2. Take the dataset type from `list_datasets()` rather than one `get_settings()` call per dataset.
 3. In the dashboard callback, drop the unused location call, read columns case-insensitively, and return no choices while `cohort_definition` is unbuilt.
 4. Bring the manifest under version control in this repo with the rest of the solution code (E1), either exported as JSON or as library functions behind thin wrappers.
+
+**Status (2026-11-05): fixes 1–4 written and tested offline; not applied to DSS.** The callbacks are `solution/setup/choices.py` (`project_choices`, `omop_table_choices`, `cohort_definition_choices`), called from 4-line wrappers in `app_manifest/tiles/` (section 2 tiles 0, 3 and 5; section 8 tile 1). `tools/app_manifest.py` patches a manifest fetched with `dku app-designer get` and changes only those 4 tiles, checked against the solution's manifest. Two things only DSS can show: whether a tile's Python process sees the project library (the wrappers import `solution.setup`), and that the select boxes render. So apply the patched manifest to `TMP_RWD_SOL_V112_TEST` first, then to the solution, each after approval. If the library is not visible to tiles, inline `choices.py` into the wrappers when patching.
 
 Before E4, run Reconfigure on Snowflake in the solution: all of its datasets are on Filesystem storage today. That is a DSS change and needs the owner's approval.
 

@@ -1,7 +1,3 @@
-# VENDORED from dataiku/bs-rwd-cohort-discovery schema/cdm_schema.py @ v1-1-1 329ff1cc3fc82258995ac247dad3e83ea889154e.
-# Do not edit. Refresh with: git -C ../bs-rwd-cohort-discovery show <hash>:schema/cdm_schema.py
-# and update SOURCE_HASH in tools/build_index.py.
-
 
 CDM_SCHEMA = {
     'person':[

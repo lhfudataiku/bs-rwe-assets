@@ -22,7 +22,7 @@ both directions. A new issue fails (a regression). A baseline entry that no long
 so the entry must be deleted when the migration fixes it -- the baseline can only shrink, and its
 remaining entries are the checklist of what the migration still has to turn green.
 
-The schema rules are the solution's own: CDM_SCHEMA vendored from v1-1-1 (tools/vendor/), column
+The schema rules are the solution's own: CDM_SCHEMA from solution/schema/cdm_schema.py, column
 names compared lowercase, bigint read as int and double as float, exactly as check_schema.py does.
 """
 
@@ -41,8 +41,8 @@ SNAP = os.path.join(INDEX, "dss_snapshot.json")
 REGISTRY = os.path.join(ROOT, "registry", "projects.json")
 BASELINE = os.path.join(ROOT, "registry", "known_issues.json")
 
-sys.path.insert(0, os.path.join(ROOT, "tools", "vendor"))
-from cdm_schema import CDM_SCHEMA  # noqa: E402
+sys.path.insert(0, ROOT)
+from solution.schema.cdm_schema import CDM_SCHEMA  # noqa: E402
 
 # The 15 tables the solution maps (v1.1 omop_cdm_standard_tables_import + the vocabulary import).
 OMOP_TABLES = [
