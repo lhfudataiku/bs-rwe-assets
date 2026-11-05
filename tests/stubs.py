@@ -29,3 +29,6 @@ def install():
         sys.path.insert(0, ROOT)
     for name in DSS_MODULES:
         sys.modules.setdefault(name, mock.MagicMock(name=name))
+    # recipes/sql_script_function.py unpacks this at import time.
+    commons = sys.modules["dku_utils.projects.project_commons"]
+    commons.get_current_project_and_variables.return_value = (mock.MagicMock(), {"standard": {}, "local": {}})
