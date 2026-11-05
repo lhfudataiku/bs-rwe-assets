@@ -111,11 +111,13 @@ flowchart LR
 
 | Project | Base workflow | Source | Main work |
 | --- | --- | --- | --- |
-| `PREP_RWD_S3_1K` | Duplicate `SYNPUFOMOP1KDATAPREPRWDV11`, keep the `input` and `OMP CDM` zones, drop the `SF` / `RS` / `DB` / `redshift` zones | Uploaded 1K files + Athena vocabularies on `hls-synth-patient` | Cast `concept` / `concept_ancestor` ids from string to int (`ATHENA_CONCEPT` is all string today) |
+| `PREP_RWD_S3_1K` | Duplicate `SYNPUFOMOP1KDATAPREPRWDV11`; keep the `input`, `OMP CDM` and `redshift` zones (the canonical S3 tables sit in `redshift`), drop `SF` / `RS` / `DB` and the Postgres syncs | Uploaded 1K files + Athena vocabularies on `hls-synth-patient` | Rename `redshift` to `OMOP CDM export` and the 15 tables to `<omop_table>`; `concept` / `concept_ancestor` already pass v1.1 (cast from the string-typed `ATHENA_*` in the existing recipes) |
 | `PREP_RWD_S3_100K` | Same 1K workflow, pointed at the 100K raw files | 100K raw files on `hls-synth-patient` (currently all string-typed) | Reuse the 1K prepare steps; add `concept_ancestor`, which the S3 set is missing |
 | `PREP_RWD_S3_2M3` | Duplicate `SYNPUFOMOP23DATAPREPARATION` | lzo archives downloaded to a managed folder, CDM v5.2 | Replace the string-typed Python schemas with `dateonly` / `datetimenotz` / `int`; map v5.2 → v5.3 column differences; ids fit `int` (measured 2026-10-15: largest 2.3M id 289,182,385 (`condition_occurrence_id`), largest Athena concept id 46,369,944, both well under 2,147,483,647) |
 
 Every canonical project exposes exactly the 15 tables with lowercase names `<omop_table>` and a zone named `OMOP CDM export`.
+
+**B1 status (2026-11-05): `PREP_RWD_S3_1K` created.** Duplicated from `SYNPUFOMOP1KDATAPREPRWDV11` after its scratch notebooks were deleted (one used the removed `solution_rwd-cohort-discovery` code env, which blocks duplication; DSS duplication always copies notebooks). The uploaded raw files came across. Removed: the `SF`, `RS` and `DB` zones with their 49 recipes and 49 datasets (definitions only, no data dropped; nothing kept read them). Zone `redshift` renamed `OMOP CDM export`, holding the 15 tables plus the `visit_*`, `CDM_VISIT_OCCURRENCE_1k` and `CDM_CARE_SITE_prepared` intermediates; the 13 `CDM_*_1k` tables and `visit_occurrence_revised` renamed to `<omop_table>` with storage paths to match. Built with schema auto-update off. `PREP_RWD_S3_100K` and `PREP_RWD_S3_2M3` not started.
 
 **B2. Schema gate.** Nothing downstream is built until `schema_compliance.tsv` shows 15/15 pass for the project. Record row counts per table in `datasets.tsv`. The gate applies to every variant and to `DEMO_SF_PREP_OMOP_2M3`, which runs its own transformations.
 
