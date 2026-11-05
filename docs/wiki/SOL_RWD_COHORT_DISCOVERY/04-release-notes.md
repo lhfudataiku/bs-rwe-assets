@@ -1,4 +1,8 @@
-# Version 1.1.2 - Patch Release - [2026-10]
+# Version 1.2.0 - Minor Release - [2026-11]
+- Solution library moved to the `bs-rwe-assets` repository (`solution/`), with offline tests
+- Project Setup: the OMOP table select boxes no longer show errors. They read the data preparation project and main connection from the setup variables, show "Select a data preparation project first" until one is chosen, and list only datasets on the main connection's type
+- Project Setup: the cohort select box reads column names in any case and stays empty, without an error, until cohorts are written
+- Create Cohort Scripts: read the table name mapping variable from the project setup (local) variables
 - Import Datasets from DataPrep Project: fail immediately when the data preparation project does not exist
 - Import Datasets from DataPrep Project: rename every column that is not uppercase, mixed-case names included
 - Import Datasets from DataPrep Project: build all imported tables in one job and fail the step if the build fails
