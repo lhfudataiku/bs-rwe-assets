@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RWE Governance MVP Proposal</title>
+<style>
+:root{
+  --white:#FFFEF9; --black:#1A1A1A; --dark:#06312E; --beige:#F8F4E4; --green:#3EDAB2; --mint:#C7FFF1;
+  --grey:#42485B; --line:#D9D4C2; --muted:#5B6170; --pain:#E9A23B; --pain-bg:#FFF6E5;
+  --serif:"Signifier",Georgia,"Times New Roman",serif;
+  --sans:"Untitled Sans",Inter,Arial,Helvetica,sans-serif;
+  --mono:"Söhne Mono","SFMono-Regular",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{background:var(--white)}
+body{margin:0;background:var(--white);color:var(--black);font-family:var(--sans);font-size:16px;line-height:1.5}
+main{max-width:1180px;margin:0 auto;padding:40px 16px 80px}
+h1,h2{font-family:var(--serif);font-weight:400;color:var(--dark);line-height:1.15;margin:0}
+h1{font-size:clamp(30px,5vw,44px)}
+h2{font-size:clamp(24px,3.6vw,32px);margin-top:64px}
+h3{font-size:17px;margin:28px 0 8px;color:var(--dark)}
+p{margin:10px 0;max-width:72ch}
+ul{margin:8px 0;padding-left:20px;max-width:72ch}
+li{margin:4px 0}
+a{color:var(--dark)}
+code{font-family:var(--mono);font-size:.86em;background:var(--beige);padding:1px 4px;border-radius:3px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey)}
+.sub{color:var(--grey);font-size:18px;margin-top:8px}
+.meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:14px}
+.status{border-left:3px solid var(--green);background:var(--beige);padding:12px 16px;margin:24px 0;font-size:14px;max-width:none}
+.status p{margin:4px 0;max-width:none}
+
+/* cards and grids */
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--beige);padding:16px;border-radius:2px}
+.card h3{margin-top:4px}
+.card p{font-size:15px}
+.big{font-family:var(--serif);font-size:34px;color:var(--dark);line-height:1}
+.src{font-size:12px;color:var(--muted)}
+
+/* tables */
+.scroll{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);font-weight:400;border-bottom:1px solid var(--dark)}
+td strong{color:var(--dark)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;white-space:nowrap}
+.pill.mvp{background:var(--green);color:var(--dark)}
+.pill.tpl{background:var(--mint);color:var(--dark)}
+.pill.later{border:1px dashed var(--grey);color:var(--grey)}
+.pill.out{background:#ECE8DA;color:var(--muted)}
+
+/* process maps */
+.map{display:grid;grid-template-columns:130px minmax(0,1fr) 150px;gap:14px;margin-top:18px;align-items:stretch}
+.scenario{background:var(--beige);border:1px solid var(--line);padding:12px;font-size:14px}
+.scenario .label{display:block;margin-bottom:10px}
+.side{padding:14px;font-size:14px}
+.side.cost{background:var(--black);color:var(--white)}
+.side.gain{background:var(--green);color:var(--dark)}
+.side .label{color:inherit;display:block;margin-bottom:6px}
+.side .lead{font-size:15px;margin:0 0 10px}
+.side.cost .lead{color:var(--green)}
+.side dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:baseline}
+.side dt{font-family:var(--serif);font-size:26px;line-height:1}
+.side dd{margin:0}
+.side .note{font-size:12px;margin-top:12px;opacity:.85}
+.mapbody{min-width:0}
+.svgwrap{overflow-x:auto;background:var(--white)}
+.svgwrap svg{display:block;min-width:700px;width:100%;height:auto}
+.callout{border-left:3px solid var(--pain);background:var(--pain-bg);padding:12px 14px;margin-top:10px}
+.callout.good{border-left-color:var(--dark);background:var(--mint)}
+.callout .label{display:block;margin-bottom:6px;color:#8A5A0B}
+.callout.good .label{color:var(--dark)}
+.callout ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:6px 18px;max-width:none}
+.callout li::before{content:"◆ ";font-size:11px}
+.strip{background:#ECEAE4;padding:10px 14px;margin-top:10px;font-size:14px}
+
+.towerwrap{overflow-x:auto}
+.tower{min-width:720px}
+.bar{background:var(--dark);color:var(--white);padding:7px 12px;display:flex;justify-content:space-between;gap:12px;font-size:13px}
+.bar span{font-family:var(--mono);font-size:12px;color:var(--green);letter-spacing:.04em}
+.rows{display:grid;grid-template-columns:78px repeat(6,minmax(0,1fr));gap:8px;margin-top:10px}
+.rowlabel{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);align-self:center}
+.step{border:1px solid var(--dark);background:var(--white);padding:8px;font-size:13px;position:relative;min-height:92px}
+.step.human{background:var(--dark);color:var(--white)}
+.step .n{position:absolute;top:-9px;left:-9px;width:20px;height:20px;border-radius:50%;background:var(--green);color:var(--dark);font-size:11px;font-weight:700;display:grid;place-items:center}
+.step b{display:block;margin:2px 0 6px 8px;font-weight:600}
+.step .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;display:block}
+.step.human .tag{color:var(--green)}
+.rule{background:var(--mint);border:1px solid var(--green);padding:8px;font-size:12.5px}
+.rule .tag,.ev .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;display:block;color:var(--grey);margin-bottom:3px}
+.ev{border:1px solid var(--grey);padding:8px;font-size:12.5px;background:var(--white)}
+.target{margin-top:10px;border:1px dashed var(--grey);padding:10px 14px;font-size:14px}
+.target .label{display:block;margin-bottom:4px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin-top:10px;color:var(--grey)}
+.legend i{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin-right:5px}
+
+details{border-top:1px solid var(--line);padding:10px 0}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;color:var(--dark);font-size:17px;padding:4px 0}
+summary span{font-weight:400;color:var(--muted);font-size:14px;margin-left:8px}
+footer{margin-top:56px;border-top:1px solid var(--green);padding-top:12px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+@media (max-width:980px){
+  .map{grid-template-columns:1fr}
+  .side dl{grid-template-columns:auto 1fr auto 1fr}
+}
+@media print{details{display:block} details>*{display:block!important}}
+</style>
+</head>
+<body>
+<main>
+
+<div class="label">RWD/RWE suite · Proposal</div>
+<h1>Governing real-world evidence from data to decision</h1>
+<p class="sub">A governance MVP for the RWD/RWE solution suite: what the market needs, how the process runs today, and what we propose to build first.</p>
+<p class="meta">Li-Heng Fu · first draft 22 Oct 2026 · revised 13 Nov 2026 · not yet accepted · build starts after the migration</p>
+
+<div class="status">
+  <p><strong>Where this stands.</strong> This is a proposal for review. The process maps are illustrative: they describe a typical pharma RWE function as the published evidence portrays it, not a named customer.</p>
+  <p><strong>What we need from you.</strong> Agreement on the MVP scope in <a href="#scope">section 5</a>. The build starts after the migration closes (<a href="#sequencing">section 8</a>). User stories are written after that agreement. The technical specification is at the <a href="#spec">end</a>.</p>
+  <p><strong>Evidence.</strong> Regulation, literature and market findings come from <a href="rwe-governance-review.md"><code>rwe-governance-review.md</code></a> (13 Nov 2026), which marks how each claim was sourced.</p>
+</div>
+
+<!-- 1 -->
+<h2 id="market">1 · The market need</h2>
+<p>Pharma companies no longer ask whether to use real-world evidence. They ask whether a regulator, a payer or their own governance board will accept it. The answer depends less on the platform and more on whether the study can show how it was run.</p>
+
+<div class="grid g3" style="margin-top:18px">
+  <div class="card">
+    <div class="label">Demand</div>
+    <div class="big">96%</div>
+    <p>of biopharma leaders call real-world data and evidence essential to strategy. 80% expect generative AI to change how evidence is produced within a year.</p>
+    <p class="src">Deloitte RWE benchmark, 2025</p>
+  </div>
+  <div class="card">
+    <div class="label">Acceptance</div>
+    <div class="big">15%</div>
+    <p>of the real-world studies in 88 FDA approvals were judged inadequate. The reasons were study design and data relevance: confounding, selection bias, misclassification, missing data.</p>
+    <p class="src">Purpura et al., Clin Pharmacol Ther, 2022</p>
+  </div>
+  <div class="card">
+    <div class="label">Reproducibility</div>
+    <div class="big">7%</div>
+    <p>of 250 published studies referenced their analysis code. Nine expert teams given the same data and written methods built cohorts from 2,159 to 63,619 patients.</p>
+    <p class="src">Wang et al., 2022; Ostropolets et al., 2023</p>
+  </div>
+</div>
+
+<h3>Three pressures are converging</h3>
+<ul>
+  <li><strong>Regulators now ask for the same study record on both sides of the Atlantic.</strong> ICH M14 has applied in the EU since March 2026 and is final at FDA. With FDA's RWE guidances and EMA's 2025 reflection paper, it asks for a protocol fixed before the outcome analysis, a data source shown fit for the question, validated definitions, and traceability from source data to result.</li>
+  <li><strong>Access to data is becoming conditional on governance.</strong> From March 2029 the European Health Data Space gives access through a data permit, for a stated purpose, inside a secure environment. In the US, data-owner agreements must already allow FDA to inspect the source.</li>
+  <li><strong>AI raises the stakes.</strong> Language models asked for clinical code lists returned about a third invented codes in one study. FDA and EMA published joint principles in January 2026 that ask for documented, human-checked use.</li>
+</ul>
+
+<h3>What buyers say is hard</h3>
+<p>In surveys, the top barriers are data compatibility (29%), privacy and security (27%), scarce talent that combines evidence and AI skills (25%) and regulatory uncertainty (23%). The last three figures come from a trade-press summary of Deloitte's survey. Fragmented tools make it hard to show the return on the investment.</p>
+
+<!-- 2 -->
+<h2 id="opportunity">2 · The opportunity</h2>
+<p>Audit trails, role-based access and security certificates are standard: every serious RWE platform claims them. What we did not find in any vendor's public material is one record that joins the steps a study goes through. This is an absence in public material, not proof that nobody does it.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Market need</th><th>What exists today</th><th>What this MVP shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Prove the study was planned before it was run</strong></td><td>Protocol locking inside purpose-built RWE tools; Word documents elsewhere</td><td>A protocol whose version is locked and time-stamped, and an analysis that refuses to run if the protocol changed</td></tr>
+    <tr><td><strong>Show the data fits the question</strong></td><td>Database-level quality checks; fitness judged informally</td><td>A fitness assessment recorded per study, required before the protocol can be locked</td></tr>
+    <tr><td><strong>Trace a result to its data, definitions and code</strong></td><td>Lineage within one tool; manual reconstruction across tools</td><td>Each result pinned to a data cut, vocabulary version, cohort definitions and code release</td></tr>
+    <tr><td><strong>Use data only as permitted</strong></td><td>Contracts held by legal; access granted by IT</td><td>Data-use terms on the dataset record, checked against each study's declared purpose</td></tr>
+    <tr><td><strong>Keep approvals meaningful</strong></td><td>Sign-off by email or committee slide</td><td>Six sign-offs, each opened only when its evidence exists</td></tr>
+    <tr><td><strong>Survive a data refresh</strong></td><td>Re-run by hand; changes found late</td><td>A refresh marks downstream approvals stale and triggers a compare</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Why Dataiku.</strong> The suite already runs across the customer's own data platforms (Snowflake, Databricks, Redshift) on the OMOP standard, and Dataiku Govern provides workflows, sign-offs and deployment gates. Purpose-built RWE tools govern inside their own product, and data science platforms govern models. Governing a study across tools is the open position.</p>
+<p><strong>How we describe it.</strong> The suite demonstrates controls that support regulated work; the customer validates its own system. Comparable platforms use the same wording, and Dataiku's own material does not claim Part 11 compliance.</p>
+
+<!-- 3 -->
+<h2 id="today">3 · The governance process today</h2>
+<p class="sub">Today's reality: three teams, no single record</p>
+
+<div class="map">
+  <div class="scenario">
+    <span class="label">Scenario</span>
+    A comparative study of a first-line hypertension medicine, intended to support a regulatory or payer decision.
+    <p class="label" style="margin-top:14px">Illustrative</p>
+  </div>
+
+  <div class="mapbody">
+    <div class="svgwrap">
+    <svg viewBox="0 0 1000 350" role="img" aria-label="Today's process across three teams: data and informatics, the study team, and quality and compliance, with seven steps, five handoffs and two rework loops">
+      <defs>
+        <marker id="a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#E9A23B"/></marker>
+        <marker id="g" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8A8A8A"/></marker>
+      </defs>
+      <style>
+        .lane{fill:#F8F4E4}.lt{font:600 13px Inter,Arial,sans-serif;fill:#1A1A1A}.ls{font:11px Menlo,Consolas,monospace;fill:#5B6170}
+        .bx{fill:#FFFEF9;stroke:#1A1A1A;stroke-width:1}.bt{font:600 13px Inter,Arial,sans-serif;fill:#1A1A1A}.bs{font:10.5px Menlo,Consolas,monospace;fill:#7A7A7A}
+        .fl{fill:none;stroke:#E9A23B;stroke-width:1.6}.rw{fill:none;stroke:#8A8A8A;stroke-width:1.4;stroke-dasharray:5 4}.rt{font:11px Menlo,Consolas,monospace;fill:#8A5A0B}
+      </style>
+      <rect class="lane" x="0" y="0" width="1000" height="110"/>
+      <rect class="lane" x="0" y="240" width="1000" height="110"/>
+      <text class="lt" x="8" y="48">Data and</text><text class="lt" x="8" y="64">informatics</text><text class="ls" x="8" y="82">Data office</text>
+      <text class="lt" x="8" y="168">Study team</text><text class="ls" x="8" y="186">Epi · Biostat</text>
+      <text class="lt" x="8" y="288">Quality and</text><text class="lt" x="8" y="304">compliance</text><text class="ls" x="8" y="322">QA · Legal</text>
+
+      <!-- flows -->
+      <path class="fl" marker-end="url(#a)" d="M162,90 V125 H290 V140"/>
+      <path class="fl" marker-end="url(#a)" d="M348,175 H360"/>
+      <path class="fl" marker-end="url(#a)" d="M418,140 V125 H530 V90"/>
+      <path class="fl" marker-end="url(#a)" d="M604,55 H690 V140"/>
+      <path class="fl" marker-end="url(#a)" d="M700,210 V235 H780 V260"/>
+      <path class="fl" marker-end="url(#a)" d="M830,260 V235 H930 V210"/>
+      <path class="rw" marker-end="url(#g)" d="M744,295 H650 V210"/>
+      <text class="rt" x="697" y="289" text-anchor="middle">re-run</text>
+      <path class="rw" marker-end="url(#g)" d="M220,40 H488"/>
+      <text class="rt" x="354" y="33" text-anchor="middle">data refresh: rebuild, re-run</text>
+
+      <!-- boxes -->
+      <g><rect class="bx" x="104" y="20" width="116" height="70"/><text class="bt" x="112" y="40">1 · Request data</text><text class="bt" x="112" y="55">access</text><text class="bs" x="112" y="78">Contract · email</text></g>
+      <g><rect class="bx" x="232" y="140" width="116" height="70"/><text class="bt" x="240" y="160">2 · Check</text><text class="bt" x="240" y="175">feasibility</text><text class="bs" x="240" y="198">SQL · Excel</text></g>
+      <g><rect class="bx" x="360" y="140" width="116" height="70"/><text class="bt" x="368" y="160">3 · Write</text><text class="bt" x="368" y="175">protocol</text><text class="bs" x="368" y="198">Word · share</text></g>
+      <g><rect class="bx" x="488" y="20" width="116" height="70"/><text class="bt" x="496" y="40">4 · Build</text><text class="bt" x="496" y="55">cohorts</text><text class="bs" x="496" y="78">Atlas · SQL copy</text></g>
+      <g><rect class="bx" x="616" y="140" width="116" height="70"/><text class="bt" x="624" y="160">5 · Run</text><text class="bt" x="624" y="175">analysis</text><text class="bs" x="624" y="198">R · SAS scripts</text></g>
+      <g><rect class="bx" x="744" y="260" width="116" height="70"/><text class="bt" x="752" y="280">6 · QC and</text><text class="bt" x="752" y="295">review</text><text class="bs" x="752" y="318">Re-code · email</text></g>
+      <g><rect class="bx" x="872" y="140" width="116" height="70"/><text class="bt" x="880" y="160">7 · Report and</text><text class="bt" x="880" y="175">defend</text><text class="bs" x="880" y="198">Word · PDF</text></g>
+    </svg>
+    </div>
+
+    <div class="callout">
+      <span class="label">Nobody can show this today</span>
+      <ul>
+        <li>Was the data judged fit for this question before the study was designed?</li>
+        <li>Was the protocol fixed before anyone saw the results?</li>
+        <li>Which data cut, definitions and code produced this figure?</li>
+        <li>Does the data licence allow this use?</li>
+      </ul>
+    </div>
+    <div class="strip"><strong>Decisions today</strong> · Who: study lead and a review committee · How: documents and email · When: once, before the report · Trail: assembled by hand when someone asks</div>
+  </div>
+
+  <div class="side cost">
+    <span class="label">The cost</span>
+    <p class="lead">Slow to run, hard to defend</p>
+    <dl>
+      <dt>3</dt><dd>teams</dd>
+      <dt>6+</dt><dd>tools and file types</dd>
+      <dt>5</dt><dd>handoffs</dd>
+      <dt>2</dt><dd>rework loops</dd>
+    </dl>
+    <p class="note">Counts read from this illustrative map, not measured at a customer.</p>
+  </div>
+</div>
+
+<!-- 4 -->
+<h2 id="mvp">4 · The process with the MVP</h2>
+<p class="sub">The platform checks and records, people decide</p>
+
+<div class="map">
+  <div class="scenario" style="border-color:var(--green)">
+    <span class="label">Scenario</span>
+    The same study, run as one governed process on the demo suite, with SYNPUF synthetic data.
+    <p class="label" style="margin-top:14px">In this suite: the LEGEND-HTN replication</p>
+  </div>
+
+  <div class="mapbody">
+    <div class="towerwrap"><div class="tower">
+      <div class="bar"><strong>Dataiku Govern</strong><span>Every step evidenced · signed · versioned</span></div>
+      <div class="rows">
+        <div class="rowlabel">Process steps</div>
+        <div class="step human"><i class="n">1</i><b>Accept data</b><span class="tag">Human approval</span>Data owner</div>
+        <div class="step human"><i class="n">2</i><b>Validate tooling</b><span class="tag">Human approval</span>Solution owner</div>
+        <div class="step human"><i class="n">3</i><b>Validate cohorts</b><span class="tag">Human approval</span>Clinical researcher</div>
+        <div class="step human"><i class="n">4</i><b>Lock protocol</b><span class="tag">Human approval</span>Epidemiologist</div>
+        <div class="step human"><i class="n">5</i><b>Review study</b><span class="tag">Human approval</span>Study owner</div>
+        <div class="step human"><i class="n">6</i><b>Approve release</b><span class="tag">Human approval</span>Suite owner</div>
+
+        <div class="rowlabel">Automated checks</div>
+        <div class="rule"><span class="tag">Rules</span>Schema, quality rules, data-use terms, version pins</div>
+        <div class="rule"><span class="tag">Test</span>Same cohort counts on three databases</div>
+        <div class="rule"><span class="tag">Rules</span>Counts, integrity, composition, validation source</div>
+        <div class="rule"><span class="tag">Gate</span>Fitness assessed; purpose permitted by the licence</div>
+        <div class="rule"><span class="tag">Gate</span>Runs only on the locked protocol; balance diagnostics; attrition</div>
+        <div class="rule"><span class="tag">Gate</span>Unapproved bundle cannot deploy</div>
+
+        <div class="rowlabel">Evidence record</div>
+        <div class="ev"><span class="tag">Dataset</span>Data cut, vocabulary, licence</div>
+        <div class="ev"><span class="tag">Release</span>Code version, test result</div>
+        <div class="ev"><span class="tag">Cohort</span>Definition fingerprint, reviewer notes</div>
+        <div class="ev"><span class="tag">Study</span>Protocol fingerprint and lock time</div>
+        <div class="ev"><span class="tag">Study</span>Diagnostics, deviations log</div>
+        <div class="ev"><span class="tag">Manifest</span>What was deployed, from what</div>
+      </div>
+      <div class="target">
+        <span class="label">Target design, after the MVP</span>
+        Phenotype validation runs · negative-control diagnostics · electronic signature · secure-environment output checks for the EHDS · study registration · model revalidation
+      </div>
+    </div></div>
+
+    <div class="callout good">
+      <span class="label">Now shown, for every study</span>
+      <ul>
+        <li>The data was accepted, with its permitted uses, before the study used it</li>
+        <li>The protocol was locked before the outcome analysis ran</li>
+        <li>Each figure traces to a data cut, definitions and code release</li>
+        <li>A data refresh reopens the approvals that depend on it</li>
+      </ul>
+    </div>
+    <div class="legend"><span><i style="background:var(--dark)"></i>Human decision</span><span><i style="background:var(--mint);border:1px solid var(--green)"></i>Automated check, in the MVP</span><span><i style="border:1px dashed var(--grey)"></i>Target design</span></div>
+  </div>
+
+  <div class="side gain">
+    <span class="label">The gain</span>
+    <p class="lead">Every approval backed by evidence</p>
+    <dl>
+      <dt>1</dt><dd>record per study, data to result</dd>
+      <dt>6</dt><dd>human decisions</dd>
+      <dt>0</dt><dd>unpinned results</dd>
+      <dt>1</dt><dd>audit trail</dd>
+    </dl>
+    <p class="note">Design targets for the MVP, not measured results.</p>
+  </div>
+</div>
+
+<!-- 5 -->
+<h2 id="scope">5 · Proposed MVP scope</h2>
+<p>The MVP governs one study end to end on the demo suite (<code>DEMO_SF_PREP_OMOP_2M3</code> → <code>DEMO_SF_RWD</code> → <code>DEMO_SF_RWE</code>). It is a demonstration on synthetic data, so two steps are shown as templates.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Process step</th><th>Today</th><th>With the MVP</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Data access and permitted use</strong></td><td>Contract and email; terms held outside the platform</td><td>Dataset accepted with licence, permitted purposes and version pins; each study's purpose checked against them</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>Fitness for the question</strong></td><td>Ad hoc feasibility counts</td><td>Fitness assessment recorded per study, required before protocol lock</td><td><span class="pill tpl">MVP · template</span></td></tr>
+    <tr><td><strong>Protocol</strong></td><td>Word document; version by file name</td><td>Protocol under version control, locked and time-stamped; analysis refuses to run if it changed</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>Cohort definitions</strong></td><td>SQL copies; counts checked by eye</td><td>Fingerprinted definitions; count, integrity and composition checks; clinical sign-off against written criteria</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>Cohort validity</strong></td><td>Rarely documented</td><td>Each cohort records how and where its definition was validated</td><td><span class="pill tpl">MVP · template</span></td></tr>
+    <tr><td><strong>Analysis and diagnostics</strong></td><td>Scripts; QC by re-coding</td><td>Balance and equipoise judged against thresholds set in the protocol; attrition table on every run; deviations logged</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>Data refresh</strong></td><td>Re-run by hand</td><td>New data cut or vocabulary marks approvals stale; re-run and compare before re-approval</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>Release and deployment</strong></td><td>Report sent; trail rebuilt on request</td><td>Generated release manifest; deployment blocked until approved</td><td><span class="pill mvp">MVP</span> needs deployment authority</td></tr>
+    <tr><td><strong>Access control and lineage</strong></td><td>Per tool</td><td>One group per part; registered data shares; index check fails on unexpected access</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>AI use</strong></td><td>Unrecorded</td><td>Log of AI-assisted definitions or code, with the person who checked them</td><td><span class="pill mvp">MVP</span></td></tr>
+    <tr><td><strong>Negative-control diagnostics</strong></td><td>Specialist practice</td><td>Strongest diagnostic in the literature; adds cohorts to the study</td><td><span class="pill later">Decision</span></td></tr>
+    <tr><td><strong>Phenotype validation runs, real fitness verdict</strong></td><td>—</td><td>Not possible on synthetic data</td><td><span class="pill later">Target</span></td></tr>
+    <tr><td><strong>EHDS secure environment, study registration</strong></td><td>—</td><td>Fields recorded now; behaviour later</td><td><span class="pill later">Target</span></td></tr>
+    <tr><td><strong>Electronic signature, system validation, training records</strong></td><td>—</td><td>Customer responsibility</td><td><span class="pill out">Out</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>The MVP is done when</h3>
+<ul>
+  <li>The demo study walks all six sign-offs in Govern, each linked to its evidence.</li>
+  <li>The outcome analysis refuses to run when the protocol file is changed after lock.</li>
+  <li>A changed data cut or vocabulary version marks the downstream approvals stale.</li>
+  <li>The automation node refuses an unapproved release and accepts the approved one.</li>
+  <li>The repository check fails on unexpected access, a missing record, an unpinned version or a missing sign-off.</li>
+</ul>
+
+<!-- 6 -->
+<h2 id="stakeholders">6 · Stakeholders</h2>
+<p>The suite plays the customer, so each role below exists twice: as a persona the demo speaks to, and as a named person who signs off in the MVP. No one is named yet.</p>
+
+<div class="scroll">
+<table>
+  <thead><tr><th>Stakeholder</th><th>What they need from governance</th><th>Role in the MVP process</th><th>Decides</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Data owner / data steward</strong><br>Data office</td><td>Data used only as licensed; one accepted version in use</td><td>Approves step 1</td><td>Is this data accepted, and for which purposes</td></tr>
+    <tr><td><strong>Biomedical informaticist</strong><br>Data and informatics</td><td>Definitions that do not drift silently between versions</td><td>Gives feedback on step 3; owns cohort quality</td><td>—</td></tr>
+    <tr><td><strong>Clinical researcher</strong><br>Medical</td><td>Cohorts that mean what they claim clinically</td><td>Approves step 3</td><td>Are these cohorts clinically plausible</td></tr>
+    <tr><td><strong>Epidemiologist / HEOR researcher</strong><br>Study team</td><td>A study design that will stand up to a regulator or payer</td><td>Approves step 4</td><td>Is the data fit, and is the protocol final</td></tr>
+    <tr><td><strong>Biostatistician</strong><br>Study team</td><td>Diagnostics judged against thresholds set in advance</td><td>Gives feedback on steps 4 and 5</td><td>—</td></tr>
+    <tr><td><strong>Study owner</strong><br>RWE lead</td><td>Results that can be defended and repeated</td><td>Approves step 5</td><td>Does the study stand as run</td></tr>
+    <tr><td><strong>QA / test engineer</strong><br>Quality</td><td>Evidence without rebuilding the trail by hand</td><td>Gives feedback on steps 1 and 2</td><td>—</td></tr>
+    <tr><td><strong>Solution owner</strong><br>Platform team</td><td>One tested release of the tooling in use</td><td>Approves step 2</td><td>Is this release fit to run studies</td></tr>
+    <tr><td><strong>Suite owner</strong><br>Programme lead</td><td>One view of what is approved and deployed</td><td>Approves step 6</td><td>Does this release go live</td></tr>
+    <tr><td><strong>Governance and compliance lead</strong><br>Regulatory, privacy, legal</td><td>Policies visibly applied; data-use terms respected</td><td>Owns the policies and data-use terms the records link to</td><td>Sets the rules; no step sign-off in the MVP</td></tr>
+    <tr><td><strong>Platform administrator</strong><br>IT</td><td>Changes that follow a controlled path</td><td>Sets up groups, connection access and the deployment gate</td><td>—</td></tr>
+    <tr><td><strong>Regulator, HTA body, data provider</strong><br>External</td><td>An inspectable record; licensed use</td><td>Readers of the record; not users of the system</td><td>—</td></tr>
+    <tr><td><strong>Account team</strong><br>Dataiku</td><td>A credible story for regulated customers</td><td>Presents the demo</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- 7 -->
+<h2 id="stories">7 · User stories</h2>
+<p>User stories are written once the scope in section 5 is agreed. They will be grouped by the stakeholder who acts, one set per process step:</p>
+<ul>
+  <li><strong>Data owner:</strong> accept a dataset and state its permitted uses.</li>
+  <li><strong>Clinical researcher and informaticist:</strong> review and approve a cohort; see what changed since the last approval.</li>
+  <li><strong>Epidemiologist and biostatistician:</strong> record data fitness; lock a protocol; review diagnostics.</li>
+  <li><strong>Study owner and suite owner:</strong> approve a study and a release; see what is stale after a refresh.</li>
+  <li><strong>QA and compliance:</strong> retrieve the full record for one result.</li>
+</ul>
+
+<!-- 8 -->
+<h2 id="sequencing">8 · Sequencing: after the migration</h2>
+<p>The governance work waits for the migration to close. At that point the three demo projects exist in their final form, read only from each other, and run a tagged library, so sign-offs are given on a stable suite and not on projects about to be recreated.</p>
+<div class="scroll"><table>
+<thead><tr><th>Step</th><th>Starts when</th><th>Work</th><th>Exit gate</th></tr></thead>
+<tbody>
+<tr><td><strong>F0 Design</strong></td><td>Scope agreed; needs no DSS change, so it can be drafted at any time</td><td>Decisions; user stories; blueprints and role map; protocol and fitness template; read-only access and governance indexes</td><td>Decisions recorded; index shows gaps as issues</td></tr>
+<tr><td><strong>F1 Data</strong></td><td>Migration phase 5 closed</td><td>Data Quality rules on the export tables; dataset acceptance with terms and pins; sign-off 1</td><td><code>DEMO_SF_PREP_OMOP_2M3</code> accepted in Govern</td></tr>
+<tr><td><strong>F2 Cohorts</strong></td><td>F1</td><td>Pre-assessments; cohort records, fingerprints, composition check; sign-offs 2 and 3</td><td>Governed cohorts approved</td></tr>
+<tr><td><strong>F3 Study</strong></td><td>F2</td><td>Study record; protocol lock (sign-off 4); scenario, diagnostics and attrition steps in <code>DEMO_SF_RWE</code>; governed rebuild; sign-off 5</td><td>Protocol locked before the rebuild's outcome analysis; study reviewed</td></tr>
+<tr><td><strong>F4 Release</strong></td><td>F3</td><td>Bundles, release manifests, Project Standards scope, sign-off 6; gated deployment</td><td>Suite runs on the automation node from approved bundles</td></tr>
+</tbody></table></div>
+<p>Every step from F1 changes DSS projects or writes to Govern, and each needs the project owner's approval as it starts.</p>
+<h3>What the migration should leave behind</h3>
+<p>No new migration work, only records that are cheap to keep now and hard to recover later:</p>
+<ul>
+<li>The data cut and source of <code>DEMO_SF_PREP_OMOP_2M3</code> when it is created, and the OMOP vocabulary version if the source carries it. The 15 export tables do not include the tables where that version normally lives; whether the source has them is not checked.</li>
+<li>The cohort counts <code>DEMO_DB_RWD2</code> recorded on 2025-10-06, exported before it is retired. They become the reference for the cohort regression check.</li>
+<li>The cross-database test result for the three sample cohorts. It is the evidence for sign-off 2.</li>
+<li>The notebook baseline of the Cox results. It becomes the study's first reference result.</li>
+</ul>
+
+<!-- 9 -->
+<h2 id="changes">9 · Changes to the demo suite</h2>
+<p>Read from the index snapshot of 5 Nov 2026 and the migration plan; live DSS was not checked. Today the prep project is planned and not yet created, <code>DEMO_SF_RWD</code> is on an old library branch with broken mappings, <code>DEMO_SF_RWE</code> still reads from a retiring project and has no scenario, and every project's owner is unassigned.</p>
+<div class="scroll"><table>
+<thead><tr><th>Project</th><th>Done by the migration</th><th>New for the framework</th></tr></thead>
+<tbody>
+<tr><td><strong><code>DEMO_SF_PREP_OMOP_2M3</code></strong></td><td>Created as a full copy of the canonical 2.3M set; 15/15 schema pass; row counts match</td><td>Data Quality rules on the 15 tables with a scenario that stops on failure; recorded data cut, vocabulary and ETL versions; data-use terms in the registry</td></tr>
+<tr><td><strong><code>DEMO_SF_RWD</code></strong></td><td>Recreated from the released solution; 45 cohorts rebuilt; counts checked against the reference</td><td>Integrity rules on the cohort table; a composition check against a stored reference; a fingerprint per governed cohort definition; validation source and expected ranges per governed cohort</td></tr>
+<tr><td><strong><code>DEMO_SF_RWE</code></strong></td><td>Inputs repointed to <code>DEMO_SF_RWD</code>; notebook replaced by a Cox recipe and static report</td><td>Protocol and fitness files in the repo; a scenario that runs the study end to end and stops if the protocol is not locked; a balance and overlap diagnostics step before the Cox model; an attrition table; a deviations log</td></tr>
+<tr><td><strong>All three</strong></td><td>Library pinned to the release tag</td><td>Suite groups and export permissions; suite tag and Project Standards; one bundle per release; Govern sync; the deployment gate</td></tr>
+</tbody></table></div>
+<p><strong><code>DEMO_SF_RWE</code> is the largest piece.</strong> It needs a new scenario and two or three new recipes. The study weights by inverse probability, so balance is checked on the weighted population.</p>
+
+<!-- 10 -->
+<h2 id="decisions">10 · Decisions needed</h2>
+<h3>To agree the scope</h3>
+<ul>
+  <li><strong>Study as a governed record.</strong> Accept a study record alongside the cohort record. This is the main change from the first draft.</li>
+  <li><strong>Negative controls.</strong> In or out of the MVP.</li>
+  <li><strong>Deployment.</strong> The scoping document excludes deploying the demo suite for lack of authority. Without it the MVP stops before the deployment gate.</li>
+  <li><strong>Cohorts in scope.</strong> The 3 sample cohorts plus the study's population and outcome cohorts; the 36 feature cohorts listed but not reviewed one by one.</li>
+</ul>
+<h3>To start building, after the migration</h3>
+<ul>
+  <li><strong>Named owners and reviewers</strong> for the six sign-offs.</li>
+  <li><strong>Instance and Govern node.</strong> The suite's design instance is not the one the Govern framework sits on; either choice needs confirmation that SYNPUF may sit there.</li>
+  <li><strong>A Govern admin key.</strong> The current key is read-only.</li>
+  <li><strong>Protocol author and thresholds</strong> for the demo study.</li>
+  <li><strong>Data-use terms for SYNPUF</strong>, so the purpose check has real values.</li>
+</ul>
+
+<h3>Main risks</h3>
+<div class="scroll">
+<table>
+  <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>The MVP grows into a study-methods project</td><td>Study controls are records, fingerprints and two automated steps; validation runs and EHDS behaviour stay out</td></tr>
+    <tr><td>Sign-offs turn into clicks</td><td>Six steps only; evidence fields are required; clinical review has written criteria</td></tr>
+    <tr><td>Template records on synthetic data are read as real evidence</td><td>Banner on the records; fields say "template"</td></tr>
+    <tr><td>The demo is read as a validation claim</td><td>"Supports the controls; the customer validates" on every page</td></tr>
+    <tr><td>The migration slips and the governance work slips with it</td><td>F0 needs no DSS change and can be drafted meanwhile; the records in section 8 are kept as the migration runs</td></tr>
+    <tr><td>Regulatory references age</td><td>The review is dated and lists drafts and pending acts</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- Appendix -->
+<h2 id="spec">Appendix · Technical specification</h2>
+<p>For the builders. Step numbers G1–G6 are the six process steps above.</p>
+
+<details>
+<summary>A · Principles</summary>
+<ol>
+  <li><strong>Govern the study, not only the platform.</strong> Each platform control is tied to the study record it protects.</li>
+  <li><strong>A sign-off is backed by evidence.</strong> The step's required fields are the evidence: an index row, a DSS check result, a file hash or a bundle.</li>
+  <li><strong>The executable specification is the record.</strong> Protocol, cohort definitions and code, pinned to a data cut and a vocabulary version.</li>
+  <li><strong>Reuse the framework.</strong> Fork versions of existing blueprints. Two blueprints are new: the cohort definition and the study.</li>
+  <li><strong>Governance configuration is code.</strong> Blueprint versions, sign-off configs and the role map are exported into the repo and imported to Govern as DRAFT. Reviewers are always Govern roles.</li>
+  <li><strong>Scale through templates.</strong> A suite tag selects projects for Project Standards and for Govern.</li>
+  <li><strong>Writes to Govern follow the wiki rule.</strong> A drift report is the default; pushing records needs the owner's approval.</li>
+</ol>
+</details>
+
+<details>
+<summary>B · Governed objects <span>blueprints and fields</span></summary>
+<div class="scroll"><table>
+<thead><tr><th>Govern object</th><th>Blueprint</th><th>One per</th><th>Filled from</th></tr></thead>
+<tbody>
+<tr><td>Business initiative</td><td><code>bp.system.business_initiative</code></td><td>Suite</td><td>Hand-written, once</td></tr>
+<tr><td>Pre-assessment</td><td><code>bp.pre_assessment</code></td><td>Use case (Part 2, Part 3)</td><td><code>project-scoping.md</code></td></tr>
+<tr><td>Govern project</td><td>standard project sync</td><td>Active DSS project of the demo suite</td><td>DSS sync; registry key</td></tr>
+<tr><td>Dataset acceptance</td><td><code>bp.gmlp_dataset_governance</code>, new version <code>bv.rwd_dataset</code></td><td>OMOP set, per data cut</td><td><code>schema_compliance.tsv</code>, <code>datasets.tsv</code>, <code>lineage.tsv</code>, registry</td></tr>
+<tr><td>Cohort definition</td><td><strong>new</strong> <code>bp.rwd_cohort_definition</code></td><td>Governed cohort</td><td><code>cohort_definition</code>, <code>cohort_building_log</code>, DQ results</td></tr>
+<tr><td>Study</td><td><strong>new</strong> <code>bp.rwe_study</code></td><td>Study (<code>DEMO_SF_RWE</code>)</td><td><code>studies/&lt;key&gt;/</code> in the repo; DSS diagnostics</td></tr>
+<tr><td>Model version</td><td>standard model version sync</td><td>Propensity model version</td><td>DSS model evaluation</td></tr>
+<tr><td>Bundle + release manifest</td><td>standard bundle sync + <code>bp.release_manifest</code></td><td>Bundle of a demo-suite project</td><td>Bundle content, index, DQ results</td></tr>
+</tbody></table></div>
+<p><strong><code>bv.rwd_dataset</code></strong> adds: <code>data_licence</code>, <code>allowed_instances</code>, <code>permitted_purposes</code>, <code>patient_level_export</code>; and the pins <code>data_cut_id</code>, <code>cdm_version</code>, <code>vocabulary_version</code>, <code>etl_version</code>. A new data cut or vocabulary version opens a new record version.</p>
+<p><strong><code>bp.rwd_cohort_definition</code></strong>:</p>
+<ul>
+<li>Identity: <code>cohort_definition_id</code>, <code>phenotype_source</code>, <code>sql_sha256</code>, <code>concept_set_sha256</code>, <code>vocabulary_version</code>, <code>governing_project</code>.</li>
+<li>Reproducibility: <code>dialect_counts</code> (SF, DB, RS), <code>reference_count</code> and date, <code>dq_result</code>.</li>
+<li>Validity: <code>validation_method</code>, <code>validation_source</code> and metrics where they exist, <code>characterisation</code>.</li>
+<li>Review: <code>clinical_review_notes</code>, <code>ai_assisted</code>, <code>used_by</code>.</li>
+</ul>
+<p>A change to the SQL hash, concept-set hash or vocabulary version opens a new version and resets the clinical sign-off.</p>
+<p><strong><code>bp.rwe_study</code></strong> follows ICH M14 and the HARPER template:</p>
+<div class="scroll"><table>
+<thead><tr><th>Stage</th><th>Fields</th></tr></thead>
+<tbody>
+<tr><td>Question</td><td><code>research_question</code>, <code>declared_purpose</code>, <code>intended_use</code></td></tr>
+<tr><td>Data fitness</td><td><code>dataset_refs</code>, <code>fitness_assessment</code> (exposure, each outcome, key confounders, follow-up, sample size), <code>fitness_verdict</code></td></tr>
+<tr><td>Protocol</td><td><code>protocol_path</code>, <code>protocol_sha256</code>, <code>locked_at</code>, <code>cohort_refs</code>, <code>target_trial_spec</code>, <code>diagnostic_thresholds</code>, <code>planned_sensitivity_analyses</code></td></tr>
+<tr><td>Conduct</td><td><code>code_ref</code>, <code>data_cut_id</code>, <code>attrition_table</code>, <code>diagnostics_result</code>, <code>deviations_log</code>, <code>exploratory_analyses</code></td></tr>
+<tr><td>Release</td><td><code>results_ref</code>, <code>registration</code> (HMA-EMA Catalogue fields, recorded, not submitted), <code>ai_use_log</code></td></tr>
+</tbody></table></div>
+<p><strong>Synthetic-data limits.</strong> <code>validation_source</code> cites the published definition each cohort comes from, and the fitness assessment is a worked template. The protocol for <code>DEMO_SF_RWE</code> is written from the published LEGEND-HTN protocol; the lock is demonstrated on a governed rebuild after the migration, not the study's first run.</p>
+</details>
+
+<details>
+<summary>C · Controls by domain <span>where enforced, what evidence</span></summary>
+<div class="scroll"><table>
+<thead><tr><th>#</th><th>Control</th><th>Enforced in</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td colspan="4"><strong>Data access and use</strong></td></tr>
+<tr><td>A1</td><td>One DSS group per part (<code>rwd_data_foundation</code>, <code>rwd_solution</code>, <code>rwe_study</code>) plus <code>rwd_reviewers</code>; write access only for the owning group</td><td>Project permissions</td><td>New <code>.index/access.tsv</code>; issue <code>ACCESS_UNEXPECTED</code></td></tr>
+<tr><td>A2</td><td>SYNPUF stays on internal instances: no export permission on Part 1 outside the owning group; bundles leaving the instance carry no managed data</td><td>Project permissions; bundle content config</td><td><code>access.tsv</code>; release manifest</td></tr>
+<tr><td>A3</td><td>Cross-project shares are the only data path, each registered</td><td>Exposed objects</td><td><code>lineage.tsv</code>; issue <code>SHARE_UNREGISTERED</code></td></tr>
+<tr><td>A4</td><td>Demo Snowflake connection usable only by the suite groups</td><td>Connection allowed groups (instance admin)</td><td>Connection settings in the snapshot</td></tr>
+<tr><td>A5</td><td>A study uses a dataset only for a permitted purpose</td><td>Study <code>declared_purpose</code> in each dataset's <code>permitted_purposes</code></td><td><code>governance.tsv</code>; issue <code>PURPOSE_NOT_PERMITTED</code></td></tr>
+<tr><td colspan="4"><strong>Lineage and traceability</strong></td></tr>
+<tr><td>L1</td><td>Zero broken shares; no dangling <code>data_preparation_project_key</code> in either scope</td><td>Existing index checks</td><td><code>lineage.tsv</code>, <code>issues.tsv</code></td></tr>
+<tr><td>L2</td><td>Every study input traces to an accepted dataset record</td><td>Govern references: study → cohort → project → dataset</td><td>New <code>.index/governance.tsv</code>; issue <code>UNGOVERNED</code></td></tr>
+<tr><td>L3</td><td>Release manifest lists datasets in flow and the transformation chain</td><td><code>bp.release_manifest</code></td><td>Filled from the snapshot at bundle time</td></tr>
+<tr><td>L4</td><td>Every result pinned to data cut, CDM, vocabulary and ETL versions, cohort hashes and code tag</td><td>Dataset, cohort and study records</td><td><code>governance.tsv</code>; issue <code>VERSION_UNPINNED</code></td></tr>
+<tr><td colspan="4"><strong>Data and cohort validation</strong></td></tr>
+<tr><td>V1</td><td>Schema contract: 15/15 v1.1 pass and built before anything downstream (DEC-RWD-003, gate B2)</td><td>DSS Data Quality rules on the 15 export tables; scenario stops on failure</td><td><code>schema_compliance.tsv</code>; DQ results</td></tr>
+<tr><td>V2</td><td>Demo copy matches its canonical project (DEC-RWD-004, gate B4)</td><td>Row-count rule against <code>PREP_RWD_S3_2M3</code></td><td><code>datasets.tsv</code></td></tr>
+<tr><td>V3</td><td>The 3 sample cohorts give identical counts on SF, DB and RS (E4)</td><td>Release test scenario</td><td><code>dialect_counts</code></td></tr>
+<tr><td>V4</td><td>2.3M counts match the recorded reference (heart failure 188,113, stroke 57,077, AMI 30,784 on 2025-10-06)</td><td>DQ rule on <code>cohort_building_log</code></td><td><code>reference_count</code></td></tr>
+<tr><td>V5</td><td>Cohort integrity: non-null subject, start ≤ end, episode inside an observation period, no duplicates</td><td>DQ rules on <code>cohort</code></td><td><code>dq_result</code></td></tr>
+<tr><td>V6</td><td>Cohort composition (age, sex, index year) compared with the reference</td><td>Scenario step on the dashboard datasets</td><td><code>characterisation</code> and its diff</td></tr>
+<tr><td>V7</td><td>Each governed cohort records how and where it was validated; "none" allowed but visible</td><td>Required fields</td><td><code>validation_method</code>, <code>validation_source</code></td></tr>
+<tr><td>V8</td><td>Clinical plausibility reviewed against expected ranges written before review</td><td>Govern sign-off on the cohort record</td><td>Sign-off with comments</td></tr>
+<tr><td colspan="4"><strong>Study design and conduct</strong></td></tr>
+<tr><td>S1</td><td>Fit-for-purpose assessment completed before protocol lock</td><td>Required fields on the study record</td><td><code>fitness_assessment</code>, <code>fitness_verdict</code></td></tr>
+<tr><td>S2</td><td>Protocol and analysis plan in the repo in HARPER structure; hash and time recorded at lock</td><td><code>studies/&lt;key&gt;/protocol.md</code>; study record</td><td><code>protocol_sha256</code>, <code>locked_at</code>; issue <code>PROTOCOL_CHANGED</code></td></tr>
+<tr><td>S3</td><td>Outcome analysis runs only on a locked protocol</td><td>Scenario step in <code>DEMO_SF_RWE</code> reads the study record and stops otherwise</td><td>Scenario run; study sign-off</td></tr>
+<tr><td>S4</td><td>Diagnostics judged against protocol thresholds: standardised mean difference, equipoise</td><td>Scenario step after the propensity model, before the outcome model</td><td><code>diagnostics_result</code></td></tr>
+<tr><td>S5</td><td>Attrition table generated on every run</td><td>Recipe output</td><td><code>attrition_table</code></td></tr>
+<tr><td>S6</td><td>Amendments are new versions with a reason; unplanned analyses listed as exploratory</td><td>Study record versions</td><td><code>deviations_log</code>, <code>exploratory_analyses</code></td></tr>
+<tr><td>S7</td><td>AI-assisted concept sets or code name their reviewer</td><td>Cohort and study records</td><td><code>ai_assisted</code>, <code>ai_use_log</code></td></tr>
+<tr><td colspan="4"><strong>Change control</strong></td></tr>
+<tr><td>C1</td><td>A new data cut, vocabulary or ETL version reopens dataset acceptance and downstream sign-offs</td><td>New record version resets dependent sign-offs</td><td>Record versions; issue <code>SIGNOFF_STALE</code></td></tr>
+<tr><td>C2</td><td>After a refresh, cohorts and study are re-run and compared before re-approval</td><td>Refresh scenario: V4, V6, results diff</td><td>Diff on the dataset record</td></tr>
+<tr><td colspan="4"><strong>Packaging</strong></td></tr>
+<tr><td>P1</td><td>Solution library pinned to a release tag; Project Setup manifest under version control (E1–E3)</td><td>Project Git references</td><td><code>projects.tsv</code> library hash</td></tr>
+<tr><td>P2</td><td>One bundle per project per suite release, named after the tag</td><td>Bundle export</td><td>Govern bundle record</td></tr>
+<tr><td>P3</td><td>Release manifest generated: datasets, DQ summary, library hash, schema result, cohort counts, protocol hash, diagnostics</td><td><code>tools/push_govern.py</code> (new)</td><td>Release manifest record</td></tr>
+<tr><td>P4</td><td>Project Standards pass</td><td>New <code>RWDSuite</code> scope selected by tag <code>rwd-suite</code></td><td>Compliance run on the manifest</td></tr>
+<tr><td colspan="4"><strong>Deployment</strong></td></tr>
+<tr><td>D1</td><td>A bundle deploys only after its Govern sign-off is approved</td><td>Automation infrastructure's Govern check policy</td><td>Deployer refusal or acceptance</td></tr>
+<tr><td>D2</td><td>Deploy order follows the data: prep → RWD → RWE</td><td>Workflow step order (G6)</td><td>Deployment timestamps</td></tr>
+<tr><td>D3</td><td>Post-deploy smoke test: schema, V4 counts, S4 diagnostics, dashboard builds</td><td>Scenario on the automation node</td><td>Result pushed to the Govern project</td></tr>
+<tr><td>D4</td><td>Previous bundle kept and redeployable</td><td>Deployer</td><td>Deployment history</td></tr>
+</tbody></table></div>
+</details>
+
+<details>
+<summary>D · Workflow and sign-offs <span>G1–G6</span></summary>
+<div class="scroll"><table>
+<thead><tr><th>Step</th><th>Govern object</th><th>Feedback from</th><th>Approval by</th><th>Opens when</th></tr></thead>
+<tbody>
+<tr><td>G1 Data accepted</td><td>Dataset acceptance</td><td>QA / test engineer</td><td>Data foundation owner</td><td>V1, V2, A2 green; data-use terms and pins filled</td></tr>
+<tr><td>G2 Solution release validated</td><td>Govern project <code>SOL_RWD_COHORT_DISCOVERY</code></td><td>QA / test engineer</td><td>Solution owner</td><td>P1, V3 green (E4)</td></tr>
+<tr><td>G3 Cohorts validated</td><td>Cohort definition</td><td>Biomedical informaticist</td><td>Clinical researcher</td><td>V4–V7 green; G1, G2 approved</td></tr>
+<tr><td>G4 Protocol locked</td><td>Study</td><td>Biostatistician</td><td>Epidemiologist / HEOR researcher</td><td>S1, S2, A5 green; G3 approved for every cohort named</td></tr>
+<tr><td>G5 Study reviewed</td><td>Study, Govern project <code>DEMO_SF_RWE</code>, model version</td><td>Biostatistician</td><td>RWE demo owner</td><td>G4 approved; study rebuilt on approved cohorts; S3–S6 green</td></tr>
+<tr><td>G6 Release approved</td><td>Bundles of the three demo projects</td><td>Part owners</td><td>Suite owner</td><td>P2–P4 green; G1–G5 approved</td></tr>
+</tbody></table></div>
+<p>Govern roles map onto the RACI in <code>project-scoping.md</code>, plus four reviewer roles. Each sign-off records the user, time and meaning.</p>
+</details>
+
+<details>
+<summary>E · Regulatory mapping <span>study layer (US, EU) and system layer (Part 11)</span></summary>
+<div class="scroll"><table>
+<thead><tr><th>Expectation</th><th>US</th><th>EU</th><th>Control</th><th>In the MVP</th></tr></thead>
+<tbody>
+<tr><td>Protocol and plan fixed before the outcome analysis; amendments dated</td><td>FDA <em>Considerations</em> (2023); ICH M14</td><td>ICH M14; EMA reflection paper (2025); HTA guidance</td><td>S2, S3, S6; G4</td><td>Yes, on the governed rebuild</td></tr>
+<tr><td>Data source fit for the question</td><td>FDA <em>EHR and Claims</em> (2024); ICH M14</td><td>ICH M14; Data Quality Framework</td><td>S1</td><td>Template only</td></tr>
+<tr><td>Operational definitions validated, re-checked on reuse</td><td>FDA <em>EHR and Claims</em></td><td>ICH M14</td><td>V7, V8; C1</td><td>Partly: published validation cited</td></tr>
+<tr><td>Traceability source to result; transformations documented</td><td>FDA <em>Considerations</em>; <em>EHR and Claims</em></td><td>EMA reflection paper</td><td>L1–L4; P3</td><td>Yes</td></tr>
+<tr><td>QA/QC plan with reproducible steps</td><td>FDA <em>EHR and Claims</em></td><td>Data Quality Framework</td><td>V1–V6; C2</td><td>Yes</td></tr>
+<tr><td>Bias and confounding addressed; diagnostics reported</td><td>ICH M14</td><td>ICH M14; EMA reflection paper</td><td>S4, S5</td><td>Partly: no negative controls</td></tr>
+<tr><td>Data-owner agreement, permitted use, inspection access</td><td>FDA <em>Considerations</em></td><td>GDPR Art. 89; EHDS permits (2029)</td><td>A2, A5</td><td>Terms yes; inspection access not shown</td></tr>
+<tr><td>Patient-level data deliverable</td><td>FDA <em>Considerations</em> (RFI Nov 2026)</td><td>—</td><td><code>patient_level_export</code></td><td>Recorded only</td></tr>
+<tr><td>Registration and public results</td><td>—</td><td>HMA-EMA Catalogues; EHDS</td><td><code>registration</code></td><td>Recorded, not submitted</td></tr>
+<tr><td>Secure environment, named users, no person-level export</td><td>—</td><td>EHDS (2029)</td><td>A1, A2</td><td>Partly: no output checking</td></tr>
+<tr><td>AI use documented by context of use</td><td>FDA draft (2025); FDA-EMA principles (2026)</td><td>FDA-EMA principles; AI Act research exemption</td><td>S7</td><td>Yes, as a log</td></tr>
+</tbody></table></div>
+<p>System layer. Per Dataiku's <em>Statement of Quality</em> (July 2026), validation and Part 11 compliance are the customer's responsibility; the suite demonstrates the customer's share.</p>
+<div class="scroll"><table>
+<thead><tr><th>Clause</th><th>Platform capability</th><th>Suite control</th><th>In the MVP</th></tr></thead>
+<tbody>
+<tr><td>11.10(a) Validation</td><td>Metrics, checks, scenarios; Govern workflows</td><td>V1–V6, schema gate, E4 test</td><td>Yes</td></tr>
+<tr><td>11.10(b) Copies of records</td><td>Exports, bundles, wiki</td><td>P2, P3</td><td>Yes</td></tr>
+<tr><td>11.10(c) Retention</td><td>Bundles, Git history</td><td>Bundles kept; Govern records</td><td>Partly: retention period not set</td></tr>
+<tr><td>11.10(d) Access limited</td><td>Groups, SSO, UIF</td><td>A1, A4</td><td>Yes, without UIF</td></tr>
+<tr><td>11.10(e) Audit trail</td><td>Audit trail, event server, Git</td><td>DSS and Govern timelines; repo history</td><td>Partly: event-server dispatch is an admin task</td></tr>
+<tr><td>11.10(f) Sequencing</td><td>Govern workflows</td><td>G1–G6; S3; D1, D2</td><td>Yes</td></tr>
+<tr><td>11.10(g) Authority checks</td><td>Permissions, deployer rights</td><td>Role-gated sign-offs</td><td>Yes</td></tr>
+<tr><td>11.10(h) Source validity</td><td>Connection permissions, schema, DQ</td><td>A4, V1, V5</td><td>Yes</td></tr>
+<tr><td>11.10(i) Training</td><td>Academy</td><td>—</td><td>No</td></tr>
+<tr><td>11.10(j) Written policies</td><td>Customer policies</td><td>Links to policy records</td><td>Reference only</td></tr>
+<tr><td>11.10(k) Documentation control</td><td>Wiki, Git, metadata</td><td>Doc headers, decision register, P4</td><td>Yes</td></tr>
+<tr><td>11.50 Signature manifestation</td><td>Govern sign-off: user, time, meaning</td><td>G1–G6</td><td>Yes; Govern is not an e-signature system, Subpart C out of scope</td></tr>
+</tbody></table></div>
+</details>
+
+<details>
+<summary>F · Repo changes</summary>
+<div class="scroll"><table>
+<thead><tr><th>Change</th><th>What it adds</th></tr></thead>
+<tbody>
+<tr><td><code>govern/blueprints/</code></td><td><code>bp.rwd_cohort_definition</code>, <code>bp.rwe_study</code>, <code>bv.rwd_dataset</code>, sign-off configs</td></tr>
+<tr><td><code>govern/roles.json</code></td><td>Govern roles to DSS groups</td></tr>
+<tr><td><code>studies/DEMO_SF_RWE/</code></td><td><code>protocol.md</code> (HARPER structure, target-trial table, thresholds) and <code>fitness.md</code></td></tr>
+<tr><td><code>registry/projects.json</code></td><td><code>access_groups</code>, <code>governed</code>, <code>govern_ref</code>; per OMOP set: licence, permitted purposes, data cut, vocabulary version</td></tr>
+<tr><td><code>tools/build_index.py</code></td><td><code>access.tsv</code>, <code>governance.tsv</code>; issues <code>ACCESS_UNEXPECTED</code>, <code>SHARE_UNREGISTERED</code>, <code>UNGOVERNED</code>, <code>VERSION_UNPINNED</code>, <code>PURPOSE_NOT_PERMITTED</code>, <code>PROTOCOL_CHANGED</code>, <code>SIGNOFF_STALE</code>, <code>SIGNOFF_MISSING</code></td></tr>
+<tr><td><code>tools/push_govern.py</code></td><td>Drift report by default; <code>--push &lt;PROJECT&gt;</code> with owner approval</td></tr>
+</tbody></table></div>
+<p>Phasing is in <a href="#sequencing">section 8</a>. Nothing writes to DSS or Govern before the decisions are taken and the migration has closed.</p>
+</details>
+
+<details>
+<summary>G · Access check <span>22 Oct 2026, not repeated since</span></summary>
+<div class="scroll"><table>
+<thead><tr><th>Surface</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><code>dku</code> profile <code>default</code> (Design)</td><td>Works on DSS 15.0.2, but it is an int2 sandbox with 42 projects, not the suite's design instance. <code>build_index.py --refresh</code> would read the wrong instance under this profile.</td></tr>
+<tr><td><code>dku</code> profile <code>govern</code></td><td>Reads work. Role and blueprint-version calls fail: the key has no Govern admin rights.</td></tr>
+<tr><td>Suite in Govern</td><td>No artifact for any suite project, dataset or bundle.</td></tr>
+</tbody></table></div>
+<p>The int2 Govern node holds a Life Sciences framework the MVP reuses: <code>bp.policy_alignment</code> (102 artifacts), <code>bp.control</code> (81), <code>bp.risk</code> (77), <code>bp.pre_assessment</code> (16), <code>bp.gmlp_dataset_governance</code>, <code>bp.release_manifest</code> (4), <code>bp.instruction_for_use</code>, <code>bp.asset_inventory</code>. Also there: 6 Project Standards checks, one automation infrastructure, and a deployed <code>RWE_ANALYTICS</code> project governed end to end, the closest working reference.</p>
+</details>
+
+<details>
+<summary>H · Out of scope and technical risks</summary>
+<ul>
+<li>Electronic-signature integration (Part 11 Subpart C), IQ/OQ/PQ, any claim of a validated system.</li>
+<li>User Isolation Framework, per-user database credentials, audit-log dispatch to an external store.</li>
+<li>Running a phenotype validation or a real fitness verdict; negative controls unless decided in.</li>
+<li>EHDS secure-environment behaviour and actual catalogue registration; packaging patient-level data for submission.</li>
+<li>Governing the <code>PREP_RWD_*</code> test variants and non-release solution builds in Govern.</li>
+<li>Model monitoring and revalidation, training records, publishing to the Business Solutions Store.</li>
+</ul>
+<div class="scroll"><table>
+<thead><tr><th>Technical risk</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td>Index and Govern drift apart</td><td>Govern records written only from the index; <code>governance.tsv</code> reports drift</td></tr>
+<tr><td>The protocol lock is read as retrospective</td><td>Stated in the record: follows a published protocol; lock precedes the governed rebuild's outcome analysis</td></tr>
+<tr><td>Forked blueprints affect other demos on the shared Govern node</td><td>New versions only, never <code>--force</code></td></tr>
+<tr><td><code>--refresh</code> under the int2 profile overwrites the snapshot</td><td>Instance check in <code>build_index.py</code> that refuses a project count far below the last snapshot</td></tr>
+</tbody></table></div>
+</details>
+
+<footer>RWD/RWE suite · Governance MVP proposal · ©2026 Dataiku Inc. · Synthetic data; demonstration of controls, not a validated system</footer>
+</main>
+</body>
+</html>
