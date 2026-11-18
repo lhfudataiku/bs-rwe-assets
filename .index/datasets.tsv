@@ -9,62 +9,62 @@ SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_rs	Redshift	redshift-solutions	yes	6			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_sf	Snowflake	managed-snowflake	yes	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA	UploadedFiles	dataiku-managed-storage	no	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_1k	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes	121386	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	yes	121386	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_rs	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_sf	Snowflake	managed-snowflake	yes	6	snowflake	condition_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	13			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes	160322	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	yes	160322	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_rs	Redshift	redshift-solutions	yes	16	redshift	condition_occurrence	yes	160322	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	16	snowflake	condition_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH	UploadedFiles	dataiku-managed-storage	no	7			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_1k	S3	dataiku-managed-storage	yes	7	s3	death	yes	45	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	yes	45	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_rs	Redshift	redshift-solutions	yes	7	redshift	death	yes	45	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_sf	Snowflake	managed-snowflake	yes	7	snowflake	death	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	14			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_1k	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes	1622	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	yes	1622	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_rs	Redshift	redshift-solutions	yes	15	redshift	device_exposure	yes	1622	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_sf	Snowflake	managed-snowflake	yes	15	snowflake	device_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA	UploadedFiles	dataiku-managed-storage	no	7			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_1k	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes	52714	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	yes	52714	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_rs	Redshift	redshift-solutions	yes	7	redshift	drug_era	yes	52714	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_sf	Snowflake	managed-snowflake	yes	7	snowflake	drug_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	21			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_1k	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes	49542	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	yes	49542	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_rs	Redshift	redshift-solutions	yes	23	redshift	drug_exposure	yes	49542	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_sf	Snowflake	managed-snowflake	yes	23	snowflake	drug_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION	UploadedFiles	dataiku-managed-storage	no	8			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_1k	S3	dataiku-managed-storage	yes	10	s3	location	yes	626	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	yes	626	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_rs	Redshift	redshift-solutions	yes	10	redshift	location	yes	626	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_sf	Snowflake	managed-snowflake	yes	10	snowflake	location	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT	UploadedFiles	dataiku-managed-storage	no	18			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_1k	S3	dataiku-managed-storage	yes	20	s3	measurement	yes	2858	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	yes	2858	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_rs	Redshift	redshift-solutions	yes	20	redshift	measurement	yes	2858	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_sf	Snowflake	managed-snowflake	yes	20	snowflake	measurement	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION	UploadedFiles	dataiku-managed-storage	no	17			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_1k	S3	dataiku-managed-storage	yes	18	s3	observation	yes	13481	metric	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD531	UploadedFiles	dataiku-managed-storage	no	5			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_1k	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes	1048	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	yes	1048	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_rs	Redshift	redshift-solutions	yes	5	redshift	observation_period	yes	1048	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_sf	Snowflake	managed-snowflake	yes	5	snowflake	observation_period	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	yes	13481	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_rs	Redshift	redshift-solutions	yes	18	redshift	observation	yes	13481	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_sf	Snowflake	managed-snowflake	yes	18	snowflake	observation	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON	UploadedFiles	dataiku-managed-storage	no	18			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_1k	S3	dataiku-managed-storage	yes	19	s3	person	yes	1000	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	yes	1000	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_rs	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_sf	Snowflake	managed-snowflake	yes	19	snowflake	person	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE531	UploadedFiles	dataiku-managed-storage	no	14			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes	62189	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	yes	62189	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_rs	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	14	snowflake	procedure_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_VISIT_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	12			-			
@@ -72,10 +72,10 @@ SYNPUFOMOP1KDATAPREPRWDV11	CDM_VISIT_OCCURRENCE_1k	S3	dataiku-managed-storage	ye
 SYNPUFOMOP1KDATAPREPRWDV11	US_States	UploadedFiles	dataiku-managed-storage	no	2			-			
 SYNPUFOMOP1KDATAPREPRWDV11	concept	S3	dataiku-managed-storage	yes	10	s3	concept	yes	6088813	metric	
 SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor	S3	dataiku-managed-storage	yes	4	s3	concept_ancestor	yes	72374967	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_db	Databricks	bs-databricks-per-user	yes	4	databricks	concept_ancestor	yes	72374967	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_db	Databricks	bs-databricks-per-user	yes	4	databricks	concept_ancestor	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_rs	Redshift	redshift-solutions	yes	4	redshift	concept_ancestor	yes	72374967	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	concept_ancestor_sf	Snowflake	managed-snowflake	yes	4	snowflake	concept_ancestor	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
-SYNPUFOMOP1KDATAPREPRWDV11	concept_for_db	Databricks	bs-databricks-per-user	yes	10	databricks	concept	yes	6088813	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	concept_for_db	Databricks	bs-databricks-per-user	yes	10	databricks	concept	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	concept_relationship	S3	dataiku-managed-storage	yes	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	concept_relationship_sf	Snowflake	managed-snowflake	yes	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	concept_rs	Redshift	redshift-solutions	yes	10	redshift	concept	yes	6088813	sql	
@@ -86,7 +86,7 @@ SYNPUFOMOP1KDATAPREPRWDV11	us_states_geo	S3	dataiku-managed-storage	yes	5			-
 SYNPUFOMOP1KDATAPREPRWDV11	visit_by_observation	S3	dataiku-managed-storage	yes	19			-			
 SYNPUFOMOP1KDATAPREPRWDV11	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-			
 SYNPUFOMOP1KDATAPREPRWDV11	visit_ip	S3	dataiku-managed-storage	yes	17			-			
-SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_db	Databricks	bs-databricks-per-user	yes	17	databricks	visit_occurrence	yes	17904	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_db	Databricks	bs-databricks-per-user	yes	17	databricks	visit_occurrence	unknown		sql	, caused by: DKUSecurityException: The refresh token may be expired, revoked, or invalid. Token response error: {"error":"invalid_grant","re
 SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_revised	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	17904	metric	
 SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_rs	Redshift	redshift-solutions	yes	17	redshift	visit_occurrence	yes	17904	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	17904	sql	
@@ -330,29 +330,29 @@ SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_2	S3	dataiku-managed-storage
 SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	12			-			
 SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	111637582	metric	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	care_site_db	Databricks	bs-databricks	yes	6			-			
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_ancestor_db	Databricks	bs-databricks	yes	4	databricks	concept_ancestor	yes	72374967	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	yes	6088813	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_ancestor_db	Databricks	bs-databricks	yes	4	databricks	concept_ancestor	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	unknown		sql	timeout after 240s
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_relationship_db	Databricks	bs-databricks	yes	6			-			
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_era_db	Databricks	bs-databricks	yes	6	databricks	condition_era	yes	223393336	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_occurrence_db	Databricks	bs-databricks	yes	16	databricks	condition_occurrence	yes	252664961	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_era_db	Databricks	bs-databricks	yes	6	databricks	condition_era	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_occurrence_db	Databricks	bs-databricks	yes	16	databricks	condition_occurrence	unknown		sql	ailure. Failed to connect to server. Reason: java.net.SocketTimeoutException: Read timed out., caused by: ErrorException: [Databricks][JDBCD
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_test	Databricks	bs-databricks	yes	16			-			
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	death_db	Databricks	bs-databricks	yes	7	databricks	death	yes	107644	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	device_exposure_db	Databricks	bs-databricks	yes	15	databricks	device_exposure	yes	4465485	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_era_db	Databricks	bs-databricks	yes	7	databricks	drug_era	yes	125872351	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	yes	126048050	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	death_db	Databricks	bs-databricks	yes	7	databricks	death	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	device_exposure_db	Databricks	bs-databricks	yes	15	databricks	device_exposure	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_era_db	Databricks	bs-databricks	yes	7	databricks	drug_era	unknown		sql	ailure. Failed to connect to server. Reason: java.net.SocketTimeoutException: Read timed out., caused by: ErrorException: [Databricks][JDBCD
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	unknown		sql	timeout after 240s
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	encounter_concepts_joined	S3	dataiku-managed-storage	yes	2			-			
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	location_db	Databricks	bs-databricks	yes	10	databricks	location	yes	3185	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	measurement_occurrence_db	Databricks	bs-databricks	yes	20	databricks	measurement	yes	74128429	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	observation_db	Databricks	bs-databricks	yes	18	databricks	observation	yes	37531051	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	observation_period_db	Databricks	bs-databricks	yes	7	databricks	observation_period	yes	2098515	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	location_db	Databricks	bs-databricks	yes	10	databricks	location	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	measurement_occurrence_db	Databricks	bs-databricks	yes	20	databricks	measurement	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	observation_db	Databricks	bs-databricks	yes	18	databricks	observation	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	observation_period_db	Databricks	bs-databricks	yes	7	databricks	observation_period	unknown		sql	ailure. Failed to connect to server. Reason: java.net.SocketTimeoutException: Read timed out., caused by: ErrorException: [Databricks][JDBCD
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	payer_plan_period_db	Databricks	bs-databricks	yes	17			-			
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	person_db	Databricks	bs-databricks	yes	18	databricks	person	yes	2326856	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	procedure_occurrence_db	Databricks	bs-databricks	yes	14	databricks	procedure_occurrence	yes	278769529	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	person_db	Databricks	bs-databricks	yes	18	databricks	person	unknown		sql	timeout after 240s
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	procedure_occurrence_db	Databricks	bs-databricks	yes	14	databricks	procedure_occurrence	unknown		sql	timeout after 240s
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	provider_db	Databricks	bs-databricks	yes	13			-			
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	visit_occurrence_rw	S3	dataiku-managed-storage	yes	17			-			
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_by_observation	S3	dataiku-managed-storage	yes	18			-			
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_by_procedure	S3	dataiku-managed-storage	yes	18			-			
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_occurrence_db	Databricks	bs-databricks	yes	17	databricks	visit_occurrence	yes	40713423	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	visits_occurrence_db	Databricks	bs-databricks	yes	17	databricks	visit_occurrence	unknown		sql	timeout after 240s
 DEMO_SF_OMOP2M_DATAPREP	CONCEPT_1	FilesInFolder		no	10			-			
 DEMO_SF_OMOP2M_DATAPREP	CONCEPT_ANCESTOR_1	FilesInFolder		no	4			-			
 DEMO_SF_OMOP2M_DATAPREP	CONCEPT_CLASS_1	FilesInFolder		no	3			-			
@@ -856,3 +856,18 @@ PREP_RWD_S3_100K	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-
 PREP_RWD_S3_100K	visit_occurrence	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	1802032	metric	
 PREP_RWD_S3_100K	visit_occurrence_100k_db	S3	dataiku-managed-storage	yes	17			-			
 PREP_RWD_S3_100K	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_SF_1K	concept_ancestor_sf	Snowflake	bs-snowflake	yes	4	snowflake	concept_ancestor	yes	72374967	sql	
+PREP_RWD_SF_1K	concept_sf	Snowflake	bs-snowflake	yes	10	snowflake	concept	yes	6088813	sql	
+PREP_RWD_SF_1K	condition_era_sf	Snowflake	bs-snowflake	yes	6	snowflake	condition_era	yes	121386	sql	
+PREP_RWD_SF_1K	condition_occurrence_sf	Snowflake	bs-snowflake	yes	16	snowflake	condition_occurrence	yes	160322	sql	
+PREP_RWD_SF_1K	death_sf	Snowflake	bs-snowflake	yes	7	snowflake	death	yes	45	sql	
+PREP_RWD_SF_1K	device_exposure_sf	Snowflake	bs-snowflake	yes	15	snowflake	device_exposure	yes	1622	sql	
+PREP_RWD_SF_1K	drug_era_sf	Snowflake	bs-snowflake	yes	7	snowflake	drug_era	yes	52714	sql	
+PREP_RWD_SF_1K	drug_exposure_sf	Snowflake	bs-snowflake	yes	23	snowflake	drug_exposure	yes	49542	sql	
+PREP_RWD_SF_1K	location_sf	Snowflake	bs-snowflake	yes	10	snowflake	location	yes	626	sql	
+PREP_RWD_SF_1K	measurement_sf	Snowflake	bs-snowflake	yes	20	snowflake	measurement	yes	2858	sql	
+PREP_RWD_SF_1K	observation_period_sf	Snowflake	bs-snowflake	yes	5	snowflake	observation_period	yes	1048	sql	
+PREP_RWD_SF_1K	observation_sf	Snowflake	bs-snowflake	yes	18	snowflake	observation	yes	13481	sql	
+PREP_RWD_SF_1K	person_sf	Snowflake	bs-snowflake	yes	19	snowflake	person	yes	1000	sql	
+PREP_RWD_SF_1K	procedure_occurrence_sf	Snowflake	bs-snowflake	yes	14	snowflake	procedure_occurrence	yes	62189	sql	
+PREP_RWD_SF_1K	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	17904	sql	

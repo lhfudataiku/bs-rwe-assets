@@ -592,9 +592,27 @@
         "solution-developer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Snowflake variant of PREP_RWD_S3_1K on bs-snowflake (DEC-RWD-002, DEC-RWD-005)",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-18: sync-only Snowflake variant of PREP_RWD_S3_1K on bs-snowflake (DEC-RWD-002, DEC-RWD-005); 15 shared-in tables, 15 sync recipes to <omop_table>_sf",
+      "omop_sets": {
+        "snowflake": {
+          "person": "person_sf",
+          "observation_period": "observation_period_sf",
+          "visit_occurrence": "visit_occurrence_sf",
+          "condition_occurrence": "condition_occurrence_sf",
+          "drug_exposure": "drug_exposure_sf",
+          "procedure_occurrence": "procedure_occurrence_sf",
+          "device_exposure": "device_exposure_sf",
+          "measurement": "measurement_sf",
+          "observation": "observation_sf",
+          "death": "death_sf",
+          "location": "location_sf",
+          "drug_era": "drug_era_sf",
+          "condition_era": "condition_era_sf",
+          "concept": "concept_sf",
+          "concept_ancestor": "concept_ancestor_sf"
+        }
+      }
     },
     {
       "key": "PREP_RWD_DB_1K",
