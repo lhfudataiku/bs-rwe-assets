@@ -19,7 +19,8 @@ Route documentation tasks through `docs/README.md`.
 - Scope, personas and business value: `docs/project-scoping.md`. Steps, order and gates:
   `docs/migration-revision-plan.md`. Durable choices: `docs/decisions/DECISION_REGISTER.md`.
 - Live DSS state: the index is a snapshot. When the answer or the change depends on current state,
-  confirm with `dku` and say when the snapshot was taken (`refreshed_at` in the snapshot).
+  confirm with `dku` and say when the snapshot was taken: each project entry has its own
+  `fetched_at`, and `SUMMARY.md` names the oldest when a partial refresh left the snapshot mixed.
 
 ## Non-negotiable boundaries
 
@@ -30,7 +31,7 @@ Route documentation tasks through `docs/README.md`.
 - SYNPUF data must not leave internal instances. Never download it into this repo or attach it to
   an issue, a PR or a bundle stored outside Dataiku.
 - `.index/` is generated: edit `registry/` and rerun `python3 tools/build_index.py`. Use `--refresh`
-  only when DSS changed; it takes several minutes.
+  only when DSS changed, and `--refresh --project KEY` when only KEY changed.
 - `registry/known_issues.json` only shrinks. Delete an entry when the index shows it fixed; add one
   only when the user accepts a newly found problem as migration work, naming the plan step.
 - Add to the decision register only when its admission rule is met. Open questions stay in the plan.
@@ -63,8 +64,9 @@ Route documentation tasks through `docs/README.md`.
 
 ## Commands
 
-    python3 tools/build_index.py --refresh   # DSS -> snapshot -> .index/ (needs dku auth, ~15 min)
-    python3 tools/build_index.py --reprobe   # re-run only the built/row-count probes (after a build)
+    python3 tools/build_index.py --refresh   # DSS -> snapshot -> .index/ (needs dku auth)
+    python3 tools/build_index.py --refresh --project KEY   # only KEY and what it reads from (repeatable)
+    python3 tools/build_index.py --reprobe [--project KEY] # re-run only the built/row-count probes (after a build)
     python3 tools/build_index.py --check     # offline; what CI and the pre-commit hook run
     python3 tools/push_wiki.py               # wiki drift report (read-only)
     python3 tools/sync_harness.py --write    # regenerate CLAUDE.md and AGENTS.md from this file

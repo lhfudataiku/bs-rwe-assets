@@ -1,9 +1,13 @@
-"""Offline tests for tools/build_index.py: the schema rules and the issue detection."""
+"""Offline tests for tools/build_index.py: the schema rules, the issue detection, and partial refresh."""
 
 import copy
+import io
+import json
 import os
 import sys
+import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import build_index as b  # noqa: E402
@@ -121,6 +125,159 @@ class Baseline(unittest.TestCase):
         status = {i["id"]: i["status"] for i in data["issues"]}
         self.assertEqual(status["UNREADABLE:PREP:s3"], "info")
         self.assertEqual(status["SCHEMA_FAIL:PREP:s3"], "NEW")
+
+
+class DependencyClosure(unittest.TestCase):
+    """--project KEY refreshes KEY and what it reads from, never what reads from it."""
+
+    def setUp(self):
+        self.reg = {"projects": [entry("S3"), entry("DB", upstream=["S3"]), entry("SOL"), entry("DEMO"),
+                                 entry("OTHER")],
+                    "out_of_scope": {}, "owners": {}}
+        self.projects = {
+            "S3": project(),
+            "DB": project(),
+            "SOL": project(local={"data_preparation_project_key": "DB"}),
+            "DEMO": project(flow_sources=["SOL.cohort", "local_input"]),
+            "OTHER": project(),
+        }
+
+    def test_registry_upstream(self):
+        self.assertEqual(b.closure(self.reg, self.projects, ["DB"]), {"DB", "S3"})
+
+    def test_prep_key_and_shares_are_followed_transitively(self):
+        self.assertEqual(b.closure(self.reg, self.projects, ["DEMO"]), {"DEMO", "SOL", "DB", "S3"})
+
+    def test_prep_key_in_standard_scope_counts_too(self):
+        self.projects["OTHER"] = project(standard={"data_preparation_project_key": "S3"})
+        self.assertEqual(b.closure(self.reg, self.projects, ["OTHER"]), {"OTHER", "S3"})
+
+    def test_consumers_are_not_pulled_in(self):
+        self.assertEqual(b.closure(self.reg, self.projects, ["S3"]), {"S3"})
+
+    def test_missing_project_still_follows_registry_upstream(self):
+        self.projects["DB"] = {"exists": False, "error": "not on DSS"}
+        self.assertEqual(b.closure(self.reg, self.projects, ["DB"]), {"DB", "S3"})
+
+    def test_several_keys_and_cycles(self):
+        self.projects["S3"] = project(flow_sources=["DEMO.x"])
+        self.assertEqual(b.closure(self.reg, self.projects, ["OTHER", "S3"]), {"OTHER", "S3", "DEMO", "SOL", "DB"})
+
+
+class PartialRefresh(unittest.TestCase):
+    """A partial refresh replaces the fetched entries and keeps every other one byte for byte."""
+
+    def setUp(self):
+        self.reg = {"projects": [entry("S3"), entry("DB", upstream=["S3"]), entry("SOL"),
+                                 entry("PLANNED", lifecycle="planned")],
+                    "out_of_scope": {}, "owners": {}, "discovery_pattern": "."}
+        sol = project(local={"data_preparation_project_key": "DB", "person": "person_db"})
+        db = project({"person_db": ds(built="yes")})
+        s3 = project({"person_s3": ds(built="yes")})
+        for key, proj in (("S3", s3), ("DB", db), ("SOL", sol)):
+            proj["fetched_at"] = proj["probed_at"] = "2026-11-01T00:00Z"
+            proj["name"] = key
+        self.old = {"dss_project_count": 3, "discovered": ["DB", "S3", "SOL"], "external_projects": {},
+                    "projects": {"S3": s3, "DB": db, "SOL": sol,
+                                 "PLANNED": {"exists": False, "error": "not on DSS", "fetched_at": "2026-11-01T00:00Z"}}}
+
+    def test_merge_keeps_untouched_entries(self):
+        fresh = project({"person_db": ds()})
+        merged = b.merge_projects(self.reg, self.old["projects"], {"DB": fresh}, {"S3", "DB", "SOL"}, "NOW")
+        self.assertIs(merged["DB"], fresh)
+        self.assertEqual(merged["S3"], self.old["projects"]["S3"])
+        self.assertEqual(merged["SOL"], self.old["projects"]["SOL"])
+        self.assertEqual(merged["PLANNED"], {"exists": False, "error": "not on DSS", "fetched_at": "NOW"})
+
+    def test_merge_marks_a_vanished_project_and_drops_unregistered_keys(self):
+        old = dict(self.old["projects"], RETIRED=project())
+        merged = b.merge_projects(self.reg, old, {}, {"DB", "SOL"}, "NOW")
+        self.assertFalse(merged["S3"]["exists"])
+        self.assertNotIn("RETIRED", merged)
+
+    def test_project_new_on_dss_must_be_fetched(self):
+        self.assertEqual(b.must_fetch(self.reg, self.old["projects"], {"S3", "DB", "SOL", "PLANNED"}), {"PLANNED"})
+
+    def run_refresh(self, only, dss_keys, fetched_defs):
+        """refresh(only) against a fake DSS; returns (snapshot written, keys fetched, datasets probed)."""
+        tmp = tempfile.mkdtemp()
+        snap_path = os.path.join(tmp, "dss_snapshot.json")
+        with open(snap_path, "w") as fh:
+            json.dump(self.old, fh)
+        fetched, probed, written = [], [], {}
+
+        def fake_fetch(key):
+            fetched.append(key)
+            proj = copy.deepcopy(fetched_defs[key])
+            proj["fetched_at"] = "NEW"
+            return proj
+
+        def fake_probe(project_key, name, dtype):
+            probed.append((project_key, name))
+            return {"built": "empty", "rows": 0, "source": "sql", "error": ""}
+
+        listing = [{"projectKey": k, "name": k} for k in dss_keys]
+        with mock.patch.object(b, "SNAP", snap_path), \
+                mock.patch.object(b, "dku", return_value=(True, listing)), \
+                mock.patch.object(b, "fetch_project", side_effect=fake_fetch), \
+                mock.patch.object(b, "probe", side_effect=fake_probe), \
+                mock.patch.object(b, "write_snapshot", side_effect=written.update), \
+                mock.patch("sys.stderr", new_callable=io.StringIO), \
+                mock.patch("sys.stdout", new_callable=io.StringIO):
+            b.refresh(self.reg, only)
+        return written, sorted(fetched), sorted(probed)
+
+    def test_refresh_one_project_fetches_its_closure_only(self):
+        defs = {"DB": project({"person_db": ds()}), "S3": project({"person_s3": ds()})}
+        snap, fetched, probed = self.run_refresh(["DB"], ["S3", "DB", "SOL"], defs)
+        self.assertEqual(fetched, ["DB", "S3"])
+        # SOL was not fetched, but it reads DB.person_db, so that dataset is probed again.
+        self.assertEqual(probed, [("DB", "person_db")])
+        self.assertEqual(snap["projects"]["SOL"], self.old["projects"]["SOL"])
+        self.assertEqual(snap["projects"]["DB"]["datasets"]["person_db"]["probe"]["built"], "empty")
+        self.assertNotEqual(snap["projects"]["DB"]["probed_at"], "2026-11-01T00:00Z")
+        self.assertEqual(snap["projects"]["SOL"]["probed_at"], "2026-11-01T00:00Z")
+        self.assertIn("mixed snapshot", b.snapshot_age(snap))
+
+    def test_refresh_follows_a_dependency_only_the_fresh_fetch_knows(self):
+        # The snapshot has SOL unwired; it was pointed at DB since. DB, and DB's upstream S3, are
+        # fetched in a second round.
+        self.old["projects"]["SOL"]["variables"]["local"] = {}
+        defs = {"SOL": project(local={"data_preparation_project_key": "DB", "person": "person_db"}),
+                "DB": project({"person_db": ds()}), "S3": project({"person_s3": ds()})}
+        snap, fetched, probed = self.run_refresh(["SOL"], ["S3", "DB", "SOL"], defs)
+        self.assertEqual(fetched, ["DB", "S3", "SOL"])
+        self.assertEqual(probed, [("DB", "person_db")])
+
+    def test_refresh_keeps_projects_outside_the_closure(self):
+        defs = {"S3": project({"person_s3": ds()})}
+        snap, fetched, _ = self.run_refresh(["S3"], ["S3", "DB", "SOL"], defs)
+        self.assertEqual(fetched, ["S3"])
+        self.assertEqual(snap["projects"]["DB"], self.old["projects"]["DB"])
+        self.assertEqual(snap["projects"]["SOL"], self.old["projects"]["SOL"])
+
+    def test_refresh_fetches_a_project_that_appeared_on_dss(self):
+        defs = {"S3": project({"person_s3": ds()}), "PLANNED": project()}
+        _, fetched, _ = self.run_refresh(["S3"], ["S3", "DB", "SOL", "PLANNED"], defs)
+        self.assertEqual(fetched, ["PLANNED", "S3"])
+
+    def test_unregistered_project_key_is_refused(self):
+        with self.assertRaises(SystemExit):
+            b.check_only(self.reg, ["NOPE"])
+
+
+class SnapshotAge(unittest.TestCase):
+    def test_legacy_refreshed_at_becomes_per_project(self):
+        snap = b.normalize_snapshot({"refreshed_at": "T0", "projects": {"A": project(), "B": {"exists": False}}})
+        self.assertNotIn("refreshed_at", snap)
+        self.assertEqual(snap["projects"]["A"]["fetched_at"], "T0")
+        self.assertEqual(snap["projects"]["A"]["probed_at"], "T0")
+        self.assertEqual(snap["projects"]["B"], {"exists": False, "fetched_at": "T0"})
+        self.assertEqual(b.snapshot_age(snap), "the snapshot fetched T0")
+
+    def test_mixed_snapshot_names_the_oldest(self):
+        snap = {"projects": {"A": {"fetched_at": "T2"}, "B": {"fetched_at": "T1"}, "C": {"fetched_at": "T3"}}}
+        self.assertEqual(b.snapshot_age(snap), "a mixed snapshot: projects fetched between T1 (oldest: `B`) and T3")
 
 
 if __name__ == "__main__":
