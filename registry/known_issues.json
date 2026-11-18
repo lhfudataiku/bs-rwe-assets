@@ -3,6 +3,10 @@
     "plan": "D1 step 4",
     "note": "Reads the unbuilt DEMO_SF_OMOP2M_DATAPREP tables; its local scope also overrides 5 table variables with names that do not exist there. Cleared when D1 recreates it on DEMO_SF_PREP_OMOP_2M3."
   },
+  "MAPPING_BROKEN:SOL_RWD_COHORT_DISCOVERY": {
+    "plan": "E4 (configure on PREP_RWD_SF_1K)",
+    "note": "Found 2026-11-05. local now names SYNPUFOMOP1KDATAPREPRWDV11 with bs-snowflake but holds no table mappings, so the check falls back to standard, whose *_sf tables are unbuilt (14 of 15). Replaces PREP_KEY_DANGLING:SOL_RWD_COHORT_DISCOVERY:local. Cleared when Project Setup maps the solution to PREP_RWD_SF_1K."
+  },
   "PREP_KEY_DANGLING:DEMO_DB_RWD2:local": {
     "plan": "D3 step 1",
     "note": "Names the non-existent SNOWFLAKESYNPUFOMOP23DATAPREPERATION. Cleared when DEMO_DB_RWD2 is retired."
@@ -10,10 +14,6 @@
   "PREP_KEY_DANGLING:DEMO_DB_RWD2:standard": {
     "plan": "D3 step 1",
     "note": "Same as the local scope. Cleared when DEMO_DB_RWD2 is retired."
-  },
-  "PREP_KEY_DANGLING:SOL_RWD_COHORT_DISCOVERY:local": {
-    "plan": "Phase 4 (repoint the solution)",
-    "note": "Found 2026-10-13, not in the 2026-09-23 audit. standard names SYNPUFOMOP1KDATAPREPRWDV11, but local (which the solution code reads) names the non-existent SNOWFLAKESYNPUFOMOP23DATAPREPERATION, so the solution's own schema check would fail. Cleared when the solution is repointed to PREP_RWD_SF_1K in both scopes."
   },
   "SCHEMA_FAIL:DATABRICKSSYNPUFOMOP23DATAPREPERATION:databricks": {
     "plan": "D3 step 3",

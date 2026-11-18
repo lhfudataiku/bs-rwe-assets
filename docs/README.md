@@ -15,7 +15,9 @@ below for scope, method and rationale.
 | [`project-scoping.md`](project-scoping.md) | The three parts and the index: scope, business value, personas, owners, success criteria |
 | [`migration-revision-plan.md`](migration-revision-plan.md) | Per-project decisions, the 2026-09-23 audit, Workstreams A, B, D and E (C folded into E), phases and gates |
 | [`decisions/DECISION_REGISTER.md`](decisions/DECISION_REGISTER.md) | Durable choices only (`DEC-RWD-###`), with the admission rule |
-| [`governance-mvp-proposal.md`](governance-mvp-proposal.md) | Proposal: Govern workflow, controls and gated deployment for the suite (not yet accepted) |
+| [`governance-mvp-proposal.html`](governance-mvp-proposal.html) | Proposal: market need, today's process against the MVP, stakeholders, scope, sequencing after the migration, changes to the demo suite; technical specification in the appendix (not yet accepted) |
+| [`governance-mvp-proposal.md`](governance-mvp-proposal.md) | Text version of the same proposal, same order; adds nothing the HTML lacks |
+| [`rwe-governance-review.md`](rwe-governance-review.md) | Reference: RWE governance in US and EU regulation, the literature and the market as of 2026-11-13; evidence base for the proposal |
 
 ## Part 1 — OMOP Data Foundation
 

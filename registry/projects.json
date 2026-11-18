@@ -361,8 +361,8 @@
       ],
       "library": {
         "python/solution": {
-          "branch": "v1-1-1",
-          "hash": "329ff1cc3fc82258995ac247dad3e83ea889154e"
+          "branch": "v1-2",
+          "hash": "a7d922a3304ef8e28536854198b032d8a1e6e756"
         },
         "python/ds_common": {
           "branch": "v2-3-1",
@@ -475,8 +475,8 @@
       "personas": [],
       "library": {
         "python/solution": {
-          "branch": "v1-1-2",
-          "hash": "fdfda6f"
+          "branch": "",
+          "hash": "a7794f0"
         }
       },
       "lifecycle": "active",
@@ -498,9 +498,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B1: duplicate SYNPUFOMOP1KDATAPREPRWDV11, keep the input and OMOP CDM zones",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B1, created 2026-11-05 as a duplicate of SYNPUFOMOP1KDATAPREPRWDV11 without its SF, RS and DB zones or notebooks; the 15 tables are lowercase <omop_table> in zone 'OMOP CDM export'",
+      "omop_sets": {
+        "s3": {
+          "person": "person",
+          "observation_period": "observation_period",
+          "visit_occurrence": "visit_occurrence",
+          "condition_occurrence": "condition_occurrence",
+          "drug_exposure": "drug_exposure",
+          "procedure_occurrence": "procedure_occurrence",
+          "device_exposure": "device_exposure",
+          "measurement": "measurement",
+          "observation": "observation",
+          "death": "death",
+          "location": "location",
+          "drug_era": "drug_era",
+          "condition_era": "condition_era",
+          "concept": "concept",
+          "concept_ancestor": "concept_ancestor"
+        }
+      }
     },
     {
       "key": "PREP_RWD_S3_100K",
@@ -517,9 +535,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B1: 1K workflow pointed at the 100K raw files",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B1, created 2026-11-05 as a duplicate of SYNPUFOMOP100KDATAPREPARATION (its own S3 workflow) without the Snowflake/Redshift zone; concept_ancestor added; raw inputs renamed raw_<table>; the 15 tables are <omop_table> in zone 'OMOP CDM export', visit_occurrence from the v5.3 visit rules as in 1K",
+      "omop_sets": {
+        "s3": {
+          "person": "person",
+          "observation_period": "observation_period",
+          "visit_occurrence": "visit_occurrence",
+          "condition_occurrence": "condition_occurrence",
+          "drug_exposure": "drug_exposure",
+          "procedure_occurrence": "procedure_occurrence",
+          "device_exposure": "device_exposure",
+          "measurement": "measurement",
+          "observation": "observation",
+          "death": "death",
+          "location": "location",
+          "drug_era": "drug_era",
+          "condition_era": "condition_era",
+          "concept": "concept",
+          "concept_ancestor": "concept_ancestor"
+        }
+      }
     },
     {
       "key": "PREP_RWD_S3_2M3",
