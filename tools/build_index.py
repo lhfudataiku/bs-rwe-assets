@@ -7,11 +7,28 @@ kept. Each failure it found (unbuilt Snowflake tables, a prep project that no lo
 tables still shared into DEMO_SF_RWE) was invisible in DSS until someone went looking. This tool
 makes them rows in a committed table, so a regression shows up in review and in CI.
 
-THREE MODES.
-    python3 tools/build_index.py --refresh   # hits DSS through `dku`, rewrites .index/dss_snapshot.json (~15 min)
+MODES.
+    python3 tools/build_index.py --refresh   # hits DSS, rewrites .index/dss_snapshot.json
     python3 tools/build_index.py --reprobe   # hits DSS for the built/row-count probes only
+    python3 tools/build_index.py --refresh --project KEY [--project KEY2]
+                                             # re-fetch only KEY and the projects it depends on
     python3 tools/build_index.py             # offline: rebuilds every .index/*.tsv from the snapshot
     python3 tools/build_index.py --check     # offline: fails if a TSV is stale or the issue baseline moved
+
+HOW DSS IS READ. --refresh and --reprobe talk to DSS through one in-process dataikuapi client built
+by the dku CLI's own factory (dku_cli.client.get_client), so they use the same profile and API key
+as `dku`. The CLI lives in its own environment (a uv tool); when this interpreter cannot import it,
+the script re-runs itself under the interpreter named on the `dku` launcher's shebang line. If that
+fails too, or BUILD_INDEX_DKU=cli is set, every call goes through a `dku` subprocess instead (slow:
+~0.8 s of CLI start-up per call). The offline modes never touch either.
+
+PARTIAL REFRESH. --project KEY (repeatable) re-fetches or re-probes KEY plus everything it depends
+on, transitively: registry `upstream`, the projects its shared-in datasets come from, and its
+data_preparation_project_key targets (both variable scopes). Every other project's snapshot entry is
+kept as it was. Each entry carries its own fetched_at (definitions) and probed_at (probes), so a
+partial refresh leaves a mixed snapshot, and SUMMARY.md says so. The `project list` existence check
+always covers every registered key: a project that disappeared is marked gone, and one that appeared
+since the last fetch is fetched as well.
 
 HAND-WRITTEN vs GENERATED. registry/projects.json holds what DSS cannot tell us (part, role,
 lifecycle, owner, which datasets form an OMOP set). registry/known_issues.json is the reviewed
@@ -29,11 +46,14 @@ names compared lowercase, bigint read as int and double as float, exactly as che
 import argparse
 import concurrent.futures
 import datetime
+import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX = os.path.join(ROOT, ".index")
@@ -55,7 +75,8 @@ LIFECYCLES = {"active", "retiring", "planned", "deleted", "archived"}
 OWNER_ROLES = {"data-foundation", "solution", "rwe-demo", "suite"}
 # Dataset types whose rows can be counted with SQL. Anything else falls back to the DSS metric.
 SQL_TYPES = {"Snowflake", "Redshift", "PostgreSQL", "Databricks", "BigQuery", "Synapse", "SQLServer"}
-WORKERS = 12
+WORKERS = 12          # concurrent dataset reads (definitions over the CLI, probes)
+PROJECT_WORKERS = 4   # projects fetched at the same time
 TIMEOUT = 240
 # A Git remote can carry a token as URL userinfo (https://<token>@github.com/...). The snapshot is
 # committed, so userinfo is stripped before it is written, and --check fails if any is left.
@@ -120,8 +141,21 @@ def load_baseline():
 
 # ------------------------------------------------------------------------------------- refresh
 
+REEXEC_ENV = "BUILD_INDEX_REEXEC"
+_API = None  # an InProcessDku once connect() succeeds; None means the subprocess path
+
+
 def dku(args, timeout=TIMEOUT):
-    """Run dku with JSON output. Returns (ok, parsed_or_error_text)."""
+    """Run a dku command with JSON output. Returns (ok, parsed_or_error_text).
+
+    In-process when connect() found the dku CLI's client; the same argument lists, the same JSON
+    and (as far as the CLI's error rendering goes) the same error text as the subprocess."""
+    if _API is not None:
+        return _API.call(args, timeout)
+    return dku_subprocess(args, timeout)
+
+
+def dku_subprocess(args, timeout=TIMEOUT):
     try:
         res = subprocess.run(["dku", "--format", "json"] + args, capture_output=True, text=True,
                              timeout=timeout)
@@ -133,6 +167,257 @@ def dku(args, timeout=TIMEOUT):
         return True, json.loads(res.stdout) if res.stdout.strip() else None
     except ValueError:
         return True, res.stdout
+
+
+class InProcessDku(object):
+    """The handful of dku commands this script uses, run on one shared dataikuapi client.
+
+    Each method mirrors the CLI command of the same name (dku_cli/commands/*.py), reusing the CLI's
+    own helpers where it has non-trivial logic (SQL table resolution, metric reading, wiki version
+    tags). Results are passed through json the way `dku --format json` prints them, and errors are
+    rendered by the CLI's own handle_api_error into a per-thread console, so the probe error text in
+    the snapshot is the text the subprocess would have printed."""
+
+    def __init__(self):
+        import requests.adapters
+        import rich.console
+        import dku_cli.output as cli_output
+        from dku_cli.client import get_client
+
+        self._console_cls = rich.console.Console
+        self._local = threading.local()
+        cli_output._quiet = True  # no stale-metric hints or large-dataset warnings, as with --format json
+        cli_output.err_console = _ThreadConsole(self)
+        self.client = get_client()
+        session = self.client._session
+        adapter = requests.adapters.HTTPAdapter(pool_connections=4, pool_maxsize=4 * WORKERS * PROJECT_WORKERS)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        request = session.request
+
+        def request_with_timeout(method, url, **kw):
+            kw.setdefault("timeout", self._local.__dict__.get("timeout", TIMEOUT))
+            return request(method, url, **kw)
+
+        session.request = request_with_timeout
+
+    def console(self):
+        c = getattr(self._local, "console", None)
+        if c is None:
+            c = self._local.console = self._console_cls(file=io.StringIO(), soft_wrap=True, emoji=False,
+                                                         color_system=None)
+        return c
+
+    def call(self, args, timeout=TIMEOUT):
+        import requests.exceptions
+        from dku_cli.errors import handle_api_error
+
+        self._local.console = None
+        self._local.timeout = timeout
+        try:
+            out = self.dispatch(list(args))
+        except SystemExit:  # exit_with_error from a CLI helper
+            return False, self.error_text()
+        except requests.exceptions.Timeout:
+            return False, "timeout after %ds" % timeout
+        except Exception as e:  # noqa: BLE001 -- the CLI turns every API error into text, so do we
+            try:
+                handle_api_error(e, project_key=self._local.__dict__.get("project_key"))
+            except SystemExit:
+                pass
+            return False, self.error_text()
+        return True, out
+
+    def error_text(self):
+        c = getattr(self._local, "console", None)
+        return " ".join(c.file.getvalue().split()) if c is not None else ""
+
+    def dispatch(self, args):
+        cmd, rest = tuple(args[:2]), args[2:]
+        opts, pos = {}, []
+        i = 0
+        while i < len(rest):
+            if rest[i].startswith("-"):
+                opts[rest[i]] = rest[i + 1]
+                i += 2
+            else:
+                pos.append(rest[i])
+                i += 1
+        self._local.project_key = None
+        handler = {
+            ("project", "list"): self.project_list,
+            ("project", "inspect"): self.project_inspect,
+            ("project", "get-variables"): self.project_get_variables,
+            ("library", "read"): self.library_read,
+            ("dataset", "get-definition"): self.dataset_get_definition,
+            ("dataset", "query"): self.dataset_query,
+            ("dataset", "info"): self.dataset_info,
+            ("dataset", "head"): self.dataset_head,
+            ("wiki", "get"): self.wiki_get,
+        }.get(cmd)
+        if handler is None:
+            raise ValueError("build_index: no in-process dku %s" % " ".join(cmd))
+        out = handler(pos, opts)
+        if isinstance(out, (bytes, str)):
+            text = out.decode("utf-8") if isinstance(out, bytes) else out
+            try:
+                return json.loads(text) if text.strip() else None
+            except ValueError:
+                return text
+        return json.loads(json.dumps(out, default=str))  # what `dku --format json` prints
+
+    def project(self, opts, pos=()):
+        key = opts.get("-P") or (pos[0] if pos else None)
+        self._local.project_key = key
+        return key, self.client.get_project(key)
+
+    def project_list(self, pos, opts):
+        return [{"projectKey": p["projectKey"], "name": p.get("name", p["projectKey"])}
+                for p in self.client.list_projects()]
+
+    def project_inspect(self, pos, opts):
+        """The parts of `dku project inspect` fetch_project reads, plus the full dataset definitions
+        (DSS's dataset list already carries them, which saves one call per dataset)."""
+        key, proj = self.project(opts, pos)
+        meta = proj.get_metadata()
+        items = [getattr(d, "_data", d) for d in proj.list_datasets()]
+        try:
+            graph = proj.get_flow().get_graph()
+            downstream = set()
+            for node in graph.nodes.values():
+                downstream.update(node.get("successors", []))
+            sources = [nid for nid, node in graph.nodes.items()
+                       if nid not in downstream and node.get("type") == "COMPUTABLE_DATASET"]
+        except Exception:  # noqa: BLE001 -- the CLI reports no sources when the flow cannot be read
+            sources = []
+        try:
+            wiki = [{"id": a.article_id, "title": a.get_data().get_name()}
+                    for a in proj.get_wiki().list_articles()]
+        except Exception:  # noqa: BLE001 -- as the CLI: a wiki that cannot be read lists nothing
+            wiki = []
+        return {"key": key, "name": meta.get("label", key),
+                "datasets": [{"name": d.get("name", d.get("id", "")), "type": d.get("type", "")} for d in items],
+                "flow_sources": sources, "wiki_articles": wiki,
+                "definitions": {d.get("name"): d for d in items}}
+
+    def project_get_variables(self, pos, opts):
+        return self.project(opts, pos)[1].get_variables()
+
+    def library_read(self, pos, opts):
+        return self.project(opts)[1].get_library().get_file(pos[0]).read(as_type="bytes")
+
+    def dataset_get_definition(self, pos, opts):
+        return self.project(opts)[1].get_dataset(pos[0]).get_definition()
+
+    def dataset_query(self, pos, opts):
+        from dku_cli.commands.dataset import _resolve_sql_table, _table_template_variables
+        from dku_cli.errors import exit_with_error
+
+        key, proj = self.project(opts)
+        name = pos[0]
+        ds_def = proj.get_dataset(name).get_definition()
+        resolved = _resolve_sql_table(ds_def, key, _table_template_variables(self.client, key, ds_def))
+        if resolved is None:
+            exit_with_error("'%s' is not a SQL-table-backed dataset (type '%s') — cannot run SQL against it."
+                            % (name, ds_def.get("type")))
+        connection, table = resolved
+        result = self.client.sql_query(opts["--sql"].replace("{{table}}", table), connection=connection)
+        columns = [c["name"] for c in result.get_schema()]
+        return [dict(zip(columns, row)) for row in result.iter_rows()]
+
+    def dataset_info(self, pos, opts):
+        from dku_cli.commands.dataset import _gather_dataset_info
+
+        key, proj = self.project(opts)
+        return _gather_dataset_info(proj.get_dataset(pos[0]), pos[0], key, recompute=False, fmt="json")[1]
+
+    def dataset_head(self, pos, opts):
+        """`dku dataset head --limit N`: the first N rows, then the stream is closed."""
+        from dku_cli.errors import exit_with_error
+
+        key, proj = self.project(opts)
+        name = pos[0]
+        ds = proj.get_dataset(name)
+        columns = [c.get("name", "col_%d" % i)
+                   for i, c in enumerate(ds.get_definition().get("schema", {}).get("columns", []))]
+        if not columns:
+            exit_with_error(
+                "Dataset '%s' has no columns — it likely has never been built." % name,
+                details=["An unbuilt managed dataset has zero columns; `head` cannot show data.",
+                         "  dku dataset build %s -P %s --type RECURSIVE_BUILD --auto-update-schema --wait" % (name, key),
+                         "  dku dataset head %s -P %s -n 10" % (name, key)])
+        limit = int(opts.get("--limit", 10))
+        rows = []
+        it = ds.iter_rows()
+        try:
+            for row in it:
+                if len(rows) >= limit:
+                    break
+                rows.append(dict(zip(columns, row)))
+        finally:
+            it.close()
+        return rows
+
+    def wiki_get(self, pos, opts):
+        from dku_cli.commands._wiki_io import _modified_by, _modified_on, _version_tag
+
+        data = self.project(opts)[1].get_wiki().get_article(pos[0]).get_data()
+        tag = _version_tag(data)
+        return {"id": pos[0], "name": data.get_name(), "body": data.get_body(),
+                "version": tag.get("versionNumber"), "lastModifiedBy": _modified_by(tag),
+                "lastModifiedOn": _modified_on(tag)}
+
+
+class _ThreadConsole(object):
+    """Stands in for the CLI's stderr console: each thread renders into its own buffer."""
+
+    def __init__(self, owner):
+        self._owner = owner
+
+    def __getattr__(self, name):
+        return getattr(self._owner.console(), name)
+
+
+def dku_launcher_python():
+    """The interpreter on the `dku` launcher's shebang line (a uv or pipx tool environment), or None."""
+    exe = shutil.which("dku")
+    if not exe:
+        return None
+    try:
+        with open(exe, "rb") as fh:
+            first = fh.readline().decode("utf-8", "replace")
+    except OSError:
+        return None
+    if not first.startswith("#!"):
+        return None
+    interp = first[2:].strip().split()[0] if first[2:].strip() else ""
+    return interp if os.path.isabs(interp) and os.access(interp, os.X_OK) else None
+
+
+def connect():
+    """Pick how DSS is read: in-process if the dku CLI's client can be imported here; else re-run
+    this script under the dku launcher's interpreter; else the subprocess path."""
+    global _API
+    if os.environ.get("BUILD_INDEX_DKU") == "cli":
+        print("BUILD_INDEX_DKU=cli: reading DSS through dku subprocesses", file=sys.stderr)
+        return
+    try:
+        import dku_cli.client  # noqa: F401
+    except ImportError:
+        interp = dku_launcher_python()
+        if interp and not os.environ.get(REEXEC_ENV) and \
+                os.path.realpath(interp) != os.path.realpath(sys.executable):
+            sys.stdout.flush()
+            sys.stderr.flush()
+            env = dict(os.environ)
+            env[REEXEC_ENV] = "1"
+            os.execve(interp, [interp, os.path.abspath(__file__)] + sys.argv[1:], env)
+        print("dku_cli is not importable here; reading DSS through dku subprocesses (slow)", file=sys.stderr)
+        return
+    try:
+        _API = InProcessDku()
+    except Exception as e:  # noqa: BLE001 -- any failure means the subprocess path, which reports its own errors
+        print("in-process dku client unavailable (%s); using dku subprocesses" % e, file=sys.stderr)
 
 
 def short_error(text):
@@ -196,10 +481,15 @@ def wiki_version(project, articles):
     return ""
 
 
+def now_utc():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+
+
 def fetch_project(key):
+    fetched_at = now_utc()
     ok, insp = dku(["project", "inspect", key])
     if not ok:
-        return {"exists": False, "error": short_error(insp)}
+        return {"exists": False, "error": short_error(insp), "fetched_at": fetched_at}
     _, variables = dku(["project", "get-variables", "-P", key])
     ok, libs = dku(["library", "read", "external-libraries.json", "-P", key])
     git_refs = {}
@@ -210,9 +500,13 @@ def fetch_project(key):
                               "hash": ref.get("lastHash", "")}
     articles = [{"id": str(a["id"]), "title": a["title"]} for a in insp.get("wiki_articles", [])]
     names = [d["name"] for d in insp.get("datasets", [])]
+    listed = insp.get("definitions") or {}  # in-process inspect returns them; the CLI does not
 
     def definition(name):
-        ok, d = dku(["dataset", "get-definition", name, "-P", key])
+        if name in listed:
+            ok, d = True, listed[name]
+        else:
+            ok, d = dku(["dataset", "get-definition", name, "-P", key])
         if not ok:
             return name, {"error": short_error(d)}
         params = d.get("params") or {}
@@ -223,10 +517,14 @@ def fetch_project(key):
             "columns": [[c.get("name"), c.get("type")] for c in (d.get("schema") or {}).get("columns", [])],
         }
 
-    with concurrent.futures.ThreadPoolExecutor(WORKERS) as pool:
-        datasets = dict(pool.map(definition, names))
+    if all(n in listed for n in names):
+        datasets = dict(map(definition, names))
+    else:
+        with concurrent.futures.ThreadPoolExecutor(WORKERS) as pool:
+            datasets = dict(pool.map(definition, names))
     return {
         "exists": True,
+        "fetched_at": fetched_at,
         "name": insp.get("name", ""),
         "variables": {"standard": (variables or {}).get("standard", {}),
                       "local": (variables or {}).get("local", {})},
@@ -272,52 +570,82 @@ def probe_targets(reg, projects):
                   if t[0] in projects and projects[t[0]].get("exists") and t[1] in projects[t[0]]["datasets"])
 
 
-def reprobe(reg):
-    """Re-run only the probes, keeping the snapshot's project definitions (minutes, not a full refresh)."""
+def dependencies(reg, projects, key):
+    """Projects KEY reads from: registry upstream, its prep project in either variable scope, and
+    the projects its shared-in datasets come from (as far as the snapshot entry knows)."""
+    deps = set()
+    for p in reg["projects"]:
+        if p["key"] == key:
+            deps.update(p["upstream"])
+    proj = projects.get(key) or {}
+    if proj.get("exists"):
+        for scope in ("standard", "local"):
+            ref = proj["variables"][scope].get("data_preparation_project_key")
+            if ref:
+                deps.add(ref)
+        deps.update(s.partition(".")[0] for s in foreign_sources(proj))
+    deps.discard(key)
+    return deps
+
+
+def closure(reg, projects, keys):
+    """KEYS plus everything they depend on, transitively."""
+    seen, stack = set(), list(keys)
+    while stack:
+        key = stack.pop()
+        if key not in seen:
+            seen.add(key)
+            stack.extend(dependencies(reg, projects, key) - seen)
+    return seen
+
+
+def normalize_snapshot(snap):
+    """Give a snapshot from before per-project timestamps its old refreshed_at on every entry."""
+    legacy = snap.pop("refreshed_at", None)
+    if legacy:
+        for proj in snap["projects"].values():
+            proj.setdefault("fetched_at", legacy)
+            if proj.get("exists"):
+                proj.setdefault("probed_at", legacy)
+    return snap
+
+
+def load_snapshot():
     with open(SNAP) as fh:
-        snap = json.load(fh)
-    write_probes(reg, snap)
+        return normalize_snapshot(json.load(fh))
 
 
-def write_probes(reg, snap):
-    projects = snap["projects"]
-    for proj in projects.values():
-        for ds in proj.get("datasets", {}).values():
-            ds.pop("probe", None)
-    targets = probe_targets(reg, projects)
-    print("probing %d datasets" % len(targets), file=sys.stderr)
-
-    def run(t):
-        project, name = t
-        return t, probe(project, name, projects[project]["datasets"][name].get("type"))
-
-    with concurrent.futures.ThreadPoolExecutor(WORKERS) as pool:
-        for (project, name), result in pool.map(run, targets):
-            projects[project]["datasets"][name]["probe"] = result
-    snap["refreshed_at"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+def write_snapshot(snap):
     with open(SNAP, "w") as fh:
         fh.write(redact(json.dumps(snap, indent=1, sort_keys=True)) + "\n")
-    print("wrote %s (%d projects, %d probes)" % (os.path.relpath(SNAP, ROOT), len(projects), len(targets)))
 
 
-def refresh(reg):
-    ok, listing = dku(["project", "list", "--fields", "projectKey,name"])
-    if not ok:
-        raise SystemExit("dku project list failed: " + listing)
-    all_keys = {p["projectKey"] for p in listing}
-    pattern = re.compile(reg["discovery_pattern"])
-    discovered = sorted(k for k in all_keys if pattern.search(k))
+def merge_projects(reg, old, fetched, all_keys, now):
+    """The snapshot's project entries after a refresh: freshly fetched entries win, a registered key
+    missing from DSS is marked gone (the existence check covers every key on every run), and every
+    other entry is kept as it was. Keys no longer registered are dropped, as a full refresh would."""
+    merged = {}
+    for p in reg["projects"]:
+        key = p["key"]
+        if key in fetched:
+            merged[key] = fetched[key]
+        elif key not in all_keys:
+            merged[key] = {"exists": False, "error": "not on DSS", "fetched_at": now}
+        elif key in old:
+            merged[key] = old[key]
+        else:
+            raise ValueError("%s is on DSS but was neither fetched nor in the snapshot" % key)
+    return merged
 
-    keys = [p["key"] for p in reg["projects"]]
-    projects = {}
-    for key in keys:
-        if key not in all_keys:
-            projects[key] = {"exists": False, "error": "not on DSS"}
-            continue
-        print("fetching %s" % key, file=sys.stderr)
-        projects[key] = fetch_project(key)
 
-    # Keys referenced from DSS (prep project variables, flow sources) that are not registered.
+def must_fetch(reg, old, all_keys):
+    """Registered keys on DSS whose snapshot entry has no definitions: new on DSS since the last fetch."""
+    return {p["key"] for p in reg["projects"]
+            if p["key"] in all_keys and not (old.get(p["key"]) or {}).get("exists")}
+
+
+def external_projects(projects, registered, all_keys):
+    """Keys referenced from DSS (prep project variables, flow sources) that are not registered."""
     referenced = set()
     for proj in projects.values():
         if not proj.get("exists"):
@@ -327,11 +655,101 @@ def refresh(reg):
             if ref:
                 referenced.add(ref)
         referenced.update(s.partition(".")[0] for s in foreign_sources(proj))
-    external = {k: (k in all_keys) for k in sorted(referenced - set(keys))}
+    return {k: (k in all_keys) for k in sorted(referenced - set(registered))}
+
+
+def check_only(reg, only):
+    registered = {p["key"] for p in reg["projects"]}
+    unknown = sorted(set(only) - registered)
+    if unknown:
+        raise SystemExit("--project %s: not in registry/projects.json" % ", ".join(unknown))
+
+
+def reprobe(reg, only=None):
+    """Re-run only the probes, keeping the snapshot's project definitions (minutes, not a full refresh)."""
+    snap = load_snapshot()
+    scope = None
+    if only:
+        check_only(reg, only)
+        scope = closure(reg, snap["projects"], only) & set(snap["projects"])
+        print("re-probing %s" % ", ".join(sorted(scope)), file=sys.stderr)
+    write_probes(reg, snap, scope)
+
+
+def write_probes(reg, snap, scope=None):
+    """Probe the datasets of the projects in SCOPE (all when None); other projects keep their probes.
+    Targets are still chosen from the whole snapshot, so a consumer outside SCOPE that reads a
+    dataset inside it gets that dataset probed."""
+    projects = snap["projects"]
+    scope = set(projects) if scope is None else set(scope)
+    for key in scope:
+        for ds in projects[key].get("datasets", {}).values():
+            ds.pop("probe", None)
+    targets = [t for t in probe_targets(reg, projects) if t[0] in scope]
+    print("probing %d datasets" % len(targets), file=sys.stderr)
+
+    def run(t):
+        project, name = t
+        return t, probe(project, name, projects[project]["datasets"][name].get("type"))
+
+    with concurrent.futures.ThreadPoolExecutor(WORKERS) as pool:
+        for (project, name), result in pool.map(run, targets):
+            projects[project]["datasets"][name]["probe"] = result
+    now = now_utc()
+    for key in scope:
+        if projects[key].get("exists"):
+            projects[key]["probed_at"] = now
+    write_snapshot(snap)
+    print("wrote %s (%d projects, %d probes)" % (os.path.relpath(SNAP, ROOT), len(projects), len(targets)))
+
+
+def fetch_all(keys):
+    """fetch_project for each key, PROJECT_WORKERS at a time."""
+    def run(key):
+        print("fetching %s" % key, file=sys.stderr)
+        return key, fetch_project(key)
+
+    with concurrent.futures.ThreadPoolExecutor(PROJECT_WORKERS) as pool:
+        return dict(pool.map(run, sorted(keys)))
+
+
+def refresh(reg, only=None):
+    ok, listing = dku(["project", "list", "--fields", "projectKey,name"])
+    if not ok:
+        raise SystemExit("dku project list failed: " + listing)
+    all_keys = {p["projectKey"] for p in listing}
+    pattern = re.compile(reg["discovery_pattern"])
+    discovered = sorted(k for k in all_keys if pattern.search(k))
+    registered = {p["key"] for p in reg["projects"]}
+
+    if only:
+        check_only(reg, only)
+        if not os.path.exists(SNAP):
+            raise SystemExit("--project needs an existing snapshot: run a full --refresh first")
+        old = load_snapshot()["projects"]
+        appeared = must_fetch(reg, old, all_keys)
+        if appeared:
+            print("on DSS but not in the snapshot, fetching too: %s" % ", ".join(sorted(appeared)), file=sys.stderr)
+        fetched, wanted = {}, closure(reg, old, only) | appeared
+        # Fetched definitions can name dependencies the snapshot did not know (a new share, a
+        # repointed prep key): recompute the closure on the merged view until it stops growing.
+        while True:
+            todo = (wanted & registered & all_keys) - set(fetched)
+            if not todo:
+                break
+            fetched.update(fetch_all(todo))
+            view = dict(old)
+            view.update(fetched)
+            wanted |= closure(reg, view, only)
+        scope = set(fetched)
+        projects = merge_projects(reg, old, fetched, all_keys, now_utc())
+    else:
+        scope = None
+        projects = merge_projects(reg, {}, fetch_all(registered & all_keys), all_keys, now_utc())
 
     snap = {"dss_project_count": len(all_keys), "discovered": discovered,
-            "external_projects": external, "projects": projects}
-    write_probes(reg, snap)
+            "external_projects": external_projects(projects, registered, all_keys), "projects": projects}
+    write_probes(reg, snap, scope)
 
 
 # ------------------------------------------------------------------------------------- analysis
@@ -545,7 +963,7 @@ SOURCE = {"projects.tsv": "projects", "datasets.tsv": "datasets", "schema_compli
 METADATA = [
     ("registry/projects.json", "suite owner", "hand-written; validated by --check", "one entry per DSS project: part, role, lifecycle, owner, OMOP sets"),
     ("registry/known_issues.json", "suite owner", "hand-written; --check fails if it differs from issues.tsv", "accepted problems the migration has still to fix"),
-    (".index/dss_snapshot.json", "tools/build_index.py --refresh", "as of refreshed_at inside the file", "raw DSS state: variables, git references, flow sources, dataset schemas, probes"),
+    (".index/dss_snapshot.json", "tools/build_index.py --refresh", "per project: fetched_at (definitions) and probed_at (probes) on each entry; --project refreshes a subset, SUMMARY.md gives the oldest","raw DSS state: variables, git references, flow sources, dataset schemas, probes"),
     (".index/projects.tsv", "tools/build_index.py", "python3 tools/build_index.py --check", "one row per registered project with live wiring"),
     (".index/datasets.tsv", "tools/build_index.py", "python3 tools/build_index.py --check", "every dataset of every registered project; built/rows for probed ones"),
     (".index/schema_compliance.tsv", "tools/build_index.py", "python3 tools/build_index.py --check", "each OMOP set table vs CDM_SCHEMA v1-1-1"),
@@ -586,6 +1004,19 @@ def render(reg, snap, baseline):
     return out, data
 
 
+def snapshot_age(snap):
+    """'the snapshot fetched T', or, after a partial refresh, the oldest project fetch and the newest."""
+    times = sorted((p.get("fetched_at") or "unknown", k) for k, p in snap["projects"].items())
+    if not times:
+        return "an empty snapshot"
+    (oldest, oldest_key), (newest, _) = times[0], times[-1]
+    if oldest == newest:
+        return "the snapshot fetched %s" % oldest
+    stale = [k for t, k in times if t == oldest]
+    names = ", ".join("`%s`" % k for k in stale[:3]) + (" and %d more" % (len(stale) - 3) if len(stale) > 3 else "")
+    return "a mixed snapshot: projects fetched between %s (oldest: %s) and %s" % (oldest, names, newest)
+
+
 def summary(reg, snap, data, baseline):
     issues = data["issues"]
     new = [i for i in issues if i["status"] == "NEW"]
@@ -599,7 +1030,7 @@ def summary(reg, snap, data, baseline):
     lines = [
         "# Index summary",
         "",
-        "> Generated by `tools/build_index.py` from the snapshot taken %s. Do not edit." % snap["refreshed_at"],
+        "> Generated by `tools/build_index.py` from %s. Do not edit." % snapshot_age(snap),
         "",
         "- Registered projects: %d (%s)" % (len(reg["projects"]), ", ".join(
             "%d %s" % (sum(p["lifecycle"] == lc for p in reg["projects"]), lc)
@@ -629,21 +1060,31 @@ def main():
     mode.add_argument("--refresh", action="store_true", help="query DSS with dku and rewrite the snapshot first")
     mode.add_argument("--reprobe", action="store_true", help="re-run only the built/row-count probes against DSS")
     mode.add_argument("--check", action="store_true", help="offline: fail if .index/ is stale or the baseline moved")
+    ap.add_argument("--project", action="append", metavar="KEY",
+                    help="with --refresh or --reprobe: only KEY and the projects it depends on (repeatable)")
     args = ap.parse_args()
+    if args.project and not (args.refresh or args.reprobe):
+        ap.error("--project needs --refresh or --reprobe")
 
     reg = load_registry()
     baseline = load_baseline()
+    if args.refresh or args.reprobe:
+        connect()
+        started = datetime.datetime.now()
     if args.refresh:
         os.makedirs(INDEX, exist_ok=True)
-        refresh(reg)
+        refresh(reg, args.project)
     elif args.reprobe:
-        reprobe(reg)
+        reprobe(reg, args.project)
+    if args.refresh or args.reprobe:
+        print("DSS read in %.0fs (%s)" % ((datetime.datetime.now() - started).total_seconds(),
+                                         "in-process" if _API is not None else "dku subprocesses"), file=sys.stderr)
     if not os.path.exists(SNAP):
         raise SystemExit("no snapshot: run python3 tools/build_index.py --refresh")
     with open(SNAP) as fh:
         raw = fh.read()
     leaked = redact(raw) != raw
-    snap = json.loads(redact(raw))
+    snap = normalize_snapshot(json.loads(redact(raw)))
     missing = sorted({p["key"] for p in reg["projects"]} - set(snap["projects"]))
     if missing:
         raise SystemExit("snapshot predates registry entries %s: run --refresh" % ", ".join(missing))
