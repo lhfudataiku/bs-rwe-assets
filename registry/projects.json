@@ -630,9 +630,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Databricks variant of PREP_RWD_S3_1K on bs-databricks, a global PAT connection (DEC-RWD-002)",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-18: sync-only Databricks variant of PREP_RWD_S3_1K on bs-databricks, a global PAT connection (DEC-RWD-002); 15 shared-in tables, 15 sync recipes to <omop_table>_db",
+      "omop_sets": {
+        "databricks": {
+          "person": "person_db",
+          "observation_period": "observation_period_db",
+          "visit_occurrence": "visit_occurrence_db",
+          "condition_occurrence": "condition_occurrence_db",
+          "drug_exposure": "drug_exposure_db",
+          "procedure_occurrence": "procedure_occurrence_db",
+          "device_exposure": "device_exposure_db",
+          "measurement": "measurement_db",
+          "observation": "observation_db",
+          "death": "death_db",
+          "location": "location_db",
+          "drug_era": "drug_era_db",
+          "condition_era": "condition_era_db",
+          "concept": "concept_db",
+          "concept_ancestor": "concept_ancestor_db"
+        }
+      }
     },
     {
       "key": "PREP_RWD_RS_1K",
@@ -650,9 +668,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Redshift variant of PREP_RWD_S3_1K (DEC-RWD-002)",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-18: sync-only Redshift variant of PREP_RWD_S3_1K on redshift-solutions (DEC-RWD-002); 15 shared-in tables, 15 sync recipes to <omop_table>_rs",
+      "omop_sets": {
+        "redshift": {
+          "person": "person_rs",
+          "observation_period": "observation_period_rs",
+          "visit_occurrence": "visit_occurrence_rs",
+          "condition_occurrence": "condition_occurrence_rs",
+          "drug_exposure": "drug_exposure_rs",
+          "procedure_occurrence": "procedure_occurrence_rs",
+          "device_exposure": "device_exposure_rs",
+          "measurement": "measurement_rs",
+          "observation": "observation_rs",
+          "death": "death_rs",
+          "location": "location_rs",
+          "drug_era": "drug_era_rs",
+          "condition_era": "condition_era_rs",
+          "concept": "concept_rs",
+          "concept_ancestor": "concept_ancestor_rs"
+        }
+      }
     },
     {
       "key": "DEMO_SF_PREP_OMOP_2M3",
