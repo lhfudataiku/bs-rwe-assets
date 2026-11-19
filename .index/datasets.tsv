@@ -856,6 +856,96 @@ PREP_RWD_S3_100K	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-
 PREP_RWD_S3_100K	visit_occurrence	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	1802032	metric	
 PREP_RWD_S3_100K	visit_occurrence_100k_db	S3	dataiku-managed-storage	yes	17			-			
 PREP_RWD_S3_100K	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	AT_CONCEPT	S3	hls-synth-patient	no	10			-			
+PREP_RWD_S3_2M3	AT_CONCEPT_ANCESTOR	S3	hls-synth-patient	no	4			-			
+PREP_RWD_S3_2M3	AT_CONCEPT_RELATIONSHIP	S3	hls-synth-patient	no	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_0	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_1	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_2	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_3	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_db	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	concept	S3	dataiku-managed-storage	yes	10	s3	concept	yes		head	
+PREP_RWD_S3_2M3	concept_ancestor	S3	dataiku-managed-storage	yes	4	s3	concept_ancestor	yes		head	
+PREP_RWD_S3_2M3	concept_relationship_db	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes		head	
+PREP_RWD_S3_2M3	condition_era_2_3_pc	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_1	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_2	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_3	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_4	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_5	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_6	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_occurrence	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes		head	
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	death	S3	dataiku-managed-storage	yes	7	s3	death	yes		head	
+PREP_RWD_S3_2M3	death_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	device_exposure	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes		head	
+PREP_RWD_S3_2M3	device_exposure_2_3_pc	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_0	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_1	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_2	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_3	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	drug_era	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes		head	
+PREP_RWD_S3_2M3	drug_era_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_1	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_2	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_3	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_4	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_5	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_6	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_exposure	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes		head	
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_0	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_1	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_2	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_3	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	encounter_concepts	S3	dataiku-managed-storage	yes	4			-			
+PREP_RWD_S3_2M3	encounter_concepts_ns_joined	S3	dataiku-managed-storage	yes	3			-			
+PREP_RWD_S3_2M3	location	S3	dataiku-managed-storage	yes	10	s3	location	yes		head	
+PREP_RWD_S3_2M3	location_2_3_pc	S3	dataiku-managed-storage	yes	8			-			
+PREP_RWD_S3_2M3	location_2_3_pc_prepared	S3	dataiku-managed-storage	yes	10			-			
+PREP_RWD_S3_2M3	measurement	S3	dataiku-managed-storage	yes	20	s3	measurement	yes		head	
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	observation	S3	dataiku-managed-storage	yes	18	s3	observation	yes		head	
+PREP_RWD_S3_2M3	observation_2_3_pc	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_0	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_1	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_2	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_3	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_period	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes		head	
+PREP_RWD_S3_2M3	observation_period_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	payer_plan_period_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	payer_plan_period_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	person	S3	dataiku-managed-storage	yes	18	s3	person	yes		head	
+PREP_RWD_S3_2M3	person_2_3_pc	S3	dataiku-managed-storage	yes	18			-			
+PREP_RWD_S3_2M3	procedure_occurrence	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes		head	
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	provider_2_3_pc	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	provider_2_3_pc_db	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	us_sdoh_county_measure	UploadedFiles	dataiku-managed-storage	no	63			-			
+PREP_RWD_S3_2M3	visit_by_observation_occurrence	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_by_procedure_occurrence	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_occurrence	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes		head	
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
 PREP_RWD_SF_1K	concept_ancestor_sf	Snowflake	bs-snowflake	yes	4	snowflake	concept_ancestor	yes	72374967	sql	
 PREP_RWD_SF_1K	concept_sf	Snowflake	bs-snowflake	yes	10	snowflake	concept	yes	6088813	sql	
 PREP_RWD_SF_1K	condition_era_sf	Snowflake	bs-snowflake	yes	6	snowflake	condition_era	yes	121386	sql	

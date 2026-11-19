@@ -1,0 +1,4 @@
+cohort_definition_id,cohort_definition_name,cohort_definition_description,cohort_sql_script_filename
+1,Chronic kidney disease,"first diagnosis followed by at least two record of dialysis procedures or observations throughout records, or second diagnosis at least 30 days apart.",feature_condition_ckd.sql
+2,Depression,"first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",feature_condition_depression.sql
+3,Diabetes mellitus type 2,"The first condition record of Type 2 Diabetes Mellitus, which is followed by another Type 2 Diabetes Mellitus condition record, at least 2 drugs used to treat Type 2 diabetes, or at least 2 HbA1c measurements with value > 6.5%",feature_condition_dm2.sql

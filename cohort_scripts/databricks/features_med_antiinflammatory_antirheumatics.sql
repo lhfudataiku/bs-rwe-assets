@@ -1,0 +1,264 @@
+CREATE TABLE @temp_database_schema.yqq1ns9zCodesets  
+USING DELTA
+ AS
+SELECT
+CAST(NULL AS int) AS codeset_id,
+	CAST(NULL AS bigint) AS concept_id  WHERE 1 = 0;
+INSERT INTO @temp_database_schema.yqq1ns9zCodesets (codeset_id, concept_id)
+SELECT 0 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+( 
+ select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (21601782)
+UNION select c.concept_id
+ from @vocabulary_database_schema.CONCEPT c
+ join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+ and ca.ancestor_concept_id in (21601782)
+ and c.invalid_reason is null
+) I
+) C UNION ALL 
+SELECT 1 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+( 
+ select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (21602796)
+UNION select c.concept_id
+ from @vocabulary_database_schema.CONCEPT c
+ join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+ and ca.ancestor_concept_id in (21602796)
+ and c.invalid_reason is null
+) I
+) C UNION ALL 
+SELECT 2 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+( 
+ select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (21604686)
+UNION select c.concept_id
+ from @vocabulary_database_schema.CONCEPT c
+ join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+ and ca.ancestor_concept_id in (21604686)
+ and c.invalid_reason is null
+) I
+) C UNION ALL 
+SELECT 3 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+( 
+ select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (21604389)
+UNION select c.concept_id
+ from @vocabulary_database_schema.CONCEPT c
+ join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+ and ca.ancestor_concept_id in (21604389)
+ and c.invalid_reason is null
+) I
+) C UNION ALL 
+SELECT 4 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+( 
+ select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (21603933,21602722)
+UNION select c.concept_id
+ from @vocabulary_database_schema.CONCEPT c
+ join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+ and ca.ancestor_concept_id in (21603933,21602722)
+ and c.invalid_reason is null
+) I
+) C;
+CREATE TABLE @temp_database_schema.yqq1ns9zqualified_events
+USING DELTA
+AS
+SELECT
+event_id, person_id, start_date, end_date, op_start_date, op_end_date, visit_occurrence_id
+FROM
+(
+ select pe.event_id, pe.person_id, pe.start_date, pe.end_date, pe.op_start_date, pe.op_end_date, row_number() over (partition by pe.person_id order by pe.start_date ASC) as ordinal, cast(pe.visit_occurrence_id as bigint) as visit_occurrence_id
+ FROM (-- Begin Primary Events
+select P.ordinal as event_id, P.person_id, P.start_date, P.end_date, op_start_date, op_end_date, cast(P.visit_occurrence_id as bigint) as visit_occurrence_id
+FROM
+(
+ select E.person_id, E.start_date, E.end_date,
+ row_number() OVER (PARTITION BY E.person_id ORDER BY E.sort_date ASC, E.event_id) ordinal,
+ OP.observation_period_start_date as op_start_date, OP.observation_period_end_date as op_end_date, cast(E.visit_occurrence_id as bigint) as visit_occurrence_id
+ FROM 
+ (
+ -- Begin Drug Era Criteria
+select C.person_id, C.drug_era_id as event_id, C.start_date, C.end_date,
+ CAST(NULL as bigint) as visit_occurrence_id,C.start_date as sort_date
+from 
+(
+ select de.person_id,de.drug_era_id,de.drug_concept_id,de.drug_exposure_count,de.gap_days,de.drug_era_start_date as start_date, de.drug_era_end_date as end_date 
+ FROM @cdm_database_schema.DRUG_ERA de
+where de.drug_concept_id in (SELECT concept_id from @temp_database_schema.yqq1ns9zCodesets where codeset_id = 4)
+) C
+-- End Drug Era Criteria
+ ) E
+ JOIN @cdm_database_schema.observation_period OP on E.person_id = OP.person_id and E.start_date >= OP.observation_period_start_date and E.start_date <= op.observation_period_end_date
+ WHERE date_add(OP.OBSERVATION_PERIOD_START_DATE, 0) <= E.START_DATE AND date_add(E.START_DATE, 0) <= OP.OBSERVATION_PERIOD_END_DATE
+) P
+-- End Primary Events
+) pe
+) QE
+;
+CREATE TABLE @temp_database_schema.yqq1ns9zinclusion_events  
+USING DELTA
+ AS
+SELECT
+CAST(NULL AS bigint) AS inclusion_rule_id,
+	CAST(NULL AS bigint) AS person_id,
+	CAST(NULL AS bigint) AS event_id  WHERE 1 = 0;
+CREATE TABLE @temp_database_schema.yqq1ns9zincluded_events
+USING DELTA
+AS
+SELECT
+event_id, person_id, start_date, end_date, op_start_date, op_end_date
+FROM
+(
+ SELECT event_id, person_id, start_date, end_date, op_start_date, op_end_date, row_number() over (partition by person_id order by start_date ASC) as ordinal
+ from
+ (
+ select Q.event_id, Q.person_id, Q.start_date, Q.end_date, Q.op_start_date, Q.op_end_date, SUM(coalesce(POWER(cast(2 as bigint), I.inclusion_rule_id), 0)) as inclusion_rule_mask
+ from @temp_database_schema.yqq1ns9zqualified_events Q
+ LEFT JOIN @temp_database_schema.yqq1ns9zinclusion_events I on I.person_id = Q.person_id and I.event_id = Q.event_id
+ GROUP BY Q.event_id, Q.person_id, Q.start_date, Q.end_date, Q.op_start_date, Q.op_end_date
+ ) MG -- matching groups
+) Results
+;
+DROP VIEW IF EXISTS ctePersons ; CREATE TEMPORARY VIEW ctePersons  AS (select distinct person_id from @temp_database_schema.yqq1ns9zincluded_events
+);
+ CREATE TABLE @temp_database_schema.yqq1ns9zdrugTarget
+USING DELTA
+AS
+(SELECT
+person_id, drug_exposure_start_date, drug_exposure_end_date
+FROM
+(
+ select de.PERSON_ID, DRUG_EXPOSURE_START_DATE, COALESCE(DRUG_EXPOSURE_END_DATE, date_add(DRUG_EXPOSURE_START_DATE, DAYS_SUPPLY), date_add(DRUG_EXPOSURE_START_DATE, 1)) as DRUG_EXPOSURE_END_DATE 
+ FROM @cdm_database_schema.DRUG_EXPOSURE de
+ JOIN ctePersons p on de.person_id = p.person_id
+ JOIN @temp_database_schema.yqq1ns9zCodesets cs on cs.codeset_id = 4 AND de.drug_concept_id = cs.concept_id
+ UNION ALL
+ select de.PERSON_ID, DRUG_EXPOSURE_START_DATE, COALESCE(DRUG_EXPOSURE_END_DATE, date_add(DRUG_EXPOSURE_START_DATE, DAYS_SUPPLY), date_add(DRUG_EXPOSURE_START_DATE, 1)) as DRUG_EXPOSURE_END_DATE 
+ FROM @cdm_database_schema.DRUG_EXPOSURE de
+ JOIN ctePersons p on de.person_id = p.person_id
+ JOIN @temp_database_schema.yqq1ns9zCodesets cs on cs.codeset_id = 4 AND de.drug_source_concept_id = cs.concept_id
+) E
+);
+CREATE TABLE @temp_database_schema.yqq1ns9zstrategy_ends
+USING DELTA
+AS
+SELECT
+et.event_id, et.person_id, ERAS.era_end_date as end_date
+FROM
+@temp_database_schema.yqq1ns9zincluded_events et
+JOIN 
+(
+ select ENDS.person_id, min(drug_exposure_start_date) as era_start_date, date_add(ENDS.era_end_date, 0) as era_end_date
+ from
+ (
+ select de.person_id, de.drug_exposure_start_date, MIN(e.END_DATE) as era_end_date
+ FROM @temp_database_schema.yqq1ns9zdrugTarget DE
+ JOIN 
+ (
+ --cteEndDates
+ select PERSON_ID, date_add(EVENT_DATE, -1 * 0) as END_DATE -- unpad the end date by 0
+ FROM
+ (
+ select PERSON_ID, EVENT_DATE, EVENT_TYPE, 
+ MAX(START_ORDINAL) OVER (PARTITION BY PERSON_ID ORDER BY event_date, event_type, START_ORDINAL ROWS UNBOUNDED PRECEDING) AS start_ordinal,
+ ROW_NUMBER() OVER (PARTITION BY PERSON_ID ORDER BY EVENT_DATE, EVENT_TYPE, START_ORDINAL) AS OVERALL_ORD -- this re-numbers the inner UNION so all rows are numbered ordered by the event date
+ from
+ (
+ -- select the start dates, assigning a row number to each
+ Select PERSON_ID, DRUG_EXPOSURE_START_DATE AS EVENT_DATE, 0 as EVENT_TYPE, ROW_NUMBER() OVER (PARTITION BY PERSON_ID ORDER BY DRUG_EXPOSURE_START_DATE) as START_ORDINAL
+ from @temp_database_schema.yqq1ns9zdrugTarget D
+ UNION ALL
+ -- add the end dates with NULL as the row number, padding the end dates by 0 to allow a grace period for overlapping ranges.
+ select PERSON_ID, date_add(DRUG_EXPOSURE_END_DATE, 0), 1 as EVENT_TYPE, NULL
+ FROM @temp_database_schema.yqq1ns9zdrugTarget D
+ ) RAWDATA
+ ) E
+ WHERE 2 * E.START_ORDINAL - E.OVERALL_ORD = 0
+ ) E on DE.PERSON_ID = E.PERSON_ID and E.END_DATE >= DE.DRUG_EXPOSURE_START_DATE
+ GROUP BY de.person_id, de.drug_exposure_start_date
+ ) ENDS
+ GROUP BY ENDS.person_id, ENDS.era_end_date
+) ERAS on ERAS.person_id = et.person_id 
+WHERE et.start_date between ERAS.era_start_date and ERAS.era_end_date;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zdrugTarget;
+DROP TABLE @temp_database_schema.yqq1ns9zdrugTarget;
+CREATE TABLE @temp_database_schema.yqq1ns9zcohort_rows
+USING DELTA
+AS
+SELECT
+person_id, start_date, end_date
+FROM
+( -- first_ends
+ select F.person_id, F.start_date, F.end_date
+ FROM (
+ select I.event_id, I.person_id, I.start_date, CE.end_date, row_number() over (partition by I.person_id, I.event_id order by CE.end_date) as ordinal
+ from @temp_database_schema.yqq1ns9zincluded_events I
+ join ( -- cohort_ends
+-- cohort exit dates
+-- By default, cohort exit at the event's op end date
+select event_id, person_id, op_end_date as end_date from @temp_database_schema.yqq1ns9zincluded_events
+UNION ALL
+-- End Date Strategy
+SELECT event_id, person_id, end_date from @temp_database_schema.yqq1ns9zstrategy_ends
+ ) CE on I.event_id = CE.event_id and I.person_id = CE.person_id and CE.end_date >= I.start_date
+ ) F
+ WHERE F.ordinal = 1
+) FE;
+CREATE TABLE @temp_database_schema.yqq1ns9zfinal_cohort
+USING DELTA
+AS
+SELECT
+person_id, min(start_date) as start_date, end_date
+FROM
+( --cteEnds
+ SELECT
+ c.person_id
+ , c.start_date
+ , MIN(ed.end_date) AS end_date
+ FROM @temp_database_schema.yqq1ns9zcohort_rows c
+ JOIN ( -- cteEndDates
+ SELECT
+ person_id
+ , date_add(event_date, -1 * 30) as end_date
+ FROM
+ (
+ SELECT
+ person_id
+ , event_date
+ , event_type
+ , SUM(event_type) OVER (PARTITION BY person_id ORDER BY event_date, event_type ROWS UNBOUNDED PRECEDING) AS interval_status
+ FROM
+ (
+ SELECT
+ person_id
+ , start_date AS event_date
+ , -1 AS event_type
+ FROM @temp_database_schema.yqq1ns9zcohort_rows
+ UNION ALL
+ SELECT
+ person_id
+ , date_add(end_date, 30) as end_date
+ , 1 AS event_type
+ FROM @temp_database_schema.yqq1ns9zcohort_rows
+ ) RAWDATA
+ ) e
+ WHERE interval_status = 0
+ ) ed ON c.person_id = ed.person_id AND ed.end_date >= c.start_date
+ GROUP BY c.person_id, c.start_date
+) e
+group by person_id, end_date
+;
+DELETE FROM @target_database_schema.@target_cohort_table where cohort_definition_id = @target_cohort_id;
+INSERT INTO @target_database_schema.@target_cohort_table (cohort_definition_id, subject_id, cohort_start_date, cohort_end_date)
+select @target_cohort_id as cohort_definition_id, person_id, start_date, end_date 
+FROM @temp_database_schema.yqq1ns9zfinal_cohort CO
+;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zstrategy_ends;
+DROP TABLE @temp_database_schema.yqq1ns9zstrategy_ends;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zcohort_rows;
+DROP TABLE @temp_database_schema.yqq1ns9zcohort_rows;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zfinal_cohort;
+DROP TABLE @temp_database_schema.yqq1ns9zfinal_cohort;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zinclusion_events;
+DROP TABLE @temp_database_schema.yqq1ns9zinclusion_events;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zqualified_events;
+DROP TABLE @temp_database_schema.yqq1ns9zqualified_events;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zincluded_events;
+DROP TABLE @temp_database_schema.yqq1ns9zincluded_events;
+TRUNCATE TABLE @temp_database_schema.yqq1ns9zCodesets;
+DROP TABLE @temp_database_schema.yqq1ns9zCodesets;
