@@ -15,8 +15,11 @@ change Project Setup, and the review behind this plan found defects in how the s
 This revision is phase 4 of the [migration plan](migration-revision-plan.md#sequencing-gates-and-risks),
 between the data layer (phase 3) and the demo suite (phase 5). D1 copies the released solution into
 `DEMO_SF_RWD`, so revising first avoids building the demo twice. D2 steps 3–7 (the RWE Cox report) do not
-depend on this work and can run in parallel. The work stays on branch `v1-2` and ships as 1.2.0, which
-has not been released yet.
+depend on this work and can run in parallel. `v1-2` is merged into `main` and closed (2026-11-20). The
+revision is on branch `solution-revision-v1-2`, cut from `main` at `c0a1b01`, and ships as 1.2.0, which
+has not been released yet. The solution still pulls `python/solution` from `refs/heads/v1-2` @ `a7d922a`,
+whose `solution/` is identical to the branch point. Before the first DSS test of revised code, the branch
+is pushed and that Git reference repointed to it; both need the owner's approval.
 
 A later v2.0, the Cohort Workbench webapp, is proposed separately in
 [`proposal-v2-cohort-workbench.md`](proposal-v2-cohort-workbench.md). It builds on R4–R7 and would
@@ -159,8 +162,9 @@ force-rebuilding about 20 datasets.
 - Person-level datasets grow with total cohort membership (sum over cohorts), not with population size.
   This all runs in-database. If a full rebuild becomes slow at 2.3M with 45 cohorts, partition the
   datasets by cohort id and rebuild only new partitions.
-- Spike first: whether dashboard filters also filter the 5 statistics cards (EDA insights). If they do not,
-  replace them with charts on the same columns or a per-cohort summary table.
+- Dashboard filters do not filter statistics cards (spike, 2026-11-20). Replace the 5 statistics cards
+  with charts on the same columns, and frequency tables with dataset-table tiles on a per-cohort summary
+  dataset. Charts and dataset tables are the only filterable tile types in DSS 15.
 - Prevalence and covariate figures must equal today's single-cohort results for the same cohort; compare
   the three E4 cohorts before and after.
 
@@ -181,8 +185,8 @@ E4 passed because all three test connections use their default database, catalog
 **Proposal.** Ask DSS for the name it uses itself:
 `dataiku.Dataset(name).get_location_info()["info"]["quotedResolvedTableName"]`. This resolves catalog,
 schema, variables and quoting per dialect. `set_table_variables()` goes. An unsupported connection type
-raises with the supported list. Unit tests stub the location info. The spike checks that, on all three
-variants, the returned names equal what the SQL recipes produce.
+raises with the supported list. Unit tests stub the location info. The spike confirmed that, on all three
+connections, the returned names equal what DSS's own recipes generate (see Spike results).
 
 ## R5. Cohort build as one static recipe
 
@@ -207,7 +211,8 @@ that explicit instead of fragile.
   - outputs: `cohort` (written in-database by the scripts) and `cohort_building_log` (appended).
   - For each cohort it splits the mapped script into statements (outside quotes and comments; tested on
     all scripts in `cohort_scripts/`) and runs them in one session with `SQLExecutor2.query_to_df(count
-    query, pre_queries=statements)`. Session temporary tables (Snowflake `TEMP`, Redshift `#`) live until
+    query, pre_queries=statements, post_queries=commit)`, where `commit` is `["COMMIT"]` on Snowflake and
+    Redshift and empty on Databricks. Session temporary tables (Snowflake `TEMP`, Redshift `#`) live until
     the count is read.
   - It records status, count and error per cohort, continues past failures, writes the log, then fails
     the recipe if any cohort failed.
@@ -224,8 +229,8 @@ that explicit instead of fragile.
   behaviour for a single-user project: a concurrent run is rejected instead of corrupting shared objects.
 
 **Cost.** Per-cohort lineage is no longer a recipe; `cohort_building_log` carries it (cohort, script,
-input tables, status, count). The spike confirms that `pre_queries` share the session on all three
-dialects.
+input tables, status, count). The spike confirmed that `pre_queries` share the session on all three
+dialects, and that an E4 script run this way gives the E4 count (see Spike results).
 
 ## R6. Databricks temporary tables
 
@@ -297,7 +302,8 @@ check that `solution/` imports nothing outside the standard library and those fo
 By the owner's decision, these stay unchanged. The built-in project macro test run before publication
 covers part of them.
 
-- Library sources: `python/solution` from this repo (`v1-2`), `bs-commons` and the previews.
+- Library sources: `python/solution` from this repo (`solution-revision-v1-2` once repointed), `bs-commons`
+  and the previews.
 - Scenario run-as user.
 - Shipped variable values. R7 changes which keys exist, not this.
 - The "⚠️ Format Solution⚠️" scenario. Its two reads of `standard` switch to `get_setting()` so it keeps
@@ -311,11 +317,126 @@ Also noted, no action in this revision:
 - Setup tiles carry an inlined copy of `solution/setup/`. `tools/app_manifest.py --check` belongs in the
   release check.
 
+## Spike results (step 0)
+
+Run on 2026-11-20 on DSS 15.2.0, in the scratch project `TMP_RWD_SPIKE_R`, created for the spike with
+the owner's approval and deleted afterwards. Nothing in `SOL_RWD_COHORT_DISCOVERY` or the `PREP_RWD_*`
+projects changed; they were only read. The `bs-snowflake`, `bs-databricks` and `redshift-solutions`
+connections were all usable by the owner's account; no OAuth grant was blocked. Python ran inside DSS as a
+custom Python scenario step.
+
+**R4: resolved table names.** On each connection, one external dataset pointed at the 1K prep `person`
+table and one managed output was built by a group recipe on the in-database engine. The Redshift output
+was given the mixed-case, hyphenated table name `${projectKey}_Out-RS`. The spike compared
+`get_location_info()["info"]["quotedResolvedTableName"]` with the names in the build job's SQL and with
+today's `set_table_variables()`:
+
+| Connection | `quotedResolvedTableName` = job SQL | Today's `get_sql_path()` |
+| --- | --- | --- |
+| Snowflake | Yes, `"DKU_SOLUTION_DESIGN"."SOL_DESIGN"."PREP_RWD_SF_1K_PERSON_SF"` | Drops the database: `"SOL_DESIGN"."PREP_RWD_SF_1K_PERSON_SF"` |
+| Databricks | Yes, `` `se-sandbox`.`business_solutions`.`PREP_RWD_DB_1K_person_db` `` | Drops the catalog: `` `business_solutions`.`PREP_RWD_DB_1K_person_db` `` |
+| Redshift | Yes, `"PREP_RWD_RS_1K_person_rs"`, `"TMP_RWD_SPIKE_R_Out-RS"` | Unquoted: `TMP_RWD_SPIKE_R_Out-RS` |
+
+- The key is present for all three connection types.
+- `info` also carries `catalog` and `schema` only when the dataset sets them, plus `table`,
+  `connectionName` and `databaseType`.
+- `${projectKey}` is expanded in all three.
+- The prep datasets set a catalog explicitly (`DKU_SOLUTION_DESIGN`, `se-sandbox`), so today's code works
+  only because those catalogs are the connection defaults. The Databricks catalog contains a hyphen and
+  needs the quoting.
+- Redshift folds even quoted names to lowercase (`tmp_rwd_spike_r_out-rs`).
+
+*Design consequence:* R4 unchanged.
+
+**R5: session temporary tables through `pre_queries`.** `SQLExecutor2(connection=...).query_to_df(query,
+pre_queries=..., post_queries=...)` was called on each connection, using names prefixed `rwdspike_`.
+
+| Behaviour | Snowflake | Redshift | Databricks |
+| --- | --- | --- | --- |
+| Temp table created in `pre_queries` is visible to the count query | Yes (`CREATE TEMPORARY TABLE`) | Yes (`#table`) | `CREATE TEMPORARY TABLE` is rejected; `CREATE TEMPORARY VIEW` works, chained views too |
+| Temp object visible in the next call | No | No | No |
+| Failing statement | Exception naming it: `During pre-query '<statement>': ...` | Same | Same |
+| Several statements in one string | Rejected (`Actual statement count 2 did not match the desired statement count 1`) | Accepted | Rejected (parse error) |
+| DML in `pre_queries` without `COMMIT` | Lost (the DDL persists, the rows do not) | Lost (DDL rolled back too) | Kept (auto-commit) |
+| `post_queries=["COMMIT"]` | Rows kept | Rows kept | Fails: `COMMIT` is not a statement |
+
+Stretch on Snowflake: the solution's mapped E4 script for cohort 1 (Anemia) was split outside quotes and
+comments into 22 statements. Its target table was redirected to `"SOL_DESIGN"."rwdspike_cohort"`; it read
+the solution's imported tables only. It was run as `pre_queries` with `COMMIT`. The count in the same
+call and in a new session was 611, equal to E4.
+
+*Design consequences for R5:*
+
+- Commit per dialect, as now written in R5: `post_queries=["COMMIT"]` on Snowflake and Redshift, none on
+  Databricks.
+- The statement splitter is required, not optional: Snowflake and Databricks reject multi-statement
+  strings.
+- Atomicity differs by dialect:
+  - Redshift: a cohort's statements run as one transaction, so a failure keeps the previous rows.
+  - Snowflake: each DDL commits. The `DELETE` and `INSERT` of the cohort rows are only committed by the
+    `TRUNCATE` after them, so a failure before that keeps the previous rows too.
+  - Databricks: every statement commits on its own. A failure after the `DELETE` leaves that cohort empty
+    until the next run. `cohort_building_log` must record it as failed, which R5 already does.
+- R6 unchanged. Atlas Databricks scripts `INSERT` into their temporary tables, so temporary views cannot
+  replace them; the `rwdtmp_` Delta tables stay.
+
+**R3: dashboard filters on statistics cards.** The DSS 15 documentation lists charts and dataset tables as
+the filterable insights ([dashboard filters](https://doc.dataiku.com/dss/15/dashboards/filters.html)). The
+15.x release notes add nothing on statistics cards. Live test:
+- A synthetic 60-row Snowflake table `rwdspike_syn` (no SYNPUF data) with `GRP` A/B/C, `CAT2` X/Y and
+  `V` numeric.
+- A dashboard with one chart (count by `CAT2`) and one statistics card (frequency table on `CAT2`,
+  summary of `V`).
+- A dashboard filter on `GRP` = A, set by the owner on dataset `syn_sf`.
+
+The chart changed, and the statistics card did not. The card has its own sample (`dataSpec`) and ignores
+page filters. *Design consequence:* R3 as now written: charts for the distributions, and dataset-table
+tiles for the frequency tables. Open question 4 is closed.
+
+**R2: custom Setup tile that reads a dataset and writes a variable.** One `PROJECT_VARIABLES_EDIT` tile
+(HTML/JS plus Python `do()`, the select-box pattern) was added to the scratch project's Setup:
+
+- **Read.** `do()` read the first rows of `syn_sf` with `dataiku.Dataset(...).iter_tuples()` and the
+  tile rendered them as an editable table.
+- **Write.** "Save" sent the edited rows to `do()`, which wrote them as a JSON list to the `local`
+  variable `rwdspike_submission` with `api_client().get_project(...).set_variables()`. The value showed
+  after a page reload, and `dku project get-variables` read it back.
+- **Validation.** A row without a name was refused through a returned `{"ok": false, "errors": [...]}`.
+  The tile showed the message.
+- **Exception.** An exception raised in `do()` reached the tile's failure callback as the full Python
+  traceback from `dataiku/customui/server.py`, ending with the message.
+- **Setup section.** A project only gets a Setup page through the App Designer action "Add a setup
+  section". The public API cannot set it; `useAppHomepage` alone is not enough. This does not affect the
+  solution, which already has one, nor its copies.
+
+*Design consequences for R2:*
+- The tile's `do()` catches its own errors and returns `{"ok": false, "errors": [...]}`, so the user sees
+  a sentence and not a traceback.
+- Saving through `do()` (read, merge, `set_variables`) is the write path, so the batch is validated in
+  Python before it is stored.
+
+**Scratch objects.** All were removed, and the removals were verified on 2026-11-20:
+- **Project.** `TMP_RWD_SPIKE_R` was deleted, with no data dropped. It held:
+  - datasets `src_sf`, `src_db`, `src_rs`, `out_sf`, `out_db`, `out_rs` and `syn_sf`;
+  - recipes `grp_sf`, `grp_db` and `grp_rs`;
+  - scenario `rwdspike`;
+  - insights `dJru2KM` and `RIEbMKn`;
+  - dashboard `4PsEojE`;
+  - the R2 Setup tile, whose manifest was restored before deletion;
+  - the variable `rwdspike_submission`.
+- **Tables dropped by exact name, then checked absent:**
+  - `TMP_RWD_SPIKE_R_out_sf` and `rwdspike_syn` (Snowflake);
+  - `TMP_RWD_SPIKE_R_out_db` (Databricks);
+  - `tmp_rwd_spike_r_out-rs` and an empty `tmp_rwd_spike_r_out_rs`, created when the dataset still had
+    its first name (Redshift);
+  - `rwdspike_commit_a`, `rwdspike_commit_b` and `rwdspike_cohort`, dropped in the probes themselves.
+- **Prep data.** The three 1K prep `person` tables still hold 1,000 rows and show as built.
+
 ## Order, verification and gate
 
 | Step | Work | Verified by |
 | --- | --- | --- |
-| 0. Spike (about 2 days) | `get_location_info()` names on SF, DB and RS; `pre_queries` session temp tables on all three; dashboard filter on statistics cards; a custom tile that reads datasets and writes a variable | Notes added to this document |
+| 0. Spike (about 2 days) | `get_location_info()` names on SF, DB and RS; `pre_queries` session temp tables on all three; dashboard filter on statistics cards; a custom tile that reads datasets and writes a variable | Done 2026-11-20: [Spike results](#spike-results-step-0) |
 | 1. Foundation | R4, R7, R8 | Offline tests; E4 counts unchanged |
 | 2. Cohort build | R5, R6 | Offline tests (statement splitter on every script in `cohort_scripts/`, literal escaping); E4 rerun; a forced failure on Databricks leaves no `rwdtmp_` table |
 | 3. Setup | R1, R2; regenerate tiles with `tools/app_manifest.py` | Two submissions in a row; a reused id is refused without **Replace** and accepted with it; "Built cohorts" lists both batches |
@@ -330,11 +451,12 @@ Also noted, no action in this revision:
 - the project macro test passes;
 - Setup has no custom-mapping, metadata-CSV or dashboard section.
 
-Then D1 copies `v1-2`.
+Then D1 copies the solution on the head of `solution-revision-v1-2`.
 
 ## Open questions
 
 - [ ] Keep the metadata CSV as a hidden bulk-import path, or drop it (recommendation: drop)
 - [ ] `condition_count_for_charlson_score`: wire into the Charlson logic or drop
 - [ ] Databricks scratch schema: the connection default, or a dedicated `temp_schema`
-- [ ] If dashboard filters do not reach statistics cards: charts or a summary table instead
+- [x] If dashboard filters do not reach statistics cards: charts or a summary table instead. They do not
+  (spike, 2026-11-20): charts for the distributions, dataset-table tiles for the frequency tables (R3)

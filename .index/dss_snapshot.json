@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1308,
+ "dss_project_count": 1302,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -20196,9 +20196,9 @@
      "connection": "bs-databricks",
      "managed": true,
      "probe": {
-      "built": "unknown",
-      "error": "rence_db`': [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: SELECT COUNT(*) AS n FROM `se-sandbox`.`business_s",
-      "rows": null,
+      "built": "yes",
+      "error": "",
+      "rows": 160322,
       "source": "sql"
      },
      "type": "Databricks"
@@ -20968,7 +20968,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-18T15:14Z",
+   "fetched_at": "2026-11-20T15:09Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -20988,7 +20988,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD DB 1K",
-   "probed_at": "2026-11-18T15:14Z",
+   "probed_at": "2026-11-20T15:16Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -21959,7 +21959,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-18T15:14Z",
+   "fetched_at": "2026-11-20T15:09Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -21979,7 +21979,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD RS 1K",
-   "probed_at": "2026-11-18T15:14Z",
+   "probed_at": "2026-11-20T15:16Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-18T15:14Z",
+   "fetched_at": "2026-11-20T15:09Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-18T15:14Z",
+   "probed_at": "2026-11-20T15:16Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-18T15:14Z",
+   "fetched_at": "2026-11-20T15:09Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-18T15:14Z",
+   "probed_at": "2026-11-20T15:16Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -36194,9 +36194,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "charlson_score_occurrence": {
      "columns": [
@@ -36237,9 +36237,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "charlson_scoring": {
      "columns": [
@@ -36275,9 +36275,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort": {
      "columns": [
@@ -36298,9 +36298,9 @@
        "dateonly"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_building_log": {
      "columns": [
@@ -36333,9 +36333,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_condition_group_count": {
      "columns": [
@@ -36352,9 +36352,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_condition_group_events": {
      "columns": [
@@ -36399,9 +36399,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_condition_group_joint": {
      "columns": [
@@ -36434,9 +36434,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_condition_group_prevalence": {
      "columns": [
@@ -36457,9 +36457,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_condition_group_prevalence_prepared": {
      "columns": [
@@ -36476,9 +36476,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_count": {
      "columns": [
@@ -36491,9 +36491,9 @@
        "bigint"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_definition": {
      "columns": [
@@ -36526,9 +36526,9 @@
        "dateonly"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_definition_filtered": {
      "columns": [
@@ -36561,9 +36561,9 @@
        "dateonly"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_demographics": {
      "columns": [
@@ -36636,9 +36636,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_drug_group_count": {
      "columns": [
@@ -36655,9 +36655,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_drug_group_events": {
      "columns": [
@@ -36702,9 +36702,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_drug_group_joined": {
      "columns": [
@@ -36737,9 +36737,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_drug_group_prevalence": {
      "columns": [
@@ -36760,9 +36760,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_drug_group_prevalence_prepared": {
      "columns": [
@@ -36779,9 +36779,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_filtered": {
      "columns": [
@@ -36802,9 +36802,9 @@
        "dateonly"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_filtered_exploded_by_quarter": {
      "columns": [
@@ -36833,9 +36833,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_location": {
      "columns": [
@@ -36864,9 +36864,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_location_prepared": {
      "columns": [
@@ -36895,9 +36895,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_metadata": {
      "columns": [
@@ -36941,9 +36941,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_observation": {
      "columns": [
@@ -36984,9 +36984,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_prevalence": {
      "columns": [
@@ -37023,9 +37023,9 @@
        "bigint"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_visit_events": {
      "columns": [
@@ -37066,9 +37066,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "cohort_visit_joined": {
      "columns": [
@@ -37109,9 +37109,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "concept": {
      "columns": [
@@ -37156,9 +37156,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "concept_ancestor": {
      "columns": [
@@ -37179,9 +37179,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "condition_era": {
      "columns": [
@@ -37210,9 +37210,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "condition_group_occurrence": {
      "columns": [
@@ -37237,9 +37237,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "condition_groups": {
      "columns": [
@@ -37256,9 +37256,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "condition_occurrence": {
      "columns": [
@@ -37327,9 +37327,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "death": {
      "columns": [
@@ -37362,9 +37362,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "demographic_covariates": {
      "columns": [
@@ -37385,9 +37385,9 @@
        "bigint"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "device_exposure": {
      "columns": [
@@ -37452,9 +37452,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "drug_class_exposure": {
      "columns": [
@@ -37483,9 +37483,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "drug_era": {
      "columns": [
@@ -37518,9 +37518,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "drug_exposure": {
      "columns": [
@@ -37617,9 +37617,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "drug_groups": {
      "columns": [
@@ -37660,9 +37660,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "location": {
      "columns": [
@@ -37707,9 +37707,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "measurement": {
      "columns": [
@@ -37794,9 +37794,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "observation": {
      "columns": [
@@ -37873,9 +37873,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "observation_period": {
      "columns": [
@@ -37900,9 +37900,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "observation_period_joined": {
      "columns": [
@@ -37927,9 +37927,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "observation_period_quarter_exploded": {
      "columns": [
@@ -37943,11 +37943,11 @@
       ],
       [
        "OBSERVATION_PERIOD_START_DATE",
-       "date"
+       "dateonly"
       ],
       [
        "OBSERVATION_PERIOD_END_DATE",
-       "date"
+       "dateonly"
       ],
       [
        "month_range",
@@ -37962,9 +37962,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "observation_period_quarter_exploded_by_QUARTER": {
      "columns": [
@@ -37977,9 +37977,9 @@
        "bigint"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "person": {
      "columns": [
@@ -38060,9 +38060,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "person_location_joined": {
      "columns": [
@@ -38119,9 +38119,9 @@
        "float"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "popoulation_cohort_charlson_score": {
      "columns": [
@@ -38138,9 +38138,9 @@
        "double"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_cohort_charlson_event_count": {
      "columns": [
@@ -38173,9 +38173,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_cohort_charlson_score_joined": {
      "columns": [
@@ -38212,9 +38212,9 @@
        "bigint"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_cohort_charlson_score_prepared": {
      "columns": [
@@ -38255,9 +38255,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_cohort_demographic_prepared": {
      "columns": [
@@ -38282,9 +38282,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_cohort_race": {
      "columns": [
@@ -38309,9 +38309,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_cohort_sex": {
      "columns": [
@@ -38336,9 +38336,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_w_cohort_first_occurrence": {
      "columns": [
@@ -38391,9 +38391,9 @@
        "bigint"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "population_w_cohort_prepared": {
      "columns": [
@@ -38442,9 +38442,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "procedure_occurrence": {
      "columns": [
@@ -38505,9 +38505,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "snomed_clinical": {
      "columns": [
@@ -38528,9 +38528,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "uploaded_cohort_definition": {
      "columns": [
@@ -38555,9 +38555,9 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "visit_occurrence": {
      "columns": [
@@ -38630,9 +38630,9 @@
        "int"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     },
     "visit_occurrence_labeled": {
      "columns": [
@@ -38661,35 +38661,31 @@
        "string"
       ]
      ],
-     "connection": "filesystem_managed",
+     "connection": "bs-snowflake",
      "managed": true,
-     "type": "Filesystem"
+     "type": "Snowflake"
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-18T15:14Z",
+   "fetched_at": "2026-11-20T15:09Z",
    "flow_sources": [
+    "PREP_RWD_SF_1K.concept_ancestor_sf",
+    "PREP_RWD_SF_1K.concept_sf",
+    "PREP_RWD_SF_1K.condition_era_sf",
+    "PREP_RWD_SF_1K.condition_occurrence_sf",
+    "PREP_RWD_SF_1K.death_sf",
+    "PREP_RWD_SF_1K.device_exposure_sf",
+    "PREP_RWD_SF_1K.drug_era_sf",
+    "PREP_RWD_SF_1K.drug_exposure_sf",
+    "PREP_RWD_SF_1K.location_sf",
+    "PREP_RWD_SF_1K.measurement_sf",
+    "PREP_RWD_SF_1K.observation_period_sf",
+    "PREP_RWD_SF_1K.observation_sf",
+    "PREP_RWD_SF_1K.person_sf",
+    "PREP_RWD_SF_1K.procedure_occurrence_sf",
+    "PREP_RWD_SF_1K.visit_occurrence_sf",
     "charlson_scoring",
-    "cohort",
-    "cohort_building_log",
-    "cohort_definition",
-    "cohort_metadata",
-    "concept",
-    "concept_ancestor",
-    "condition_era",
-    "condition_occurrence",
-    "death",
-    "device_exposure",
-    "drug_era",
-    "drug_exposure",
-    "location",
-    "measurement",
-    "observation",
-    "observation_period",
-    "person",
-    "procedure_occurrence",
-    "uploaded_cohort_definition",
-    "visit_occurrence"
+    "cohort_metadata"
    ],
    "git_references": {
     "preview": {
@@ -38709,14 +38705,27 @@
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-18T15:14Z",
+   "probed_at": "2026-11-20T15:16Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
-     "data_preparation_project_key": "SYNPUFOMOP1KDATAPREPRWDV11",
+     "cohort_build_error": 0,
+     "concept": "concept_sf",
+     "concept_ancestor": "concept_ancestor_sf",
+     "condition_era": "condition_era_sf",
+     "condition_occurrence": "condition_occurrence_sf",
+     "data_preparation_project_key": "PREP_RWD_SF_1K",
+     "death": "death_sf",
+     "device_exposure": "device_exposure_sf",
+     "drug_era": "drug_era_sf",
+     "drug_exposure": "drug_exposure_sf",
      "enable_pipeline": false,
      "folder_connection": "filesystem_folders",
+     "location": "location_sf",
      "main_connection": "bs-snowflake",
+     "measurement": "measurement_sf",
+     "observation": "observation_sf",
+     "observation_period": "observation_period_sf",
      "omop_cdm_standard_tables_import": [
       "person",
       "observation_period",
@@ -38735,7 +38744,10 @@
      "omop_standardised_vocabulary_tables_import": [
       "concept",
       "concept_ancestor"
-     ]
+     ],
+     "person": "person_sf",
+     "procedure_occurrence": "procedure_occurrence_sf",
+     "visit_occurrence": "visit_occurrence_sf"
     },
     "standard": {
      "advanced_file_format": false,
@@ -38749,29 +38761,29 @@
      "concept_relationship": "concept_relationship",
      "concept_synonym": "concept_synonym",
      "condition_count_for_charlson_score": 2,
-     "condition_era": "CDM_CONDITION_ERA_sf",
-     "condition_occurrence": "CDM_CONDITION_OCCURRENCE_sf",
+     "condition_era": "condition_era_sf",
+     "condition_occurrence": "condition_occurrence_sf",
      "connection_type": "PostgreSQL",
      "cost": "cost table:",
-     "data_preparation_project_key": "SYNPUFOMOP1KDATAPREPRWDV11",
+     "data_preparation_project_key": "PREP_RWD_SF_1K",
      "days_prior_to_cohort_startdate": 365,
-     "death": "CDM_DEATH_sf",
-     "device_exposure": "CDM_DEVICE_EXPOSURE_sf",
+     "death": "death_sf",
+     "device_exposure": "device_exposure_sf",
      "domain": "domain",
      "dose_era": "dose_era",
-     "drug_era": "CDM_DRUG_ERA_sf",
-     "drug_exposure": "CDM_DRUG_EXPOSURE_sf",
+     "drug_era": "drug_era_sf",
+     "drug_exposure": "drug_exposure_sf",
      "drug_strength": "drug_strength",
-     "enable_pipeline": true,
+     "enable_pipeline": false,
      "fact_relationship": "fact_relationship",
-     "folder_connection": "dataiku-managed-storage",
-     "location": "CDM_LOCATION_sf",
+     "folder_connection": "filesystem_folders",
+     "location": "location_sf",
      "main_connection": "bs-snowflake",
-     "measurement": "CDM_MEASUREMENT_sf",
+     "measurement": "measurement_sf",
      "note": "note",
      "note_nlp": "note_nlp",
-     "observation": "CDM_OBSERVATION_sf",
-     "observation_period": "CDM_OBSERVATION_PERIOD_sf",
+     "observation": "observation_sf",
+     "observation_period": "observation_period_sf",
      "omop_cdm_standard_tables_import": [
       "person",
       "observation_period",
@@ -38792,8 +38804,8 @@
       "concept_ancestor"
      ],
      "payer_plan_period": "payer_plan_period",
-     "person": "CDM_PERSON_sf",
-     "procedure_occurrence": "CDM_PROCEDURE_OCCURRENCE_sf",
+     "person": "person_sf",
+     "procedure_occurrence": "procedure_occurrence_sf",
      "provider": "provider",
      "relationship": "relationship",
      "source_to_concept_map": "source_to_concept_map",
@@ -48477,7 +48489,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-18T15:14Z",
+   "fetched_at": "2026-11-20T15:09Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -48501,7 +48513,7 @@
    ],
    "git_references": {},
    "name": "SYNPUF OMOP 1k Data Prep RWD v.1.1",
-   "probed_at": "2026-11-18T15:14Z",
+   "probed_at": "2026-11-20T15:16Z",
    "variables": {
     "local": {},
     "standard": {}
