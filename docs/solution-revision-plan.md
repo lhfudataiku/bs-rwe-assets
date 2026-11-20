@@ -1,0 +1,340 @@
+# RWD Cohort Discovery — Solution Revision Plan (E5)
+
+> **Lifecycle:** Planning (active until phase 4 of the migration plan closes) · **Part:** 2 ·
+> **Audience:** solution developers, asset owners and coding agents · **Authority:** scope, design and
+> order of the `SOL_RWD_COHORT_DISCOVERY` revision before the demo suite is recreated · **Update when:**
+> an item's design, status or verification changes.
+
+## Summary
+
+`SOL_RWD_COHORT_DISCOVERY` passes the migration plan's E gate: it runs the `v1-2` library from this
+repo, Project Setup shows no errors, and E4 gave identical cohort counts on `PREP_RWD_SF_1K`,
+`PREP_RWD_DB_1K` and `PREP_RWD_RS_1K` (611, 593, 247). It is not ready to release. Three backlog tickets
+change Project Setup, and the review behind this plan found defects in how the solution writes cohorts.
+
+This revision is phase 4 of the [migration plan](migration-revision-plan.md#sequencing-gates-and-risks),
+between the data layer (phase 3) and the demo suite (phase 5). D1 copies the released solution into
+`DEMO_SF_RWD`, so revising first avoids building the demo twice. D2 steps 3–7 (the RWE Cox report) do not
+depend on this work and can run in parallel. The work stays on branch `v1-2` and ships as 1.2.0, which
+has not been released yet.
+
+A later v2.0, the Cohort Workbench webapp, is proposed separately in
+[`proposal-v2-cohort-workbench.md`](proposal-v2-cohort-workbench.md). It builds on R4–R7 and would
+supersede R2 and R3. This plan stays the scope of 1.2 until the owner decides otherwise.
+
+| Item | Topic | Source |
+| --- | --- | --- |
+| [R1](#r1-cohort-script-table-naming-ticket-1) | Cohort script table naming replaces the custom JSON mapping | Ticket 1 |
+| [R2](#r2-cohort-registration-ticket-2) | Cohort registration: repeated submissions, list of built cohorts, guard against id overwrite | Ticket 2 |
+| [R3](#r3-dashboard-for-all-cohorts-ticket-3) | Dashboard precomputed for all cohorts; dashboard section removed from Setup | Ticket 3 |
+| [R4](#r4-resolved-table-paths) | `sql_script_function.py`: table paths resolved by DSS | Review |
+| [R5](#r5-cohort-build-as-one-static-recipe) | Cohort build as one static recipe instead of the `create_cohort` scenario chain | Review |
+| [R6](#r6-databricks-temporary-tables) | Databricks temporary tables left behind | Review |
+| [R7](#r7-project-variables) | Project variables: one scope per purpose | Review |
+| [R8](#r8-code-environment) | Code environment: instance default | Review |
+
+The review read the live Setup manifest, all 16 scenarios, the library references, the project variables,
+the flow (64 recipes, 66 datasets, 30 insights) and this repo's `solution/` code on 2026-11-20. Nothing in
+DSS was changed for it.
+
+## Current Project Setup
+
+| Section | Tiles | What the user does today |
+| --- | --- | --- |
+| S1 Connection Reconfiguration | connections, SQL pipeline toggle, "Reconfigure" | One-time |
+| S2 Connect OMOP CDM Standard Tables | prep project, table multiselects, 30 table selects, "Import" | One-time |
+| S3 OMOP CDM Custom Table Name Mapping (optional) | upload a JSON file, type its filename, "Verify" | One-time, by hand |
+| S5 Upload Cohort SQL Scripts & Cohort Metadata | upload scripts, upload a 4-column CSV, "Create cohort definition and scripts", link to mapped scripts | Per submission |
+| S6 Write Cohort to Datasets | "Write Cohort", links to explore `cohort`, `cohort_definition`, `cohort_building_log` | Per submission |
+| S8 Create Cohort Dashboard | pick one cohort, "Rebuild Cohort Dashboard", dashboard link | Per cohort viewed |
+
+## R1. Cohort script table naming (ticket 1)
+
+**Today.** The rewriting step needs to know how uploaded scripts name OMOP tables. The user uploads a JSON
+file mapping 37 table keys to placeholders (the shipped `omop_cdm_atlas.json`), types its filename into
+`cdm_standard_tables_map`, and runs "Verify OMOP Table Variables Mapping", which only checks that every key
+is present. Without a file, scripts must use bare table names. In practice there are two styles: Atlas
+placeholders (`@cdm_database_schema.<table>`, `@vocabulary_database_schema.<table>`,
+`@target_database_schema.@target_cohort_table`) and bare OMOP names.
+
+**Proposal.** A one-time choice in S2, next to the table mapping:
+
+- `cohort_script_table_naming` (SELECT): **OHDSI Atlas placeholders** (default), **Plain OMOP table
+  names**, or **Custom prefix**; with `cohort_script_table_prefix` (STRING) for the third, applied to every
+  CDM table (for example `cdm.`).
+- `solution/setup/table_naming.py` (new, pure, unit-tested) builds the key map from the choice. The Atlas
+  style reproduces `omop_cdm_atlas.json` exactly; a test compares them.
+- Script ingestion (R2) scans each script for `@<schema>.<table>` references the map does not cover and
+  names them in the error, so a wrong choice fails with a readable message before any SQL runs.
+- Remove S3, the "OMOP CDM table variable mapping" folder (`4ktqvA1F`), `cdm_standard_tables_map` and the
+  "Check OMOP Table Variables Mapping" scenario (and its call from "Create Cohort Scripts").
+
+**Not proposed.** Per-table overrides. No script in `cohort_scripts/` needs one. If a customer does, a
+MAP parameter can be added to the same tile later.
+
+## R2. Cohort registration (ticket 2)
+
+**Today.** Scripts go into "Original Scripts" (`PqOBn6B3`); a CSV with `cohort_definition_id`,
+`cohort_definition_name`, `cohort_definition_description` and `cohort_sql_script_filename` goes into the
+uploaded dataset `cohort_metadata`. "Create Cohort Scripts" copies it, checks columns, nulls and filenames,
+writes mapped scripts and rewrites the runtime SQL recipe `compute_cohort_definition`. Its SQL does
+`DELETE FROM cohort_definition WHERE id IN (...)` then inserts, and recreates `uploaded_cohort_definition`
+with the current batch only. "Write Cohort" then builds that batch.
+
+What this means for repeated submissions:
+
+- They mostly work: `cohort_definition`, `cohort` and `cohort_building_log` accumulate across batches.
+- **A reused id silently replaces a cohort.** Its definition row is deleted and reinserted, and each Atlas
+  script starts with `DELETE FROM @target_database_schema.@target_cohort_table WHERE cohort_definition_id
+  = @target_cohort_id`, so the old cohort's rows go too. Re-uploading a file with an existing name
+  overwrites it in "Original Scripts" with no warning either.
+- **Names and descriptions are pasted into SQL inside single quotes without escaping**
+  (`map_cohort_script_paths.py`, `write_cohorts.py`). A cohort named "Crohn's disease" breaks the
+  definition and log SQL.
+- Nothing in Setup shows which cohorts already exist; the S6 links open the raw datasets.
+
+**Proposal.** Replace the CSV upload with two custom tiles (the HTML/JS + Python `do()` pattern the
+prep-project select box already uses; the Python is inlined by `tools/app_manifest.py`, since tiles
+cannot import the project library on DSS 15.2).
+
+1. **Upload cohort SQL scripts** (unchanged).
+2. **Register cohorts** (new). `do()` lists the scripts in "Original Scripts" and matches them against
+   `cohort_definition` and the last submission. One row per script:
+
+   | Column | Behaviour |
+   | --- | --- |
+   | File | Read-only. Marked *new*, *registered as cohort N* or *changed since registration* |
+   | Cohort id | Suggested: the next free id. Editable |
+   | Name | Prefilled from a `-- name:` comment in the script, else from the filename. Required |
+   | Description | Prefilled from `-- description:` if present. Optional |
+   | Submit | Ticked for new files, unticked for registered ones |
+   | Replace | Only offered when the id already exists. Unticked by default |
+
+   Inline checks: unique ids in the batch, positive integers, a name on every submitted row, and a
+   conflicting id needs **Replace**. Saving writes the batch to the project variable `cohort_submission`
+   (JSON). Then the existing button runs ingestion.
+3. **Built cohorts** (new, read-only). `do()` reads `cohort_definition` and the latest
+   `cohort_building_log` row per id: id, name, description, script, subject count, status, last built. This
+   answers "can we display the built cohorts' metadata": yes, the same way the cohort select box reads
+   `cohort_definition` today.
+
+Ingestion repeats every check against the data, because the tile is a convenience and the scenario is the
+authority. An id that exists in `cohort_definition` without **Replace** fails the run and names the
+conflicting cohorts. A Python recipe materialises `cohort_submission` into a dataset, replacing the
+uploaded `cohort_metadata` and its copy. Every literal written into SQL goes through one dialect-aware
+helper (`''` on Snowflake and Redshift, `\'` on Databricks), with unit tests on names containing quotes.
+
+**Open question.** Keep the CSV as a hidden bulk-import path feeding the same validation, or drop it.
+Recommendation: drop it; the 45-cohort demo library can be registered once by a helper script in
+`tools/`.
+
+## R3. Dashboard for all cohorts (ticket 3)
+
+**Today.** One recipe, `compute_cohort_definition_filtered`, keeps the cohort chosen in
+`${cohort_definition_id}`. 30 datasets depend on it; the dashboard "Cohort Discovery Insights" (2 pages)
+shows 25 charts and 5 statistics cards from 11 of them. Switching cohorts means picking one in S8 and
+force-rebuilding about 20 datasets.
+
+**Proposal.** Precompute every cohort and filter on the dashboard.
+
+- Drop the `${cohort_definition_id}` filter. Carry `COHORT_DEFINITION_ID` and `COHORT_DEFINITION_NAME`
+  through the 30 downstream datasets. Four chart datasets lose the id today
+  (`cohort_condition_group_prevalence_prepared`, `cohort_drug_group_prevalence_prepared`,
+  `cohort_location_prepared`, `popoulation_cohort_charlson_score`). Recipes to change, at least:
+  - groupings `compute_cohort_count`, `compute_cohort_location`,
+    `compute_cohort_condition_group_first_by_CONCEPT_NAME`,
+    `compute_cohort_condition_group_first_by_CONCEPT_NAME_1`, `compute_cohort_charlson_score`,
+    `compute_population_cohort_charlson_event_count`: add the cohort id to the keys;
+  - window `compute_population_w_cohort_first_occurrence`: partition by cohort id and `PERSON_ID`, since
+    one person can belong to several cohorts;
+  - joins that match on `PERSON_ID` alone: add the cohort id;
+  - prevalence denominators: per cohort.
+- Add a single-select, required dashboard filter on `COHORT_DEFINITION_NAME` to both pages.
+- Build the dashboard datasets at the end of "Write Cohort" (R5), so a new cohort appears without a manual
+  step. Rename "Build Cohort Dashboard" to "Refresh Dashboard" and keep it for manual use.
+- Remove S7/S8, the `cohort_definition_id` variable and its select tile.
+
+**Costs and checks.**
+
+- Person-level datasets grow with total cohort membership (sum over cohorts), not with population size.
+  This all runs in-database. If a full rebuild becomes slow at 2.3M with 45 cohorts, partition the
+  datasets by cohort id and rebuild only new partitions.
+- Spike first: whether dashboard filters also filter the 5 statistics cards (EDA insights). If they do not,
+  replace them with charts on the same columns or a per-cohort summary table.
+- Prevalence and covariate figures must equal today's single-cohort results for the same cohort; compare
+  the three E4 cohorts before and after.
+
+## R4. Resolved table paths
+
+**Today.** `get_sql_path()` and `set_table_variables()` in `solution/recipes/sql_script_function.py`
+rebuild each table's SQL name from dataset parameters by hand:
+
+| Connection | Defect |
+| --- | --- |
+| Snowflake | Ignores the dataset's database (`catalog`); only `${TENANT}`, `${NODE}`, `${projectKey}` expanded |
+| Databricks | Ignores `catalog`; `${catalog}` read from a project variable that does not exist |
+| Redshift | Ignores the schema and does not quote, so mixed-case or hyphenated names fail |
+| Any other | Returns the raw table name, so failures surface later as SQL errors |
+
+E4 passed because all three test connections use their default database, catalog and schema.
+
+**Proposal.** Ask DSS for the name it uses itself:
+`dataiku.Dataset(name).get_location_info()["info"]["quotedResolvedTableName"]`. This resolves catalog,
+schema, variables and quoting per dialect. `set_table_variables()` goes. An unsupported connection type
+raises with the supported list. Unit tests stub the location info. The spike checks that, on all three
+variants, the returned names equal what the SQL recipes produce.
+
+## R5. Cohort build as one static recipe
+
+**Today.** For each cohort in the batch, `write_cohorts()`:
+
+1. rewrites the inputs and script of a single runtime SQL recipe, `create_cohort`, created on first use;
+2. rewrites the steps of the "Drop SQL Temporary Tables" scenario and runs it, polling every 5 s;
+3. runs "Build Cohort Dataset" and polls it;
+4. counts the cohort with a separate query and appends a log row.
+
+At the end it rewrites the runtime SQL recipe `compute_cohort_building_log` and builds it.
+`compute_cohort_definition` is created the same way. The flow therefore changes at run time, scenarios
+start other scenarios, and every cohort rewrites the same shared objects.
+
+**Proposal.** Two static Python recipes. The solution stays single-user per project; this design makes
+that explicit instead of fragile.
+
+- `register_cohorts`: input `cohort_submission`. Outputs `cohort_definition` and
+  `uploaded_cohort_definition`, written in-database through `SQLExecutor2` with escaped literals (R2).
+- `build_cohorts`:
+  - inputs: the mapped scripts folder, the batch, and every imported OMOP table (declared for lineage);
+  - outputs: `cohort` (written in-database by the scripts) and `cohort_building_log` (appended).
+  - For each cohort it splits the mapped script into statements (outside quotes and comments; tested on
+    all scripts in `cohort_scripts/`) and runs them in one session with `SQLExecutor2.query_to_df(count
+    query, pre_queries=statements)`. Session temporary tables (Snowflake `TEMP`, Redshift `#`) live until
+    the count is read.
+  - It records status, count and error per cohort, continues past failures, writes the log, then fails
+    the recipe if any cohort failed.
+- "Write Cohort" becomes: build `build_cohorts`'s outputs, then refresh the dashboard (R3).
+- Remove `create_cohort`, `compute_cohort_definition`, `compute_cohort_building_log`, "Drop SQL Temporary
+  Tables", "Build Cohort Dataset", "Build Cohort Metadata Dataset" and "Build Cohort Log Dataset", and the
+  "Move recipe to zone" steps.
+
+**What this gives.**
+
+- The flow is fixed at design time, so bundles and copies match what runs.
+- No nested scenarios or polling loops.
+- DSS refuses a second job that writes the same dataset while one is running, which is the right
+  behaviour for a single-user project: a concurrent run is rejected instead of corrupting shared objects.
+
+**Cost.** Per-cohort lineage is no longer a recipe; `cohort_building_log` carries it (cohort, script,
+input tables, status, count). The spike confirms that `pre_queries` share the session on all three
+dialects.
+
+## R6. Databricks temporary tables
+
+**Today.** Atlas renders Databricks temporary tables as real Delta tables
+(`CREATE TABLE @temp_database_schema.<random8><name> USING DELTA`). `@temp_database_schema.x` becomes a
+bare `x` in the connection's default schema. Each script drops its tables at the end, and a pre-run step
+drops those of the same script. A run that fails midway leaves them until that cohort runs again. Snowflake
+(`CREATE TEMP TABLE`) and Redshift (`#table`) use session tables and are not affected.
+
+**Proposal**, inside `build_cohorts` (R5):
+
+- Map `@temp_database_schema.<name>` to `<scratch schema>.rwdtmp_<project key>_<cohort id>_<name>`. The
+  scratch schema is the main connection's default schema unless the optional variable `temp_schema` names
+  another. Names are then attributable and unique per project and cohort.
+- Drop that cohort's tables before the run, and again in a `finally` block after it.
+- At the start of every build, drop any `rwdtmp_<project key>_*` table left in the scratch schema by an
+  earlier crash (`SHOW TABLES IN <schema> LIKE 'rwdtmp_<project key>_*'`).
+- Note for later: Databricks SQL has a temporary-table feature in preview. When it is generally available,
+  rendering Databricks scripts with session temp tables would remove the problem at source.
+
+## R7. Project variables
+
+**Today.**
+
+- Project Setup writes the `local` scope, and the repo code reads `local`.
+- "Update project variables" copies `local` into `standard`. Four scenarios call it, and two scenarios then
+  read `standard` (`enable_pipeline`, the two import lists).
+- `${...}` references in recipes already resolve with `local` overriding `standard`, so the copy is not
+  needed for them.
+- `standard` also carries keys nothing reads:
+  - `advanced_file_format` and `condition_count_for_charlson_score`;
+  - `connection_type` (set to "PostgreSQL");
+  - `cohort_build_error`, which is written but never read;
+  - 22 OMOP table keys that Setup never maps, `cost` among them with the value `"cost table:"`.
+
+**Proposal.**
+
+| Scope | Holds | Keys after the revision |
+| --- | --- | --- |
+| `standard` | Shipped defaults and tunables, documented in the wiki | `days_prior_to_cohort_startdate` (365), `enable_pipeline` (false), `cohort_script_table_naming` (atlas), `temp_schema` (empty) |
+| `local` | Whatever Project Setup writes | connections, prep project, import lists, table mapping, `cohort_script_table_prefix`, `cohort_submission` |
+
+- One reader, `solution/utils/variables.py:get_setting(name)` (moved from `setup/choices.py:scoped_variable`):
+  `local`, then `standard`. Use it in all repo code and scenario steps.
+- Delete "Update project variables" and its four call sites.
+- Delete the unused keys. `cohort_definition_id` and `cdm_standard_tables_map` go with R3 and R1.
+- `tests/test_variables.py` fails when code or the Setup manifest uses a key that is not in the table above.
+
+**Open question.** `condition_count_for_charlson_score` is unused: the Charlson recipes do not read it.
+Wire it into the Charlson logic or drop it.
+
+## R8. Code environment
+
+The project inherits the instance default Python environment, and the one Python recipe also inherits.
+Every third-party module the solution loads is `dataiku`, `dataikuapi`, `pandas` or `numpy`. That covers:
+
+- the repo code;
+- the 16 scenarios;
+- the Python recipe;
+- the 18 `dku_utils` modules reached from those imports in `bs-commons` `v2-3-1`.
+
+`bs-commons` also imports `PIL`, `cv2`, `skimage` and Google client libraries, but only in modules the
+solution never loads. **Keep the instance default.** The DSS built-in environment provides pandas and
+numpy. State that requirement in the wiki's technical requirements article. `tests/test_imports.py` gains a
+check that `solution/` imports nothing outside the standard library and those four packages.
+
+## Accepted as is
+
+By the owner's decision, these stay unchanged. The built-in project macro test run before publication
+covers part of them.
+
+- Library sources: `python/solution` from this repo (`v1-2`), `bs-commons` and the previews.
+- Scenario run-as user.
+- Shipped variable values. R7 changes which keys exist, not this.
+- The "⚠️ Format Solution⚠️" scenario. Its two reads of `standard` switch to `get_setting()` so it keeps
+  working after R7. No other change.
+- Bundle and Project Setup export settings.
+
+Also noted, no action in this revision:
+
+- `PREP_RWD_S3_1K` and `PREP_RWD_S3_100K` still repeat visit ids; 2.3M has one row per visit since
+  2026-11-20.
+- Setup tiles carry an inlined copy of `solution/setup/`. `tools/app_manifest.py --check` belongs in the
+  release check.
+
+## Order, verification and gate
+
+| Step | Work | Verified by |
+| --- | --- | --- |
+| 0. Spike (about 2 days) | `get_location_info()` names on SF, DB and RS; `pre_queries` session temp tables on all three; dashboard filter on statistics cards; a custom tile that reads datasets and writes a variable | Notes added to this document |
+| 1. Foundation | R4, R7, R8 | Offline tests; E4 counts unchanged |
+| 2. Cohort build | R5, R6 | Offline tests (statement splitter on every script in `cohort_scripts/`, literal escaping); E4 rerun; a forced failure on Databricks leaves no `rwdtmp_` table |
+| 3. Setup | R1, R2; regenerate tiles with `tools/app_manifest.py` | Two submissions in a row; a reused id is refused without **Replace** and accepted with it; "Built cohorts" lists both batches |
+| 4. Dashboard | R3 | All cohorts selectable by filter; the three E4 cohorts' figures equal the single-cohort build |
+| 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
+
+**Gate to exit phase 4:**
+
+- E4 rerun gives identical counts on SF, DB and RS and equals 611, 593 and 247;
+- the multi-submission test passes;
+- the dashboard shows every built cohort without a rebuild;
+- the project macro test passes;
+- Setup has no custom-mapping, metadata-CSV or dashboard section.
+
+Then D1 copies `v1-2`.
+
+## Open questions
+
+- [ ] Keep the metadata CSV as a hidden bulk-import path, or drop it (recommendation: drop)
+- [ ] `condition_count_for_charlson_score`: wire into the Charlson logic or drop
+- [ ] Databricks scratch schema: the connection default, or a dedicated `temp_schema`
+- [ ] If dashboard filters do not reach statistics cards: charts or a summary table instead

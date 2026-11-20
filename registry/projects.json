@@ -572,9 +572,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B1: duplicate SYNPUFOMOP23DATAPREPARATION, fix types and map CDM v5.2 to v5.3",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B1, created 2026-11-19 as a duplicate of SYNPUFOMOP23DATAPREPARATION with code env test_fda remapped to prep_rwd_s3_2m3 and without its notebooks; dates typed dateonly/datetimenotz, v5.2 leftovers dropped, v5.3 inpatient visit branch added as in 100K; the 15 tables are lowercase <omop_table> in zone 'OMOP CDM export'",
+      "omop_sets": {
+        "s3": {
+          "person": "person",
+          "observation_period": "observation_period",
+          "visit_occurrence": "visit_occurrence",
+          "condition_occurrence": "condition_occurrence",
+          "drug_exposure": "drug_exposure",
+          "procedure_occurrence": "procedure_occurrence",
+          "device_exposure": "device_exposure",
+          "measurement": "measurement",
+          "observation": "observation",
+          "death": "death",
+          "location": "location",
+          "drug_era": "drug_era",
+          "condition_era": "condition_era",
+          "concept": "concept",
+          "concept_ancestor": "concept_ancestor"
+        }
+      }
     },
     {
       "key": "PREP_RWD_SF_1K",
@@ -592,9 +610,27 @@
         "solution-developer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Snowflake variant of PREP_RWD_S3_1K on bs-snowflake (DEC-RWD-002, DEC-RWD-005)",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-18: sync-only Snowflake variant of PREP_RWD_S3_1K on bs-snowflake (DEC-RWD-002, DEC-RWD-005); 15 shared-in tables, 15 sync recipes to <omop_table>_sf",
+      "omop_sets": {
+        "snowflake": {
+          "person": "person_sf",
+          "observation_period": "observation_period_sf",
+          "visit_occurrence": "visit_occurrence_sf",
+          "condition_occurrence": "condition_occurrence_sf",
+          "drug_exposure": "drug_exposure_sf",
+          "procedure_occurrence": "procedure_occurrence_sf",
+          "device_exposure": "device_exposure_sf",
+          "measurement": "measurement_sf",
+          "observation": "observation_sf",
+          "death": "death_sf",
+          "location": "location_sf",
+          "drug_era": "drug_era_sf",
+          "condition_era": "condition_era_sf",
+          "concept": "concept_sf",
+          "concept_ancestor": "concept_ancestor_sf"
+        }
+      }
     },
     {
       "key": "PREP_RWD_DB_1K",
@@ -612,9 +648,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Databricks variant of PREP_RWD_S3_1K on bs-databricks, a global PAT connection (DEC-RWD-002)",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-18: sync-only Databricks variant of PREP_RWD_S3_1K on bs-databricks, a global PAT connection (DEC-RWD-002); 15 shared-in tables, 15 sync recipes to <omop_table>_db",
+      "omop_sets": {
+        "databricks": {
+          "person": "person_db",
+          "observation_period": "observation_period_db",
+          "visit_occurrence": "visit_occurrence_db",
+          "condition_occurrence": "condition_occurrence_db",
+          "drug_exposure": "drug_exposure_db",
+          "procedure_occurrence": "procedure_occurrence_db",
+          "device_exposure": "device_exposure_db",
+          "measurement": "measurement_db",
+          "observation": "observation_db",
+          "death": "death_db",
+          "location": "location_db",
+          "drug_era": "drug_era_db",
+          "condition_era": "condition_era_db",
+          "concept": "concept_db",
+          "concept_ancestor": "concept_ancestor_db"
+        }
+      }
     },
     {
       "key": "PREP_RWD_RS_1K",
@@ -632,9 +686,27 @@
         "qa-test-engineer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: sync-only Redshift variant of PREP_RWD_S3_1K (DEC-RWD-002)",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-18: sync-only Redshift variant of PREP_RWD_S3_1K on redshift-solutions (DEC-RWD-002); 15 shared-in tables, 15 sync recipes to <omop_table>_rs",
+      "omop_sets": {
+        "redshift": {
+          "person": "person_rs",
+          "observation_period": "observation_period_rs",
+          "visit_occurrence": "visit_occurrence_rs",
+          "condition_occurrence": "condition_occurrence_rs",
+          "drug_exposure": "drug_exposure_rs",
+          "procedure_occurrence": "procedure_occurrence_rs",
+          "device_exposure": "device_exposure_rs",
+          "measurement": "measurement_rs",
+          "observation": "observation_rs",
+          "death": "death_rs",
+          "location": "location_rs",
+          "drug_era": "drug_era_rs",
+          "condition_era": "condition_era_rs",
+          "concept": "concept_rs",
+          "concept_ancestor": "concept_ancestor_rs"
+        }
+      }
     },
     {
       "key": "DEMO_SF_PREP_OMOP_2M3",
@@ -652,9 +724,27 @@
         "demo-installer"
       ],
       "library": null,
-      "lifecycle": "planned",
-      "decision": "Workstream B3: full copy of PREP_RWD_S3_2M3 on bs-snowflake (DEC-RWD-005), the exception to DEC-RWD-002 (DEC-RWD-004); demo suite input for DEMO_SF_RWD",
-      "omop_sets": {}
+      "lifecycle": "active",
+      "decision": "Workstream B3, created 2026-11-19: sync-only Snowflake variant of PREP_RWD_S3_2M3 on bs-snowflake (DEC-RWD-002, DEC-RWD-005, DEC-RWD-006); 15 shared-in tables, 15 sync recipes to <omop_table>_sf; demo suite input for DEMO_SF_RWD",
+      "omop_sets": {
+        "snowflake": {
+          "person": "person_sf",
+          "observation_period": "observation_period_sf",
+          "visit_occurrence": "visit_occurrence_sf",
+          "condition_occurrence": "condition_occurrence_sf",
+          "drug_exposure": "drug_exposure_sf",
+          "procedure_occurrence": "procedure_occurrence_sf",
+          "device_exposure": "device_exposure_sf",
+          "measurement": "measurement_sf",
+          "observation": "observation_sf",
+          "death": "death_sf",
+          "location": "location_sf",
+          "drug_era": "drug_era_sf",
+          "condition_era": "condition_era_sf",
+          "concept": "concept_sf",
+          "concept_ancestor": "concept_ancestor_sf"
+        }
+      }
     }
   ]
 }

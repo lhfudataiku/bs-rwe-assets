@@ -22,7 +22,7 @@ The revision keeps the three-part structure the Snowflake demo suite wiki alread
 
 | Part | What it delivers | DSS projects (target) | Primary personas |
 | --- | --- | --- | --- |
-| 1. OMOP Data Foundation | Harmonised SYNPUF OMOP CDM input tables that pass the v1.1 schema check, in three sample sizes and four storage variants | 3 S3 canonical projects (1K, 100K, 2.3M) + 3 connection variants (1K Snowflake / Databricks / Redshift) + 1 full copy for the demo suite (2.3M Snowflake, `DEMO_SF_PREP_OMOP_2M3`) | Solution developer, QA / test engineer, demo installer |
+| 1. OMOP Data Foundation | Harmonised SYNPUF OMOP CDM input tables that pass the v1.1 schema check, in three sample sizes and four storage variants | 3 S3 canonical projects (1K, 100K, 2.3M) + 3 connection variants (1K Snowflake / Databricks / Redshift) + 1 variant for the demo suite (2.3M Snowflake, `DEMO_SF_PREP_OMOP_2M3`) | Solution developer, QA / test engineer, demo installer |
 | 2. RWD Cohort Discovery | The released solution: cohort repository, clinical covariates, cohort features, cohort dashboard | `SOL_RWD_COHORT_DISCOVERY` (release) + `DEMO_SF_RWD` (demo, upgraded to v1.1) | Biomedical informaticist, clinical researcher |
 | 3. Real World Evidence | A worked RWE study (LEGEND-HTN replication: ACEi first-line survival analysis) built on Part 2 outputs | `DEMO_SF_RWE` | Epidemiologist / HEOR researcher, account team |
 | Cross-cutting: Index & docs | One registry of every RWD/RWE project, generated lineage and schema indexes, standard wiki and doc headers | `bs-rwe-assets` repo + DSS wiki | All of the above, plus the asset owner |
@@ -47,21 +47,21 @@ Data flows left to right. Each part consumes the part before it only through sha
 
 ## Part 1 — OMOP Data Foundation
 
-Part 1 replaces seven overlapping prep projects with three canonical S3 projects, three thin connection variants and one full copy for the demo suite, all passing the v1.1 schema check.
+Part 1 replaces seven overlapping prep projects with three canonical S3 projects, three thin connection variants and one for the demo suite, all passing the v1.1 schema check.
 
 **Scope**
 
 - **Canonical layer (S3, `dataiku-managed-storage`).** One project per sample size: 1K, 100K and 2.3M persons. Each one ingests raw SYNPUF OMOP files plus Athena vocabularies, then normalises and harmonises them into the 15 OMOP tables the solution reads (13 standard + `concept`, `concept_ancestor`).
 - **Workflow reuse.** The 1K and 100K projects follow the `SYNPUFOMOP1KDATAPREPRWDV11` pattern: uploaded or S3 files → prepare → S3. The 2.3M project follows `SYNPUFOMOP23DATAPREPARATION`: download lzo archives → Python decompress per part → stack → prepare → S3.
 - **Harmonisation contract.** Column names lowercase and types matching `CDM_SCHEMA` in `solution/schema/cdm_schema.py` (moved from `dataiku/bs-rwd-cohort-discovery` in Workstream E1). In particular: `dateonly` for OMOP DATE, `datetimenotz` for DATETIME, `int` for ids and concept ids. No legacy `date` type anywhere.
-- **Database projects.** The 1K connection variants are sync-only projects that share in the canonical S3 tables and write them to one database (DEC-RWD-002). The demo suite's 2.3M Snowflake set is the exception: a full copy of the 2.3M canonical project that reads no other project, so the demo suite can be bundled or rebuilt without its canonical project ([DEC-RWD-004](decisions/DECISION_REGISTER.md#dec-rwd-004--the-demo-suites-23m-prep-project-is-a-full-copy-of-prep_rwd_s3_2m3)):
+- **Database projects.** The 1K connection variants are sync-only projects that share in the canonical S3 tables and write them to one database (DEC-RWD-002). The demo suite's 2.3M Snowflake set is built the same way from the 2.3M canonical project, so the demo suite needs that project at build time ([DEC-RWD-006](decisions/DECISION_REGISTER.md#dec-rwd-006--the-demo-suites-23m-prep-project-is-a-sync-only-variant-of-prep_rwd_s3_2m3), superseding DEC-RWD-004's full copy):
 
 | Project | Source | Target connection | Purpose |
 | --- | --- | --- | --- |
 | 1K Snowflake variant | 1K S3 (shared, synced) | Snowflake | Solution development and CI-style regression |
 | 1K Databricks variant | 1K S3 (shared, synced) | Databricks | Dialect test for the Databricks SQL templates |
 | 1K Redshift variant | 1K S3 (shared, synced) | `redshift-solutions` | Dialect test for the Redshift SQL templates |
-| `DEMO_SF_PREP_OMOP_2M3` | 2.3M S3 (full copy) | Snowflake | Demo suite input and performance testing |
+| `DEMO_SF_PREP_OMOP_2M3` | 2.3M S3 (sync-only variant) | Snowflake | Demo suite input and performance testing |
 
 **Business value**
 
@@ -157,7 +157,7 @@ Every part has one accountable owner role; names are still to be assigned.
 | Activity | Data foundation owner | Solution owner | RWE demo owner | Suite owner |
 | --- | --- | --- | --- | --- |
 | Canonical S3 projects and schema contract | A / R | C | I | I |
-| Connection variants (SF, DB, RS) and the demo copy | A / R | C | I | I |
+| Connection variants (SF, DB, RS) and the demo variant | A / R | C | I | I |
 | `sync_omop_datasets` fix and release testing | C | A / R | I | I |
 | `DEMO_SF_RWD` recreation and cohort library | C | A / R | C | I |
 | `DEMO_SF_RWE` repointing | I | C | A / R | I |
@@ -185,5 +185,5 @@ A = accountable, R = responsible, C = consulted, I = informed.
 
 - Who owns each part?
 - Rename the "2.3%" projects to "2.3M"?
-- ~~Connection variants as separate projects or as zones in one project?~~ Decided: separate sync-only projects (DEC-RWD-002); the demo suite's 2.3M Snowflake set is a full copy (DEC-RWD-004, 2026-10-16).
+- ~~Connection variants as separate projects or as zones in one project?~~ Decided: separate sync-only projects (DEC-RWD-002); the demo suite's 2.3M Snowflake set was a full copy (DEC-RWD-004, 2026-10-16) and is a sync-only variant since 2026-11-19 (DEC-RWD-006).
 - Is 100K needed on any database, or is S3-only enough?

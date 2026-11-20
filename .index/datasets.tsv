@@ -9,62 +9,62 @@ SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_rs	Redshift	redshift-solutions	yes	6			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_sf	Snowflake	managed-snowflake	yes	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA	UploadedFiles	dataiku-managed-storage	no	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_1k	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes	121386	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	yes	121386	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_rs	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_sf	Snowflake	managed-snowflake	yes	6	snowflake	condition_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	13			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes	160322	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	yes	160322	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_rs	Redshift	redshift-solutions	yes	16	redshift	condition_occurrence	yes	160322	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	16	snowflake	condition_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH	UploadedFiles	dataiku-managed-storage	no	7			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_1k	S3	dataiku-managed-storage	yes	7	s3	death	yes	45	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	yes	45	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_rs	Redshift	redshift-solutions	yes	7	redshift	death	yes	45	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_sf	Snowflake	managed-snowflake	yes	7	snowflake	death	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	14			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_1k	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes	1622	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	yes	1622	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_rs	Redshift	redshift-solutions	yes	15	redshift	device_exposure	yes	1622	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_sf	Snowflake	managed-snowflake	yes	15	snowflake	device_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA	UploadedFiles	dataiku-managed-storage	no	7			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_1k	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes	52714	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	yes	52714	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_rs	Redshift	redshift-solutions	yes	7	redshift	drug_era	yes	52714	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_sf	Snowflake	managed-snowflake	yes	7	snowflake	drug_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	21			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_1k	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes	49542	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	yes	49542	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_rs	Redshift	redshift-solutions	yes	23	redshift	drug_exposure	yes	49542	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_sf	Snowflake	managed-snowflake	yes	23	snowflake	drug_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION	UploadedFiles	dataiku-managed-storage	no	8			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_1k	S3	dataiku-managed-storage	yes	10	s3	location	yes	626	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	yes	626	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_rs	Redshift	redshift-solutions	yes	10	redshift	location	yes	626	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_sf	Snowflake	managed-snowflake	yes	10	snowflake	location	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT	UploadedFiles	dataiku-managed-storage	no	18			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_1k	S3	dataiku-managed-storage	yes	20	s3	measurement	yes	2858	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	yes	2858	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_rs	Redshift	redshift-solutions	yes	20	redshift	measurement	yes	2858	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_sf	Snowflake	managed-snowflake	yes	20	snowflake	measurement	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION	UploadedFiles	dataiku-managed-storage	no	17			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_1k	S3	dataiku-managed-storage	yes	18	s3	observation	yes	13481	metric	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD531	UploadedFiles	dataiku-managed-storage	no	5			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_1k	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes	1048	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	yes	1048	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_rs	Redshift	redshift-solutions	yes	5	redshift	observation_period	yes	1048	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_sf	Snowflake	managed-snowflake	yes	5	snowflake	observation_period	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	yes	13481	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_rs	Redshift	redshift-solutions	yes	18	redshift	observation	yes	13481	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_sf	Snowflake	managed-snowflake	yes	18	snowflake	observation	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON	UploadedFiles	dataiku-managed-storage	no	18			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_1k	S3	dataiku-managed-storage	yes	19	s3	person	yes	1000	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	yes	1000	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_rs	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_sf	Snowflake	managed-snowflake	yes	19	snowflake	person	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE531	UploadedFiles	dataiku-managed-storage	no	14			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes	62189	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	yes	62189	sql	
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	unknown		sql	timeout after 240s
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_rs	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	14	snowflake	procedure_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_VISIT_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	12			-			
@@ -331,7 +331,7 @@ SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_3	S3	dataiku-managed-storage
 SYNPUFOMOP23DATAPREPARATION	visit_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	111637582	metric	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	care_site_db	Databricks	bs-databricks	yes	6			-			
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_ancestor_db	Databricks	bs-databricks	yes	4	databricks	concept_ancestor	yes	72374967	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	yes	6088813	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	unknown		sql	ncept_db`': [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: SELECT COUNT(*) AS n FROM `se-sandbox`.`business_s
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	concept_relationship_db	Databricks	bs-databricks	yes	6			-			
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_era_db	Databricks	bs-databricks	yes	6	databricks	condition_era	yes	223393336	sql	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_occurrence_db	Databricks	bs-databricks	yes	16	databricks	condition_occurrence	yes	252664961	sql	
@@ -339,7 +339,7 @@ DATABRICKSSYNPUFOMOP23DATAPREPERATION	condition_test	Databricks	bs-databricks	ye
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	death_db	Databricks	bs-databricks	yes	7	databricks	death	yes	107644	sql	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	device_exposure_db	Databricks	bs-databricks	yes	15	databricks	device_exposure	yes	4465485	sql	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_era_db	Databricks	bs-databricks	yes	7	databricks	drug_era	yes	125872351	sql	
-DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	yes	126048050	sql	
+DATABRICKSSYNPUFOMOP23DATAPREPERATION	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	unknown		sql	LException: [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: USE `se-sandbox`.`business_solutions`., caused by:
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	encounter_concepts_joined	S3	dataiku-managed-storage	yes	2			-			
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	location_db	Databricks	bs-databricks	yes	10	databricks	location	yes	3185	sql	
 DATABRICKSSYNPUFOMOP23DATAPREPERATION	measurement_occurrence_db	Databricks	bs-databricks	yes	20	databricks	measurement	yes	74128429	sql	
@@ -856,3 +856,154 @@ PREP_RWD_S3_100K	visit_by_procedure	S3	dataiku-managed-storage	yes	19			-
 PREP_RWD_S3_100K	visit_occurrence	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes	1802032	metric	
 PREP_RWD_S3_100K	visit_occurrence_100k_db	S3	dataiku-managed-storage	yes	17			-			
 PREP_RWD_S3_100K	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	AT_CONCEPT	S3	hls-synth-patient	no	10			-			
+PREP_RWD_S3_2M3	AT_CONCEPT_ANCESTOR	S3	hls-synth-patient	no	4			-			
+PREP_RWD_S3_2M3	AT_CONCEPT_RELATIONSHIP	S3	hls-synth-patient	no	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_0	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_1	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_2	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_3	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	care_site_2_3_pc_db	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	concept	S3	dataiku-managed-storage	yes	10	s3	concept	yes		head	
+PREP_RWD_S3_2M3	concept_ancestor	S3	dataiku-managed-storage	yes	4	s3	concept_ancestor	yes		head	
+PREP_RWD_S3_2M3	concept_relationship_db	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes		head	
+PREP_RWD_S3_2M3	condition_era_2_3_pc	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_1	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_2	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_3	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_4	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_5	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_era_2_3_pc_6	S3	dataiku-managed-storage	yes	6			-			
+PREP_RWD_S3_2M3	condition_occurrence	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes		head	
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	condition_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	15			-			
+PREP_RWD_S3_2M3	death	S3	dataiku-managed-storage	yes	7	s3	death	yes		head	
+PREP_RWD_S3_2M3	death_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	device_exposure	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes		head	
+PREP_RWD_S3_2M3	device_exposure_2_3_pc	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_0	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_1	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_2	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	device_exposure_2_3_pc_3	S3	dataiku-managed-storage	yes	14			-			
+PREP_RWD_S3_2M3	drug_era	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes		head	
+PREP_RWD_S3_2M3	drug_era_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_1	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_2	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_3	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_4	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_5	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_era_2_3_pc_6	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	drug_exposure	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes		head	
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_0	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_1	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_2	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	drug_exposure_2_3_pc_3	S3	dataiku-managed-storage	yes	21			-			
+PREP_RWD_S3_2M3	encounter_concepts	S3	dataiku-managed-storage	yes	4			-			
+PREP_RWD_S3_2M3	encounter_concepts_ns_joined	S3	dataiku-managed-storage	yes	3			-			
+PREP_RWD_S3_2M3	location	S3	dataiku-managed-storage	yes	10	s3	location	yes		head	
+PREP_RWD_S3_2M3	location_2_3_pc	S3	dataiku-managed-storage	yes	8			-			
+PREP_RWD_S3_2M3	location_2_3_pc_prepared	S3	dataiku-managed-storage	yes	10			-			
+PREP_RWD_S3_2M3	measurement	S3	dataiku-managed-storage	yes	20	s3	measurement	yes		head	
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	measurement_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	16			-			
+PREP_RWD_S3_2M3	observation	S3	dataiku-managed-storage	yes	18	s3	observation	yes		head	
+PREP_RWD_S3_2M3	observation_2_3_pc	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_0	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_1	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_2	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_2_3_pc_3	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	observation_period	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes		head	
+PREP_RWD_S3_2M3	observation_period_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	payer_plan_period_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
+PREP_RWD_S3_2M3	payer_plan_period_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	person	S3	dataiku-managed-storage	yes	18	s3	person	yes	2326856	metric	
+PREP_RWD_S3_2M3	person_2_3_pc	S3	dataiku-managed-storage	yes	18			-			
+PREP_RWD_S3_2M3	procedure_occurrence	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes		head	
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	provider_2_3_pc	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	provider_2_3_pc_db	S3	dataiku-managed-storage	yes	13			-			
+PREP_RWD_S3_2M3	us_sdoh_county_measure	UploadedFiles	dataiku-managed-storage	no	63			-			
+PREP_RWD_S3_2M3	visit_by_observation_occurrence	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_by_procedure_occurrence	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_occurrence	S3	dataiku-managed-storage	yes	17	s3	visit_occurrence	yes		head	
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_0	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_1	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	12			-			
+PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_occurrence_stacked	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_SF_1K	concept_ancestor_sf	Snowflake	bs-snowflake	yes	4	snowflake	concept_ancestor	yes	72374967	sql	
+PREP_RWD_SF_1K	concept_sf	Snowflake	bs-snowflake	yes	10	snowflake	concept	yes	6088813	sql	
+PREP_RWD_SF_1K	condition_era_sf	Snowflake	bs-snowflake	yes	6	snowflake	condition_era	yes	121386	sql	
+PREP_RWD_SF_1K	condition_occurrence_sf	Snowflake	bs-snowflake	yes	16	snowflake	condition_occurrence	yes	160322	sql	
+PREP_RWD_SF_1K	death_sf	Snowflake	bs-snowflake	yes	7	snowflake	death	yes	45	sql	
+PREP_RWD_SF_1K	device_exposure_sf	Snowflake	bs-snowflake	yes	15	snowflake	device_exposure	yes	1622	sql	
+PREP_RWD_SF_1K	drug_era_sf	Snowflake	bs-snowflake	yes	7	snowflake	drug_era	yes	52714	sql	
+PREP_RWD_SF_1K	drug_exposure_sf	Snowflake	bs-snowflake	yes	23	snowflake	drug_exposure	yes	49542	sql	
+PREP_RWD_SF_1K	location_sf	Snowflake	bs-snowflake	yes	10	snowflake	location	yes	626	sql	
+PREP_RWD_SF_1K	measurement_sf	Snowflake	bs-snowflake	yes	20	snowflake	measurement	yes	2858	sql	
+PREP_RWD_SF_1K	observation_period_sf	Snowflake	bs-snowflake	yes	5	snowflake	observation_period	yes	1048	sql	
+PREP_RWD_SF_1K	observation_sf	Snowflake	bs-snowflake	yes	18	snowflake	observation	yes	13481	sql	
+PREP_RWD_SF_1K	person_sf	Snowflake	bs-snowflake	yes	19	snowflake	person	yes	1000	sql	
+PREP_RWD_SF_1K	procedure_occurrence_sf	Snowflake	bs-snowflake	yes	14	snowflake	procedure_occurrence	yes	62189	sql	
+PREP_RWD_SF_1K	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	17904	sql	
+PREP_RWD_DB_1K	concept_ancestor_db	Databricks	bs-databricks	yes	4	databricks	concept_ancestor	yes	72374967	sql	
+PREP_RWD_DB_1K	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	yes	6088813	sql	
+PREP_RWD_DB_1K	condition_era_db	Databricks	bs-databricks	yes	6	databricks	condition_era	yes	121386	sql	
+PREP_RWD_DB_1K	condition_occurrence_db	Databricks	bs-databricks	yes	16	databricks	condition_occurrence	unknown		sql	rence_db`': [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: SELECT COUNT(*) AS n FROM `se-sandbox`.`business_s
+PREP_RWD_DB_1K	death_db	Databricks	bs-databricks	yes	7	databricks	death	yes	45	sql	
+PREP_RWD_DB_1K	device_exposure_db	Databricks	bs-databricks	yes	15	databricks	device_exposure	yes	1622	sql	
+PREP_RWD_DB_1K	drug_era_db	Databricks	bs-databricks	yes	7	databricks	drug_era	yes	52714	sql	
+PREP_RWD_DB_1K	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	yes	49542	sql	
+PREP_RWD_DB_1K	location_db	Databricks	bs-databricks	yes	10	databricks	location	yes	626	sql	
+PREP_RWD_DB_1K	measurement_db	Databricks	bs-databricks	yes	20	databricks	measurement	yes	2858	sql	
+PREP_RWD_DB_1K	observation_db	Databricks	bs-databricks	yes	18	databricks	observation	yes	13481	sql	
+PREP_RWD_DB_1K	observation_period_db	Databricks	bs-databricks	yes	5	databricks	observation_period	yes	1048	sql	
+PREP_RWD_DB_1K	person_db	Databricks	bs-databricks	yes	19	databricks	person	yes	1000	sql	
+PREP_RWD_DB_1K	procedure_occurrence_db	Databricks	bs-databricks	yes	14	databricks	procedure_occurrence	yes	62189	sql	
+PREP_RWD_DB_1K	visit_occurrence_db	Databricks	bs-databricks	yes	17	databricks	visit_occurrence	yes	17904	sql	
+PREP_RWD_RS_1K	concept_ancestor_rs	Redshift	redshift-solutions	yes	4	redshift	concept_ancestor	yes	72374967	sql	
+PREP_RWD_RS_1K	concept_rs	Redshift	redshift-solutions	yes	10	redshift	concept	yes	6088813	sql	
+PREP_RWD_RS_1K	condition_era_rs	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	
+PREP_RWD_RS_1K	condition_occurrence_rs	Redshift	redshift-solutions	yes	16	redshift	condition_occurrence	yes	160322	sql	
+PREP_RWD_RS_1K	death_rs	Redshift	redshift-solutions	yes	7	redshift	death	yes	45	sql	
+PREP_RWD_RS_1K	device_exposure_rs	Redshift	redshift-solutions	yes	15	redshift	device_exposure	yes	1622	sql	
+PREP_RWD_RS_1K	drug_era_rs	Redshift	redshift-solutions	yes	7	redshift	drug_era	yes	52714	sql	
+PREP_RWD_RS_1K	drug_exposure_rs	Redshift	redshift-solutions	yes	23	redshift	drug_exposure	yes	49542	sql	
+PREP_RWD_RS_1K	location_rs	Redshift	redshift-solutions	yes	10	redshift	location	yes	626	sql	
+PREP_RWD_RS_1K	measurement_rs	Redshift	redshift-solutions	yes	20	redshift	measurement	yes	2858	sql	
+PREP_RWD_RS_1K	observation_period_rs	Redshift	redshift-solutions	yes	5	redshift	observation_period	yes	1048	sql	
+PREP_RWD_RS_1K	observation_rs	Redshift	redshift-solutions	yes	18	redshift	observation	yes	13481	sql	
+PREP_RWD_RS_1K	person_rs	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
+PREP_RWD_RS_1K	procedure_occurrence_rs	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
+PREP_RWD_RS_1K	visit_occurrence_rs	Redshift	redshift-solutions	yes	17	redshift	visit_occurrence	yes	17904	sql	
+DEMO_SF_PREP_OMOP_2M3	concept_ancestor_sf	Snowflake	bs-snowflake	yes	4	snowflake	concept_ancestor	yes	72374967	sql	
+DEMO_SF_PREP_OMOP_2M3	concept_sf	Snowflake	bs-snowflake	yes	10	snowflake	concept	yes	6088813	sql	
+DEMO_SF_PREP_OMOP_2M3	condition_era_sf	Snowflake	bs-snowflake	yes	6	snowflake	condition_era	yes	223393336	sql	
+DEMO_SF_PREP_OMOP_2M3	condition_occurrence_sf	Snowflake	bs-snowflake	yes	16	snowflake	condition_occurrence	yes	289182385	sql	
+DEMO_SF_PREP_OMOP_2M3	death_sf	Snowflake	bs-snowflake	yes	7	snowflake	death	yes	107644	sql	
+DEMO_SF_PREP_OMOP_2M3	device_exposure_sf	Snowflake	bs-snowflake	yes	15	snowflake	device_exposure	yes	4465485	sql	
+DEMO_SF_PREP_OMOP_2M3	drug_era_sf	Snowflake	bs-snowflake	yes	7	snowflake	drug_era	yes	125872351	sql	
+DEMO_SF_PREP_OMOP_2M3	drug_exposure_sf	Snowflake	bs-snowflake	yes	23	snowflake	drug_exposure	yes	126048050	sql	
+DEMO_SF_PREP_OMOP_2M3	location_sf	Snowflake	bs-snowflake	yes	10	snowflake	location	yes	3185	sql	
+DEMO_SF_PREP_OMOP_2M3	measurement_sf	Snowflake	bs-snowflake	yes	20	snowflake	measurement	yes	74128429	sql	
+DEMO_SF_PREP_OMOP_2M3	observation_period_sf	Snowflake	bs-snowflake	yes	5	snowflake	observation_period	yes	2098515	sql	
+DEMO_SF_PREP_OMOP_2M3	observation_sf	Snowflake	bs-snowflake	yes	18	snowflake	observation	yes	37531051	sql	
+DEMO_SF_PREP_OMOP_2M3	person_sf	Snowflake	bs-snowflake	yes	18	snowflake	person	yes	2326856	sql	
+DEMO_SF_PREP_OMOP_2M3	procedure_occurrence_sf	Snowflake	bs-snowflake	yes	14	snowflake	procedure_occurrence	yes	278769529	sql	
+DEMO_SF_PREP_OMOP_2M3	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	39468906	sql	

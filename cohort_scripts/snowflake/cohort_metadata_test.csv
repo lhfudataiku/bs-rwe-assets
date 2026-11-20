@@ -1,0 +1,3 @@
+cohort_definition_id,cohort_definition_name,cohort_definition_description,cohort_sql_script_filename
+133,Drug exposure: opioid,ATC: N02A,feature_drug_opioids.sql
+10,Untreated hypertension,patients with at least two record of hypertension without any antihypertensive drugs exposure,cohort_untreated_htn.sql

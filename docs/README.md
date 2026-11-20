@@ -13,7 +13,9 @@ below for scope, method and rationale.
 | | |
 |---|---|
 | [`project-scoping.md`](project-scoping.md) | The three parts and the index: scope, business value, personas, owners, success criteria |
-| [`migration-revision-plan.md`](migration-revision-plan.md) | Per-project decisions, the 2026-09-23 audit, Workstreams A, B, D and E (C folded into E), phases and gates |
+| [`migration-revision-plan.md`](migration-revision-plan.md) | Per-project decisions, the 2026-09-23 audit, Workstreams A, B, D and E (C folded into E), six phases and gates |
+| [`solution-revision-plan.md`](solution-revision-plan.md) | Phase 4 (E5): revision of `SOL_RWD_COHORT_DISCOVERY` before the demo suite is recreated: Setup tickets, cohort build redesign, variables, code env, order and gate |
+| [`proposal-v2-cohort-workbench.md`](proposal-v2-cohort-workbench.md) | Proposal (not accepted): v2.0 Cohort Workbench webapp on bs-blueprint, reusing OHDSI backend components; scope, milestones, assistant-led estimate, go/no-go at M0 |
 | [`decisions/DECISION_REGISTER.md`](decisions/DECISION_REGISTER.md) | Durable choices only (`DEC-RWD-###`), with the admission rule |
 | [`governance-mvp-proposal.html`](governance-mvp-proposal.html) | Proposal: market need, today's process against the MVP, stakeholders, scope, sequencing after the migration, changes to the demo suite; technical specification in the appendix (not yet accepted) |
 | [`governance-mvp-proposal.md`](governance-mvp-proposal.md) | Text version of the same proposal, same order; adds nothing the HTML lacks |

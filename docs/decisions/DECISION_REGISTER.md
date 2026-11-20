@@ -54,14 +54,14 @@ decision is superseded, never edited away: add the new record and fill both **Su
 ## DEC-RWD-004 — The demo suite's 2.3M prep project is a full copy of `PREP_RWD_S3_2M3`
 
 - **Date:** 2026-10-16
-- **Status:** accepted
+- **Status:** superseded by DEC-RWD-006
 - **Decision:** `DEMO_SF_PREP_OMOP_2M3`, the 2.3M Snowflake set that was planned as `PREP_RWD_SF_2M3`, is a duplicate of `PREP_RWD_S3_2M3`: the same zones, recipes and dataset names, with its managed datasets on Snowflake. It is the one exception to DEC-RWD-002. `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K` stay sync-only variants.
 - **Rationale:** The demo suite (`DEMO_SF_PREP_OMOP_2M3`, `DEMO_SF_RWD`, `DEMO_SF_RWE`) has to stand alone, so that it can be bundled, moved or rebuilt without its S3 canonical project. A sync-only variant always needs its canonical project next to it at run time.
 - **Alternatives rejected:** A sync-only `PREP_RWD_SF_2M3` (DEC-RWD-002), which ties the demo suite to `PREP_RWD_S3_2M3` at run time. Full copies for every database project, which would give up the single transformation path per size that the solution's test variants rely on.
 - **Evidence:** Owner's revision of the [migration plan](../migration-revision-plan.md#workstream-b--rebuild-the-data-prep-layer) on 2026-10-16 (Workstream B).
 - **Consequences:** This one copy can drift from its canonical project. It passes the schema gate itself (DEC-RWD-003), and its row counts must equal those of `PREP_RWD_S3_2M3`. A change to `PREP_RWD_S3_2M3` is applied to the copy, which is then rebuilt. The copy reruns the 2.3M download and parse. DEC-RWD-001 still holds: the copy keeps lowercase columns.
 - **Supersedes:** —
-- **Superseded by:** —
+- **Superseded by:** DEC-RWD-006 (2026-11-19)
 
 ## DEC-RWD-005 — `bs-snowflake` hosts the suite's Snowflake prep data and demo suite
 
@@ -73,4 +73,16 @@ decision is superseded, never edited away: add the new record and fill both **Su
 - **Evidence:** `dku connection get` and `dku connection test` on 2026-11-05 (DSS 15.2): `bs-snowflake` is `OAUTH2_APP` with per-user credentials; `managed-snowflake` is `KEY_PAIR` with global credentials; both work.
 - **Consequences:** Builds and scenarios on these projects run with the run-as user's Snowflake grant. An expired grant fails builds and makes the index report `UNREADABLE`, as with `bs-databricks-per-user`. Scenarios run as a named user with a current grant, and the grant is renewed before phase 3 and 4 builds. Moving to `managed-snowflake` later means rebuilding all three projects.
 - **Supersedes:** —
+- **Superseded by:** —
+
+## DEC-RWD-006 — The demo suite's 2.3M prep project is a sync-only variant of `PREP_RWD_S3_2M3`
+
+- **Date:** 2026-11-19
+- **Status:** accepted
+- **Decision:** `DEMO_SF_PREP_OMOP_2M3` follows the 1K variant design (DEC-RWD-002): it shares in the 15 tables of `PREP_RWD_S3_2M3` and holds 15 sync recipes writing `<omop_table>_sf` on `bs-snowflake` (DEC-RWD-005), and nothing else. It keeps its demo-suite key. With this, DEC-RWD-002 has no exception.
+- **Rationale:** Owner's choice, after `PREP_RWD_S3_2M3` was built (2026-11-19). A full copy would rerun the 2.3M download (about 25 GB) and the 50 lzo parsers, which filled the DSS host disk when run in parallel, and its Python recipes would write to `bs-snowflake` by row-by-row JDBC inserts (about 5 hours for `concept_ancestor` alone). The 1K variants' syncs used the `S3 to Snowflake` bulk path and built in about 3 minutes. A sync-only variant cannot drift from its canonical project.
+- **Alternatives rejected:** The full copy of DEC-RWD-004, for the cost and drift above. A full copy with only the final 15 tables on Snowflake, which still duplicates the 2.3M ingestion and its transformation logic.
+- **Evidence:** B1 and B3 status in the [migration plan](../migration-revision-plan.md#workstream-b--rebuild-the-data-prep-layer) (2.3M build, 1K sync timings); owner's instruction on 2026-11-19.
+- **Consequences:** The demo suite no longer stands alone: `DEMO_SF_PREP_OMOP_2M3` needs `PREP_RWD_S3_2M3` and its share at build time, so a bundle or move of the demo suite takes the canonical 2.3M project with it, or rebuilds the Snowflake tables first and moves only them. A change to `PREP_RWD_S3_2M3` is followed by a resync, as for any variant. B2 and B4 apply as to the 1K variants. DEC-RWD-001 still holds: columns stay lowercase.
+- **Supersedes:** DEC-RWD-004
 - **Superseded by:** —

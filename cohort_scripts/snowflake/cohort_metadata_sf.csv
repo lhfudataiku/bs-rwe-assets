@@ -1,0 +1,46 @@
+cohort_definition_id,cohort_definition_name,cohort_definition_description,cohort_sql_script_filename
+101,Acute GI bleeding,a gi bleeding diagnosis during an ER/IP encounter,feature_condition_acute_gi_bleeding.sql
+102,Acute respiratory disease,an acute respiratory disease diagnosis,feature_condition_acute_respiratory_disease.sql
+103,Atrial fibrillation,"first diagnosis at ER/IP, or one diagnosis followed by another diagnosis, or at least two records of anticoagulants, or proceeded by an EKG procedure",feature_condition_af.sql
+104,Anemia,first diagnosis of anemia,feature_condition_anemia.sql
+105,Cardiovascular events,"One diagnosis of AMI, HF, or sudden cardiac death between between the date start and the date end of an ER or IP visit.",feature_condition_cardiovascular_events.sql
+106,Cerebrovascular events,"One diagnosis of ischemic stroke, hemorrhagic stroke, or TIA between between the date start and the date end of an ER or IP visit.",feature_condition_cerebrovascular_events.sql
+107,Chronic liver diseases,"first diagnosis of chronic liver disease (alcoholic, non-alcoholic, autoimmune hepatitis, or cirrhosis)",feature_condition_chronic_liver_disease.sql
+108,Chronic kidney disease,"first diagnosis followed by at least two record of dialysis procedures or observations throughout records, or second diagnosis at least 30 days apart.",feature_condition_ckd.sql
+109,Chronic obstructive pulmonary disease,first diagnosis of COPD,feature_condition_chronic_obstructive_lung_disease.sql
+110,Coronary arteriosclerosis,first diagnosis,feature_condition_cad.sql
+111,Dementia,first diagnosis,feature_condition_dementia.sql
+112,Depression,"first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",feature_condition_depression.sql
+113,Diabetes mellitus type 2,"The first condition record of Type 2 Diabetes Mellitus, which is followed by another Type 2 Diabetes Mellitus condition record, at least 2 drugs used to treat Type 2 diabetes, or at least 2 HbA1c measurements with value > 6.5%",feature_condition_dm2.sql
+114,Gastroesophageal reflux disease,first diagnosis followed by at least another diagnosis or having at least two GERD medication records at any time.,feature_condition_gerd.sql
+115,HIV infection,first diagnosis followed by at least another diagnosis or at least two GERD medication records.,feature_condition_hiv.sql
+116,Hyperlipidemia,first diagnosis,feature_condition_hyperlipidemia.sql
+117,Non-skin malignant neoplasms,first non-skin cancer malignant malignancy followed by at least two diagnosis of the same neoplasm type.,feature_condition_cancer.sql
+118,Obesity,first diagnosis,feature_condition_obesity.sql
+119,Osteoarthritis,first diagnosis,feature_condition_osteoarthritis.sql
+120,Peripheral vascular disease,first diagnosis,feature_condition_pvd.sql
+121,Rheumatoid arthritis,first diagnosis,feature_condition_rheumatoid_arthritis.sql
+122,Schizophrenia,"one diagnosis followed by at least one diagnosis, or two records of antipsychotics or psychiatric procedures.",feature_condition_schizophrenia.sql
+123,Urinary tract infection,one diagnosis,feature_condition_uti.sql
+124,Venous thromboembolic evetns,one diagnosis of pulmonary embolism or deep vein thrombosis,feature_condition_venous_thromboembolic_events.sql
+125,Drug exposure: anti-acid agents,ATC: A02,feature_drug_antiacid.sql
+126,Drug exposure: antidepressant,ATC: N06A,feature_drug_antidepressants.sql
+127,Drug exposure: antiepileptics,ATC: N03,feature_drug_antiepileptics.sql
+128,Drug exposure: anti-inflammatory & anti-rheumatoid,ATC: H02 & M01A,feature_drug_antiinflammatory_agents.sql
+129,Drug exposure: antineoplastics,ATC: L01,feature_drug_antineoplastic_agent.sql
+130,Drug exposure: insulin & blood suger lowering agents,"ATC: A10A, A10B",feature_drug_blood_suger_lower_agent.sql
+131,Drug exposure: lipid modifying agents,ATC: C10,feature_drug_lipid_modifying_agent.sql
+132,Drug exposure: med for obstructive airways,ATC: R03,feature_drug_for_obstructive_airway.sql
+133,Drug exposure: opioid,ATC: N02A,feature_drug_opioids.sql
+134,Drug exposure: psycholeptics,ATC: N05,feature_drug_psycholeptics.sql
+135,Drug exposure: systemic antibacterials,ATC: J01,feature_drug_systemic_antibacterials.sql
+0,Firstline monotherapy angiotensin-converting enzyme inhibitors,New users of ACE inhibitors as first-line monotherapy for hypertension,cohort_script_mono_acei.sql
+1,Firstline monotherapy angiotensin receptor blockers,New users of ARB as first-line monotherapy for hypertension,cohort_script_mono_arb.sql
+2,Firstline monotherapy dihydropyridine calcium channel blockers,New users of dihydropyridine CCB as first-line monotherapy for hypertension,cohort_script_mono_dccb.sql
+3,Firstline monotherapy non-dihydropyridine calcium channel blockers,New users of non-dihydropyridine CCB as first-line monotherapy for hypertension,cohort_script_mono_ndccb.sql
+4,Firstline monotherapy thiazide,New users of Thiazide-like as first-line monotherapy for hypertension,cohort_script_mono_thz.sql
+5,Inpatient heart failure,hospitalization for heart failure,cohort_script_hospitalization_hf.sql
+6,Inpatient stroke,hospitalization for cerebrovascular events,cohort_script_hospitalization_stroke.sql
+7,Inpatient acute myocardial infarction,hospitalization for myocardial infarction,cohort_script_hospitalization_ami.sql
+9,CV death,"Death record with at least 1 cardiovascular-related condition record (myocardial infarction, ischemic stroke, intracranial hemorrhage, sudden cardiac death, hospitalization for heart failure) in 30 days prior to death",cohort_script_mortality_cv_events.sql
+10,Untreated hypertension,patients with at least two record of hypertension without any antihypertensive drugs exposure,cohort_untreated_htn.sql

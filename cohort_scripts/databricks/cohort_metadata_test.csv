@@ -1,0 +1,3 @@
+cohort_definition_id,cohort_definition_name,cohort_definition_description,cohort_sql_script_filename
+999,test_db,test,cohort_script_chronic_t2dm_db.sql
+998,test_db2,test2,cohort_script_chronic_ckd_db.sql

@@ -4,10 +4,15 @@
   "DATABRICKSSYNPUFOMOP23DATAPREPERATION",
   "DEMO_DB_RWD2",
   "DEMO_SF_OMOP2M_DATAPREP",
+  "DEMO_SF_PREP_OMOP_2M3",
   "DEMO_SF_RWD",
   "DEMO_SF_RWE",
+  "PREP_RWD_DB_1K",
+  "PREP_RWD_RS_1K",
   "PREP_RWD_S3_100K",
   "PREP_RWD_S3_1K",
+  "PREP_RWD_S3_2M3",
+  "PREP_RWD_SF_1K",
   "RWD1KDATAPREPDEMO",
   "SOL_RWD_COHORT_DISCOVERY",
   "SYNPUF",
@@ -19,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1227,
+ "dss_project_count": 1308,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -132,9 +137,9 @@
      "connection": "bs-databricks",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 6088813,
+      "built": "unknown",
+      "error": "ncept_db`': [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: SELECT COUNT(*) AS n FROM `se-sandbox`.`business_s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -608,9 +613,9 @@
      "connection": "bs-databricks",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 126048050,
+      "built": "unknown",
+      "error": "LException: [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: USE `se-sandbox`.`business_solutions`., caused by:",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -1506,6 +1511,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "SYNPUFOMOP23DATAPREPARATION.care_site_2_3_pc",
     "SYNPUFOMOP23DATAPREPARATION.condition_era_2_3_pc",
@@ -1530,6 +1536,7 @@
    ],
    "git_references": {},
    "name": "Databricks SYNPUF OMOP 2.3% Data Preperation",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -4089,6 +4096,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "charlson_scoring",
     "cohort_metadata",
@@ -4126,6 +4134,7 @@
     }
    },
    "name": "RWD Cohort Discovery",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
@@ -9825,11 +9834,13 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "us_sdoh_county_measure_1"
    ],
    "git_references": {},
    "name": "(Snowflake) SYNPUF OMOP 2M Data Prep",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -9855,8 +9866,991 @@
    "wiki_version": "0.1.0"
   },
   "DEMO_SF_PREP_OMOP_2M3": {
-   "error": "not on DSS",
-   "exists": false
+   "datasets": {
+    "concept_ancestor_sf": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "int"
+      ],
+      [
+       "descendant_concept_id",
+       "int"
+      ],
+      [
+       "min_levels_of_separation",
+       "int"
+      ],
+      [
+       "max_levels_of_separation",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 72374967,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "concept_sf": {
+     "columns": [
+      [
+       "concept_id",
+       "int"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 6088813,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "condition_era_sf": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_era_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 223393336,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "condition_occurrence_sf": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 289182385,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "death_sf": {
+     "columns": [
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "death_date",
+       "dateonly"
+      ],
+      [
+       "death_datetime",
+       "datetimenotz"
+      ],
+      [
+       "death_type_concept_id",
+       "int"
+      ],
+      [
+       "cause_concept_id",
+       "int"
+      ],
+      [
+       "cause_source_value",
+       "string"
+      ],
+      [
+       "cause_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 107644,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "device_exposure_sf": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "device_concept_id",
+       "int"
+      ],
+      [
+       "device_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_type_concept_id",
+       "int"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "int"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 4465485,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "drug_era_sf": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_era_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 125872351,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "drug_exposure_sf": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "float"
+      ],
+      [
+       "days_supply",
+       "int"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "int"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "verbatim_end_date",
+       "dateonly"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 126048050,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "location_sf": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude",
+       "float"
+      ],
+      [
+       "longtitude",
+       "float"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 3185,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "measurement_sf": {
+     "columns": [
+      [
+       "measurement_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "measurement_concept_id",
+       "int"
+      ],
+      [
+       "measurement_date",
+       "dateonly"
+      ],
+      [
+       "measurement_datetime",
+       "datetimenotz"
+      ],
+      [
+       "measurement_type_concept_id",
+       "int"
+      ],
+      [
+       "operator_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "range_low",
+       "float"
+      ],
+      [
+       "range_high",
+       "float"
+      ],
+      [
+       "measurement_source_value",
+       "string"
+      ],
+      [
+       "measurement_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "value_source_value",
+       "string"
+      ],
+      [
+       "measurement_time",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 74128429,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "observation_period_sf": {
+     "columns": [
+      [
+       "observation_period_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_period_start_date",
+       "dateonly"
+      ],
+      [
+       "observation_period_end_date",
+       "dateonly"
+      ],
+      [
+       "period_type_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2098515,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "observation_sf": {
+     "columns": [
+      [
+       "observation_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_concept_id",
+       "int"
+      ],
+      [
+       "observation_date",
+       "dateonly"
+      ],
+      [
+       "observation_datetime",
+       "datetimenotz"
+      ],
+      [
+       "observation_type_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "qualifier_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 37531051,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "person_sf": {
+     "columns": [
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "gender_concept_id",
+       "int"
+      ],
+      [
+       "year_of_birth",
+       "int"
+      ],
+      [
+       "month_of_birth",
+       "int"
+      ],
+      [
+       "day_of_birth",
+       "int"
+      ],
+      [
+       "birth_datetime",
+       "datetimenotz"
+      ],
+      [
+       "race_concept_id",
+       "int"
+      ],
+      [
+       "ethnicity_concept_id",
+       "int"
+      ],
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "person_source_value",
+       "string"
+      ],
+      [
+       "gender_source_value",
+       "string"
+      ],
+      [
+       "gender_source_concept_id",
+       "int"
+      ],
+      [
+       "race_source_value",
+       "string"
+      ],
+      [
+       "race_source_concept_id",
+       "int"
+      ],
+      [
+       "ethnicity_source_value",
+       "string"
+      ],
+      [
+       "ethnicity_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2326856,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "procedure_occurrence_sf": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "procedure_concept_id",
+       "int"
+      ],
+      [
+       "procedure_date",
+       "dateonly"
+      ],
+      [
+       "procedure_datetime",
+       "datetimenotz"
+      ],
+      [
+       "procedure_type_concept_id",
+       "int"
+      ],
+      [
+       "modifier_concept_id",
+       "int"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "int"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 278769529,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "visit_occurrence_sf": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 39468906,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    }
+   },
+   "exists": true,
+   "fetched_at": "2026-11-20T09:41Z",
+   "flow_sources": [
+    "PREP_RWD_S3_2M3.concept",
+    "PREP_RWD_S3_2M3.concept_ancestor",
+    "PREP_RWD_S3_2M3.condition_era",
+    "PREP_RWD_S3_2M3.condition_occurrence",
+    "PREP_RWD_S3_2M3.death",
+    "PREP_RWD_S3_2M3.device_exposure",
+    "PREP_RWD_S3_2M3.drug_era",
+    "PREP_RWD_S3_2M3.drug_exposure",
+    "PREP_RWD_S3_2M3.location",
+    "PREP_RWD_S3_2M3.measurement",
+    "PREP_RWD_S3_2M3.observation",
+    "PREP_RWD_S3_2M3.observation_period",
+    "PREP_RWD_S3_2M3.person",
+    "PREP_RWD_S3_2M3.procedure_occurrence",
+    "PREP_RWD_S3_2M3.visit_occurrence"
+   ],
+   "git_references": {},
+   "name": "DEMO SF PREP OMOP 2M3",
+   "probed_at": "2026-11-20T09:41Z",
+   "variables": {
+    "local": {},
+    "standard": {}
+   },
+   "wiki_articles": [],
+   "wiki_version": ""
   },
   "DEMO_SF_RWD": {
    "datasets": {
@@ -12364,6 +13358,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "DEMO_SF_OMOP2M_DATAPREP.computed_visit_occurrence_stacked",
     "DEMO_SF_OMOP2M_DATAPREP.concept_ancestor_db",
@@ -12396,6 +13391,7 @@
     }
    },
    "name": "(SNOWFLAKE) RWD Cohort Discovery",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
@@ -18966,6 +19962,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "DEMO_DB_RWD2.charlson_score_occurrence",
     "DEMO_DB_RWD2.cohort",
@@ -18979,6 +19976,7 @@
    ],
    "git_references": {},
    "name": "(Snowflake) Real World Evidence",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -19008,12 +20006,1986 @@
    "wiki_version": "0.1.0"
   },
   "PREP_RWD_DB_1K": {
-   "error": "not on DSS",
-   "exists": false
+   "datasets": {
+    "concept_ancestor_db": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "bigint"
+      ],
+      [
+       "descendant_concept_id",
+       "bigint"
+      ],
+      [
+       "min_levels_of_separation",
+       "bigint"
+      ],
+      [
+       "max_levels_of_separation",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 72374967,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "concept_db": {
+     "columns": [
+      [
+       "concept_id",
+       "bigint"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 6088813,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "condition_era_db": {
+     "columns": [
+      [
+       "condition_era_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "condition_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_era_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_era_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_occurrence_count",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 121386,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "condition_occurrence_db": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "condition_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_type_concept_id",
+       "bigint"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_status_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "unknown",
+      "error": "rence_db`': [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: SELECT COUNT(*) AS n FROM `se-sandbox`.`business_s",
+      "rows": null,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "death_db": {
+     "columns": [
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "death_date",
+       "dateonly"
+      ],
+      [
+       "death_datetime",
+       "datetimenotz"
+      ],
+      [
+       "death_type_concept_id",
+       "bigint"
+      ],
+      [
+       "cause_concept_id",
+       "bigint"
+      ],
+      [
+       "cause_source_value",
+       "string"
+      ],
+      [
+       "cause_source_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 45,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "device_exposure_db": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "device_concept_id",
+       "bigint"
+      ],
+      [
+       "device_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_type_concept_id",
+       "bigint"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "bigint"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1622,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "drug_era_db": {
+     "columns": [
+      [
+       "drug_era_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "drug_concept_id",
+       "bigint"
+      ],
+      [
+       "drug_era_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_era_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_count",
+       "bigint"
+      ],
+      [
+       "gap_days",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 52714,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "drug_exposure_db": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "drug_concept_id",
+       "bigint"
+      ],
+      [
+       "drug_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "verbatim_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_type_concept_id",
+       "bigint"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "double"
+      ],
+      [
+       "days_supply",
+       "bigint"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "bigint"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 49542,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "location_db": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude_county",
+       "string"
+      ],
+      [
+       "longitude_county",
+       "string"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 626,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "measurement_db": {
+     "columns": [
+      [
+       "measurement_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "measurement_concept_id",
+       "bigint"
+      ],
+      [
+       "measurement_date",
+       "dateonly"
+      ],
+      [
+       "measurement_datetime",
+       "datetimenotz"
+      ],
+      [
+       "measurement_time",
+       "string"
+      ],
+      [
+       "measurement_type_concept_id",
+       "bigint"
+      ],
+      [
+       "operator_concept_id",
+       "bigint"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_concept_id",
+       "bigint"
+      ],
+      [
+       "range_low",
+       "double"
+      ],
+      [
+       "range_high",
+       "double"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "measurement_source_value",
+       "string"
+      ],
+      [
+       "measurement_source_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "value_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2858,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "observation_db": {
+     "columns": [
+      [
+       "observation_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "observation_concept_id",
+       "bigint"
+      ],
+      [
+       "observation_date",
+       "dateonly"
+      ],
+      [
+       "observation_datetime",
+       "datetimenotz"
+      ],
+      [
+       "observation_type_concept_id",
+       "bigint"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "bigint"
+      ],
+      [
+       "qualifier_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_concept_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 13481,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "observation_period_db": {
+     "columns": [
+      [
+       "observation_period_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "observation_period_start_date",
+       "dateonly"
+      ],
+      [
+       "observation_period_end_date",
+       "dateonly"
+      ],
+      [
+       "period_type_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1048,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "person_db": {
+     "columns": [
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "gender_concept_id",
+       "bigint"
+      ],
+      [
+       "year_of_birth",
+       "bigint"
+      ],
+      [
+       "month_of_birth",
+       "int"
+      ],
+      [
+       "day_of_birth",
+       "int"
+      ],
+      [
+       "birth_datetime",
+       "datetimenotz"
+      ],
+      [
+       "time_of_birth",
+       "string"
+      ],
+      [
+       "race_concept_id",
+       "bigint"
+      ],
+      [
+       "ethnicity_concept_id",
+       "bigint"
+      ],
+      [
+       "location_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "person_source_value",
+       "string"
+      ],
+      [
+       "gender_source_value",
+       "string"
+      ],
+      [
+       "gender_source_concept_id",
+       "bigint"
+      ],
+      [
+       "race_source_value",
+       "string"
+      ],
+      [
+       "race_source_concept_id",
+       "bigint"
+      ],
+      [
+       "ethnicity_source_value",
+       "string"
+      ],
+      [
+       "ethnicity_source_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1000,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "procedure_occurrence_db": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "procedure_concept_id",
+       "bigint"
+      ],
+      [
+       "procedure_date",
+       "dateonly"
+      ],
+      [
+       "procedure_datetime",
+       "datetimenotz"
+      ],
+      [
+       "procedure_type_concept_id",
+       "bigint"
+      ],
+      [
+       "modifier_concept_id",
+       "bigint"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "bigint"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 62189,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    },
+    "visit_occurrence_db": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "visit_concept_id",
+       "bigint"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "care_site_id",
+       "bigint"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "bigint"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-databricks",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 17904,
+      "source": "sql"
+     },
+     "type": "Databricks"
+    }
+   },
+   "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
+   "flow_sources": [
+    "PREP_RWD_S3_1K.concept",
+    "PREP_RWD_S3_1K.concept_ancestor",
+    "PREP_RWD_S3_1K.condition_era",
+    "PREP_RWD_S3_1K.condition_occurrence",
+    "PREP_RWD_S3_1K.death",
+    "PREP_RWD_S3_1K.device_exposure",
+    "PREP_RWD_S3_1K.drug_era",
+    "PREP_RWD_S3_1K.drug_exposure",
+    "PREP_RWD_S3_1K.location",
+    "PREP_RWD_S3_1K.measurement",
+    "PREP_RWD_S3_1K.observation",
+    "PREP_RWD_S3_1K.observation_period",
+    "PREP_RWD_S3_1K.person",
+    "PREP_RWD_S3_1K.procedure_occurrence",
+    "PREP_RWD_S3_1K.visit_occurrence"
+   ],
+   "git_references": {},
+   "name": "PREP RWD DB 1K",
+   "probed_at": "2026-11-18T15:14Z",
+   "variables": {
+    "local": {},
+    "standard": {}
+   },
+   "wiki_articles": [],
+   "wiki_version": ""
   },
   "PREP_RWD_RS_1K": {
-   "error": "not on DSS",
-   "exists": false
+   "datasets": {
+    "concept_ancestor_rs": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "bigint"
+      ],
+      [
+       "descendant_concept_id",
+       "bigint"
+      ],
+      [
+       "min_levels_of_separation",
+       "bigint"
+      ],
+      [
+       "max_levels_of_separation",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 72374967,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "concept_rs": {
+     "columns": [
+      [
+       "concept_id",
+       "bigint"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 6088813,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "condition_era_rs": {
+     "columns": [
+      [
+       "condition_era_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "condition_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_era_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_era_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_occurrence_count",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 121386,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "condition_occurrence_rs": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "condition_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_type_concept_id",
+       "bigint"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_status_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 160322,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "death_rs": {
+     "columns": [
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "death_date",
+       "dateonly"
+      ],
+      [
+       "death_datetime",
+       "datetimenotz"
+      ],
+      [
+       "death_type_concept_id",
+       "bigint"
+      ],
+      [
+       "cause_concept_id",
+       "bigint"
+      ],
+      [
+       "cause_source_value",
+       "string"
+      ],
+      [
+       "cause_source_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 45,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "device_exposure_rs": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "device_concept_id",
+       "bigint"
+      ],
+      [
+       "device_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_type_concept_id",
+       "bigint"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "bigint"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1622,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "drug_era_rs": {
+     "columns": [
+      [
+       "drug_era_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "drug_concept_id",
+       "bigint"
+      ],
+      [
+       "drug_era_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_era_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_count",
+       "bigint"
+      ],
+      [
+       "gap_days",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 52714,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "drug_exposure_rs": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "drug_concept_id",
+       "bigint"
+      ],
+      [
+       "drug_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "verbatim_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_type_concept_id",
+       "bigint"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "double"
+      ],
+      [
+       "days_supply",
+       "bigint"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "bigint"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 49542,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "location_rs": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude_county",
+       "string"
+      ],
+      [
+       "longitude_county",
+       "string"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 626,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "measurement_rs": {
+     "columns": [
+      [
+       "measurement_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "measurement_concept_id",
+       "bigint"
+      ],
+      [
+       "measurement_date",
+       "dateonly"
+      ],
+      [
+       "measurement_datetime",
+       "datetimenotz"
+      ],
+      [
+       "measurement_time",
+       "string"
+      ],
+      [
+       "measurement_type_concept_id",
+       "bigint"
+      ],
+      [
+       "operator_concept_id",
+       "bigint"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_concept_id",
+       "bigint"
+      ],
+      [
+       "range_low",
+       "double"
+      ],
+      [
+       "range_high",
+       "double"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "measurement_source_value",
+       "string"
+      ],
+      [
+       "measurement_source_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "value_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2858,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "observation_period_rs": {
+     "columns": [
+      [
+       "observation_period_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "observation_period_start_date",
+       "dateonly"
+      ],
+      [
+       "observation_period_end_date",
+       "dateonly"
+      ],
+      [
+       "period_type_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1048,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "observation_rs": {
+     "columns": [
+      [
+       "observation_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "observation_concept_id",
+       "bigint"
+      ],
+      [
+       "observation_date",
+       "dateonly"
+      ],
+      [
+       "observation_datetime",
+       "datetimenotz"
+      ],
+      [
+       "observation_type_concept_id",
+       "bigint"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "bigint"
+      ],
+      [
+       "qualifier_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_concept_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 13481,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "person_rs": {
+     "columns": [
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "gender_concept_id",
+       "bigint"
+      ],
+      [
+       "year_of_birth",
+       "bigint"
+      ],
+      [
+       "month_of_birth",
+       "int"
+      ],
+      [
+       "day_of_birth",
+       "int"
+      ],
+      [
+       "birth_datetime",
+       "datetimenotz"
+      ],
+      [
+       "time_of_birth",
+       "string"
+      ],
+      [
+       "race_concept_id",
+       "bigint"
+      ],
+      [
+       "ethnicity_concept_id",
+       "bigint"
+      ],
+      [
+       "location_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "person_source_value",
+       "string"
+      ],
+      [
+       "gender_source_value",
+       "string"
+      ],
+      [
+       "gender_source_concept_id",
+       "bigint"
+      ],
+      [
+       "race_source_value",
+       "string"
+      ],
+      [
+       "race_source_concept_id",
+       "bigint"
+      ],
+      [
+       "ethnicity_source_value",
+       "string"
+      ],
+      [
+       "ethnicity_source_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1000,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "procedure_occurrence_rs": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "procedure_concept_id",
+       "bigint"
+      ],
+      [
+       "procedure_date",
+       "dateonly"
+      ],
+      [
+       "procedure_datetime",
+       "datetimenotz"
+      ],
+      [
+       "procedure_type_concept_id",
+       "bigint"
+      ],
+      [
+       "modifier_concept_id",
+       "bigint"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "bigint"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 62189,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    },
+    "visit_occurrence_rs": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "visit_concept_id",
+       "bigint"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "care_site_id",
+       "bigint"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "bigint"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 17904,
+      "source": "sql"
+     },
+     "type": "Redshift"
+    }
+   },
+   "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
+   "flow_sources": [
+    "PREP_RWD_S3_1K.concept",
+    "PREP_RWD_S3_1K.concept_ancestor",
+    "PREP_RWD_S3_1K.condition_era",
+    "PREP_RWD_S3_1K.condition_occurrence",
+    "PREP_RWD_S3_1K.death",
+    "PREP_RWD_S3_1K.device_exposure",
+    "PREP_RWD_S3_1K.drug_era",
+    "PREP_RWD_S3_1K.drug_exposure",
+    "PREP_RWD_S3_1K.location",
+    "PREP_RWD_S3_1K.measurement",
+    "PREP_RWD_S3_1K.observation",
+    "PREP_RWD_S3_1K.observation_period",
+    "PREP_RWD_S3_1K.person",
+    "PREP_RWD_S3_1K.procedure_occurrence",
+    "PREP_RWD_S3_1K.visit_occurrence"
+   ],
+   "git_references": {},
+   "name": "PREP RWD RS 1K",
+   "probed_at": "2026-11-18T15:14Z",
+   "variables": {
+    "local": {},
+    "standard": {}
+   },
+   "wiki_articles": [],
+   "wiki_version": ""
   },
   "PREP_RWD_S3_100K": {
    "datasets": {
@@ -21772,6 +24744,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "AT_CONCEPT",
     "AT_CONCEPT_ANCESTOR",
@@ -21797,6 +24770,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 100K",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -24328,6 +27302,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -24351,6 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -24359,12 +27335,6295 @@
    "wiki_version": ""
   },
   "PREP_RWD_S3_2M3": {
-   "error": "not on DSS",
-   "exists": false
+   "datasets": {
+    "AT_CONCEPT": {
+     "columns": [
+      [
+       "concept_id",
+       "string"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "string"
+      ],
+      [
+       "valid_end_date",
+       "string"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "hls-synth-patient",
+     "managed": false,
+     "type": "S3"
+    },
+    "AT_CONCEPT_ANCESTOR": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "string"
+      ],
+      [
+       "descendant_concept_id",
+       "string"
+      ],
+      [
+       "min_levels_of_separation",
+       "string"
+      ],
+      [
+       "max_levels_of_separation",
+       "string"
+      ]
+     ],
+     "connection": "hls-synth-patient",
+     "managed": false,
+     "type": "S3"
+    },
+    "AT_CONCEPT_RELATIONSHIP": {
+     "columns": [
+      [
+       "concept_id_1",
+       "string"
+      ],
+      [
+       "concept_id_2",
+       "string"
+      ],
+      [
+       "relationship_id",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "string"
+      ],
+      [
+       "valid_end_date",
+       "string"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "hls-synth-patient",
+     "managed": false,
+     "type": "S3"
+    },
+    "care_site_2_3_pc": {
+     "columns": [
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_NAME",
+       "string"
+      ],
+      [
+       "PLACE_OF_SERVICE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "LOCATION_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PLACE_OF_SERVICE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "care_site_2_3_pc_0": {
+     "columns": [
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_NAME",
+       "string"
+      ],
+      [
+       "PLACE_OF_SERVICE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "LOCATION_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PLACE_OF_SERVICE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "care_site_2_3_pc_1": {
+     "columns": [
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "care_site_name",
+       "string"
+      ],
+      [
+       "place_of_service_concept_id",
+       "int"
+      ],
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "care_site_source_value",
+       "string"
+      ],
+      [
+       "place_of_service_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "care_site_2_3_pc_2": {
+     "columns": [
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "care_site_name",
+       "string"
+      ],
+      [
+       "place_of_service_concept_id",
+       "int"
+      ],
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "care_site_source_value",
+       "string"
+      ],
+      [
+       "place_of_service_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "care_site_2_3_pc_3": {
+     "columns": [
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "care_site_name",
+       "string"
+      ],
+      [
+       "place_of_service_concept_id",
+       "int"
+      ],
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "care_site_source_value",
+       "string"
+      ],
+      [
+       "place_of_service_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "care_site_2_3_pc_db": {
+     "columns": [
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_NAME",
+       "string"
+      ],
+      [
+       "PLACE_OF_SERVICE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "LOCATION_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PLACE_OF_SERVICE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "concept": {
+     "columns": [
+      [
+       "concept_id",
+       "int"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "concept_ancestor": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "int"
+      ],
+      [
+       "descendant_concept_id",
+       "int"
+      ],
+      [
+       "min_levels_of_separation",
+       "int"
+      ],
+      [
+       "max_levels_of_separation",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "concept_relationship_db": {
+     "columns": [
+      [
+       "concept_id_1",
+       "int"
+      ],
+      [
+       "concept_id_2",
+       "int"
+      ],
+      [
+       "relationship_id",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_era_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "condition_era_2_3_pc": {
+     "columns": [
+      [
+       "CONDITION_ERA_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "CONDITION_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CONDITION_ERA_START_DATE",
+       "string"
+      ],
+      [
+       "CONDITION_ERA_END_DATE",
+       "string"
+      ],
+      [
+       "CONDITION_OCCURRENCE_COUNT",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era_2_3_pc_1": {
+     "columns": [
+      [
+       "CONDITION_ERA_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "CONDITION_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CONDITION_ERA_START_DATE",
+       "string"
+      ],
+      [
+       "CONDITION_ERA_END_DATE",
+       "string"
+      ],
+      [
+       "CONDITION_OCCURRENCE_COUNT",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era_2_3_pc_2": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "string"
+      ],
+      [
+       "condition_era_end_date",
+       "string"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era_2_3_pc_3": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "string"
+      ],
+      [
+       "condition_era_end_date",
+       "string"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era_2_3_pc_4": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "string"
+      ],
+      [
+       "condition_era_end_date",
+       "string"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era_2_3_pc_5": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "string"
+      ],
+      [
+       "condition_era_end_date",
+       "string"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_era_2_3_pc_6": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "string"
+      ],
+      [
+       "condition_era_end_date",
+       "string"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_occurrence": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "condition_occurrence_2_3_pc": {
+     "columns": [
+      [
+       "CONDITION_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "CONDITION_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CONDITION_START_DATE",
+       "string"
+      ],
+      [
+       "CONDITION_START_DATETIME",
+       "string"
+      ],
+      [
+       "CONDITION_END_DATE",
+       "string"
+      ],
+      [
+       "CONDITION_END_DATETIME",
+       "string"
+      ],
+      [
+       "CONDITION_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "STOP_REASON",
+       "string"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "CONDITION_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "CONDITION_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CONDITION_STATUS_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "CONDITION_STATUS_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_occurrence_2_3_pc_0": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "string"
+      ],
+      [
+       "condition_start_datetime",
+       "string"
+      ],
+      [
+       "condition_end_date",
+       "string"
+      ],
+      [
+       "condition_end_datetime",
+       "string"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_occurrence_2_3_pc_1": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "string"
+      ],
+      [
+       "condition_start_datetime",
+       "string"
+      ],
+      [
+       "condition_end_date",
+       "string"
+      ],
+      [
+       "condition_end_datetime",
+       "string"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_occurrence_2_3_pc_2": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "string"
+      ],
+      [
+       "condition_start_datetime",
+       "string"
+      ],
+      [
+       "condition_end_date",
+       "string"
+      ],
+      [
+       "condition_end_datetime",
+       "string"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "condition_occurrence_2_3_pc_3": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "string"
+      ],
+      [
+       "condition_start_datetime",
+       "string"
+      ],
+      [
+       "condition_end_date",
+       "string"
+      ],
+      [
+       "condition_end_datetime",
+       "string"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "death": {
+     "columns": [
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "death_date",
+       "dateonly"
+      ],
+      [
+       "death_datetime",
+       "datetimenotz"
+      ],
+      [
+       "death_type_concept_id",
+       "int"
+      ],
+      [
+       "cause_concept_id",
+       "int"
+      ],
+      [
+       "cause_source_value",
+       "string"
+      ],
+      [
+       "cause_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "death_2_3_pc": {
+     "columns": [
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DEATH_DATE",
+       "string"
+      ],
+      [
+       "DEATH_DATETIME",
+       "string"
+      ],
+      [
+       "DEATH_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CAUSE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CAUSE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "CAUSE_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "device_exposure": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "device_concept_id",
+       "int"
+      ],
+      [
+       "device_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_type_concept_id",
+       "int"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "int"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "device_exposure_2_3_pc": {
+     "columns": [
+      [
+       "DEVICE_EXPOSURE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DEVICE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "DEVICE_EXPOSURE_START_DATE",
+       "string"
+      ],
+      [
+       "DEVICE_EXPOSURE_START_DATETIME",
+       "string"
+      ],
+      [
+       "DEVICE_EXPOSURE_END_DATE",
+       "string"
+      ],
+      [
+       "DEVICE_EXPOSURE_END_DATETIME",
+       "string"
+      ],
+      [
+       "DEVICE_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIQUE_DEVICE_ID",
+       "string"
+      ],
+      [
+       "QUANTITY",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "DEVICE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "DEVICE_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "device_exposure_2_3_pc_0": {
+     "columns": [
+      [
+       "DEVICE_EXPOSURE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DEVICE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "DEVICE_EXPOSURE_START_DATE",
+       "string"
+      ],
+      [
+       "DEVICE_EXPOSURE_START_DATETIME",
+       "string"
+      ],
+      [
+       "DEVICE_EXPOSURE_END_DATE",
+       "string"
+      ],
+      [
+       "DEVICE_EXPOSURE_END_DATETIME",
+       "string"
+      ],
+      [
+       "DEVICE_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIQUE_DEVICE_ID",
+       "string"
+      ],
+      [
+       "QUANTITY",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "DEVICE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "DEVICE_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "device_exposure_2_3_pc_1": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "device_concept_id",
+       "int"
+      ],
+      [
+       "device_exposure_start_date",
+       "string"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "string"
+      ],
+      [
+       "device_exposure_end_date",
+       "string"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "string"
+      ],
+      [
+       "device_type_concept_id",
+       "int"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "device_exposure_2_3_pc_2": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "device_concept_id",
+       "int"
+      ],
+      [
+       "device_exposure_start_date",
+       "string"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "string"
+      ],
+      [
+       "device_exposure_end_date",
+       "string"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "string"
+      ],
+      [
+       "device_type_concept_id",
+       "int"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "device_exposure_2_3_pc_3": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "device_concept_id",
+       "int"
+      ],
+      [
+       "device_exposure_start_date",
+       "string"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "string"
+      ],
+      [
+       "device_exposure_end_date",
+       "string"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "string"
+      ],
+      [
+       "device_type_concept_id",
+       "int"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_era_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "drug_era_2_3_pc": {
+     "columns": [
+      [
+       "DRUG_ERA_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DRUG_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "DRUG_ERA_START_DATE",
+       "string"
+      ],
+      [
+       "DRUG_ERA_END_DATE",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_COUNT",
+       "int"
+      ],
+      [
+       "GAP_DAYS",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era_2_3_pc_1": {
+     "columns": [
+      [
+       "DRUG_ERA_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DRUG_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "DRUG_ERA_START_DATE",
+       "string"
+      ],
+      [
+       "DRUG_ERA_END_DATE",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_COUNT",
+       "int"
+      ],
+      [
+       "GAP_DAYS",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era_2_3_pc_2": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "string"
+      ],
+      [
+       "drug_era_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era_2_3_pc_3": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "string"
+      ],
+      [
+       "drug_era_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era_2_3_pc_4": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "string"
+      ],
+      [
+       "drug_era_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era_2_3_pc_5": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "string"
+      ],
+      [
+       "drug_era_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_era_2_3_pc_6": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "string"
+      ],
+      [
+       "drug_era_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_exposure": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "float"
+      ],
+      [
+       "days_supply",
+       "int"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "int"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "verbatim_end_date",
+       "dateonly"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "drug_exposure_2_3_pc": {
+     "columns": [
+      [
+       "DRUG_EXPOSURE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DRUG_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "DRUG_EXPOSURE_START_DATE",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_START_DATETIME",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_END_DATE",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_END_DATETIME",
+       "string"
+      ],
+      [
+       "DRUG_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "STOP_REASON",
+       "string"
+      ],
+      [
+       "REFILLS",
+       "int"
+      ],
+      [
+       "QUANTITY",
+       "double"
+      ],
+      [
+       "DAYS_SUPPLY",
+       "int"
+      ],
+      [
+       "SIG",
+       "string"
+      ],
+      [
+       "ROUTE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "LOT_NUMBER",
+       "string"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "DRUG_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "DRUG_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "ROUTE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "DOSE_UNIT_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_exposure_2_3_pc_0": {
+     "columns": [
+      [
+       "DRUG_EXPOSURE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "DRUG_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "DRUG_EXPOSURE_START_DATE",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_START_DATETIME",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_END_DATE",
+       "string"
+      ],
+      [
+       "DRUG_EXPOSURE_END_DATETIME",
+       "string"
+      ],
+      [
+       "DRUG_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "STOP_REASON",
+       "string"
+      ],
+      [
+       "REFILLS",
+       "int"
+      ],
+      [
+       "QUANTITY",
+       "double"
+      ],
+      [
+       "DAYS_SUPPLY",
+       "int"
+      ],
+      [
+       "SIG",
+       "string"
+      ],
+      [
+       "ROUTE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "LOT_NUMBER",
+       "string"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "DRUG_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "DRUG_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "ROUTE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "DOSE_UNIT_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_exposure_2_3_pc_1": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_exposure_start_date",
+       "string"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "string"
+      ],
+      [
+       "drug_exposure_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "string"
+      ],
+      [
+       "drug_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "double"
+      ],
+      [
+       "days_supply",
+       "int"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "int"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_exposure_2_3_pc_2": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_exposure_start_date",
+       "string"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "string"
+      ],
+      [
+       "drug_exposure_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "string"
+      ],
+      [
+       "drug_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "double"
+      ],
+      [
+       "days_supply",
+       "int"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "int"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "drug_exposure_2_3_pc_3": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_exposure_start_date",
+       "string"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "string"
+      ],
+      [
+       "drug_exposure_end_date",
+       "string"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "string"
+      ],
+      [
+       "drug_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "double"
+      ],
+      [
+       "days_supply",
+       "int"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "int"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "encounter_concepts": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "int"
+      ],
+      [
+       "descendant_concept_id",
+       "int"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "encounter_concepts_ns_joined": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "int"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "descendant_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "location": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude",
+       "float"
+      ],
+      [
+       "longtitude",
+       "float"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "location_2_3_pc": {
+     "columns": [
+      [
+       "LOCATION_ID",
+       "int"
+      ],
+      [
+       "ADDRESS_1",
+       "string"
+      ],
+      [
+       "ADDRESS_2",
+       "string"
+      ],
+      [
+       "CITY",
+       "string"
+      ],
+      [
+       "STATE",
+       "string"
+      ],
+      [
+       "ZIP",
+       "string"
+      ],
+      [
+       "COUNTY",
+       "string"
+      ],
+      [
+       "LOCATION_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "location_2_3_pc_prepared": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude",
+       "float"
+      ],
+      [
+       "longtitude",
+       "float"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "measurement": {
+     "columns": [
+      [
+       "measurement_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "measurement_concept_id",
+       "int"
+      ],
+      [
+       "measurement_date",
+       "dateonly"
+      ],
+      [
+       "measurement_datetime",
+       "datetimenotz"
+      ],
+      [
+       "measurement_type_concept_id",
+       "int"
+      ],
+      [
+       "operator_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "range_low",
+       "float"
+      ],
+      [
+       "range_high",
+       "float"
+      ],
+      [
+       "measurement_source_value",
+       "string"
+      ],
+      [
+       "measurement_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "value_source_value",
+       "string"
+      ],
+      [
+       "measurement_time",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "measurement_occurrence_2_3_pc": {
+     "columns": [
+      [
+       "MEASUREMENT_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_DATE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_DATETIME",
+       "string"
+      ],
+      [
+       "MEASUREMENT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OPERATOR_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "RANGE_LOW",
+       "double"
+      ],
+      [
+       "RANGE_HIGH",
+       "double"
+      ],
+      [
+       "MEASUREMENT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VALUE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "measurement_occurrence_2_3_pc_0": {
+     "columns": [
+      [
+       "MEASUREMENT_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_DATE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_DATETIME",
+       "string"
+      ],
+      [
+       "MEASUREMENT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OPERATOR_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "RANGE_LOW",
+       "double"
+      ],
+      [
+       "RANGE_HIGH",
+       "double"
+      ],
+      [
+       "MEASUREMENT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VALUE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "measurement_occurrence_2_3_pc_1": {
+     "columns": [
+      [
+       "MEASUREMENT_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_DATE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_DATETIME",
+       "string"
+      ],
+      [
+       "MEASUREMENT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OPERATOR_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "RANGE_LOW",
+       "double"
+      ],
+      [
+       "RANGE_HIGH",
+       "double"
+      ],
+      [
+       "MEASUREMENT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VALUE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "measurement_occurrence_2_3_pc_2": {
+     "columns": [
+      [
+       "MEASUREMENT_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_DATE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_DATETIME",
+       "string"
+      ],
+      [
+       "MEASUREMENT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OPERATOR_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "RANGE_LOW",
+       "double"
+      ],
+      [
+       "RANGE_HIGH",
+       "double"
+      ],
+      [
+       "MEASUREMENT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VALUE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "measurement_occurrence_2_3_pc_3": {
+     "columns": [
+      [
+       "MEASUREMENT_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MEASUREMENT_DATE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_DATETIME",
+       "string"
+      ],
+      [
+       "MEASUREMENT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OPERATOR_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "RANGE_LOW",
+       "double"
+      ],
+      [
+       "RANGE_HIGH",
+       "double"
+      ],
+      [
+       "MEASUREMENT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "MEASUREMENT_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VALUE_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "observation": {
+     "columns": [
+      [
+       "observation_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_concept_id",
+       "int"
+      ],
+      [
+       "observation_date",
+       "dateonly"
+      ],
+      [
+       "observation_datetime",
+       "datetimenotz"
+      ],
+      [
+       "observation_type_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "qualifier_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "observation_2_3_pc": {
+     "columns": [
+      [
+       "OBSERVATION_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "OBSERVATION_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OBSERVATION_DATE",
+       "string"
+      ],
+      [
+       "OBSERVATION_DATETIME",
+       "string"
+      ],
+      [
+       "OBSERVATION_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_STRING",
+       "string"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "QUALIFIER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "OBSERVATION_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "OBSERVATION_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "QUALIFIER_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "observation_2_3_pc_0": {
+     "columns": [
+      [
+       "OBSERVATION_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "OBSERVATION_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "OBSERVATION_DATE",
+       "string"
+      ],
+      [
+       "OBSERVATION_DATETIME",
+       "string"
+      ],
+      [
+       "OBSERVATION_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_NUMBER",
+       "double"
+      ],
+      [
+       "VALUE_AS_STRING",
+       "string"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "QUALIFIER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "OBSERVATION_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "OBSERVATION_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "UNIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "QUALIFIER_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "observation_2_3_pc_1": {
+     "columns": [
+      [
+       "observation_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_concept_id",
+       "int"
+      ],
+      [
+       "observation_date",
+       "string"
+      ],
+      [
+       "observation_datetime",
+       "string"
+      ],
+      [
+       "observation_type_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "double"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "qualifier_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "observation_2_3_pc_2": {
+     "columns": [
+      [
+       "observation_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_concept_id",
+       "int"
+      ],
+      [
+       "observation_date",
+       "string"
+      ],
+      [
+       "observation_datetime",
+       "string"
+      ],
+      [
+       "observation_type_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "double"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "qualifier_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "observation_2_3_pc_3": {
+     "columns": [
+      [
+       "observation_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_concept_id",
+       "int"
+      ],
+      [
+       "observation_date",
+       "string"
+      ],
+      [
+       "observation_datetime",
+       "string"
+      ],
+      [
+       "observation_type_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "double"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "qualifier_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "observation_period": {
+     "columns": [
+      [
+       "observation_period_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_period_start_date",
+       "dateonly"
+      ],
+      [
+       "observation_period_end_date",
+       "dateonly"
+      ],
+      [
+       "period_type_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "observation_period_2_3_pc": {
+     "columns": [
+      [
+       "observation_period_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_period_start_date",
+       "string"
+      ],
+      [
+       "observation_period_start_datetime",
+       "string"
+      ],
+      [
+       "observation_period_end_date",
+       "string"
+      ],
+      [
+       "observation_period_end_datetime",
+       "string"
+      ],
+      [
+       "period_type_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "payer_plan_period_2_3_pc": {
+     "columns": [
+      [
+       "PAYER_PLAN_PERIOD_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "PAYER_PLAN_PERIOD_START_DATE",
+       "string"
+      ],
+      [
+       "PAYER_PLAN_PERIOD_END_DATE",
+       "string"
+      ],
+      [
+       "PAYER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PLAN_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "FAMILY_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "payer_plan_period_2_3_pc_db": {
+     "columns": [
+      [
+       "PAYER_PLAN_PERIOD_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "PAYER_PLAN_PERIOD_START_DATE",
+       "date"
+      ],
+      [
+       "PAYER_PLAN_PERIOD_END_DATE",
+       "date"
+      ],
+      [
+       "PAYER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "SPONSOR_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PLAN_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "FAMILY_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PAYER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PLAN_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "SPONSOR_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "STOP_REASON_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PAYER_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PLAN_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "SPONSOR_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "STOP_REASON_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "STOP_REASON_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "person": {
+     "columns": [
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "gender_concept_id",
+       "int"
+      ],
+      [
+       "year_of_birth",
+       "int"
+      ],
+      [
+       "month_of_birth",
+       "int"
+      ],
+      [
+       "day_of_birth",
+       "int"
+      ],
+      [
+       "birth_datetime",
+       "datetimenotz"
+      ],
+      [
+       "race_concept_id",
+       "int"
+      ],
+      [
+       "ethnicity_concept_id",
+       "int"
+      ],
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "person_source_value",
+       "string"
+      ],
+      [
+       "gender_source_value",
+       "string"
+      ],
+      [
+       "gender_source_concept_id",
+       "int"
+      ],
+      [
+       "race_source_value",
+       "string"
+      ],
+      [
+       "race_source_concept_id",
+       "int"
+      ],
+      [
+       "ethnicity_source_value",
+       "string"
+      ],
+      [
+       "ethnicity_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2326856,
+      "source": "metric"
+     },
+     "type": "S3"
+    },
+    "person_2_3_pc": {
+     "columns": [
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "GENDER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "YEAR_OF_BIRTH",
+       "int"
+      ],
+      [
+       "MONTH_OF_BIRTH",
+       "int"
+      ],
+      [
+       "DAY_OF_BIRTH",
+       "int"
+      ],
+      [
+       "BIRTH_DATETIME",
+       "string"
+      ],
+      [
+       "RACE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "ETHNICITY_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "LOCATION_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "PERSON_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "GENDER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "GENDER_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "RACE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "RACE_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "ETHNICITY_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "ETHNICITY_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "procedure_occurrence": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "procedure_concept_id",
+       "int"
+      ],
+      [
+       "procedure_date",
+       "dateonly"
+      ],
+      [
+       "procedure_datetime",
+       "datetimenotz"
+      ],
+      [
+       "procedure_type_concept_id",
+       "int"
+      ],
+      [
+       "modifier_concept_id",
+       "int"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "int"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "procedure_occurrence_2_3_pc": {
+     "columns": [
+      [
+       "PROCEDURE_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "PROCEDURE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROCEDURE_DATE",
+       "string"
+      ],
+      [
+       "PROCEDURE_DATETIME",
+       "string"
+      ],
+      [
+       "PROCEDURE_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MODIFIER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "QUANTITY",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PROCEDURE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PROCEDURE_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MODIFIER_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "procedure_occurrence_2_3_pc_0": {
+     "columns": [
+      [
+       "PROCEDURE_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "PROCEDURE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROCEDURE_DATE",
+       "string"
+      ],
+      [
+       "PROCEDURE_DATETIME",
+       "string"
+      ],
+      [
+       "PROCEDURE_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MODIFIER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "QUANTITY",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PROCEDURE_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "PROCEDURE_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "MODIFIER_SOURCE_VALUE",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "procedure_occurrence_2_3_pc_1": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "procedure_concept_id",
+       "int"
+      ],
+      [
+       "procedure_date",
+       "string"
+      ],
+      [
+       "procedure_datetime",
+       "string"
+      ],
+      [
+       "procedure_type_concept_id",
+       "int"
+      ],
+      [
+       "modifier_concept_id",
+       "int"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "int"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "procedure_occurrence_2_3_pc_2": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "procedure_concept_id",
+       "int"
+      ],
+      [
+       "procedure_date",
+       "string"
+      ],
+      [
+       "procedure_datetime",
+       "string"
+      ],
+      [
+       "procedure_type_concept_id",
+       "int"
+      ],
+      [
+       "modifier_concept_id",
+       "int"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "int"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "procedure_occurrence_2_3_pc_3": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "procedure_concept_id",
+       "int"
+      ],
+      [
+       "procedure_date",
+       "string"
+      ],
+      [
+       "procedure_datetime",
+       "string"
+      ],
+      [
+       "procedure_type_concept_id",
+       "int"
+      ],
+      [
+       "modifier_concept_id",
+       "int"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "int"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "provider_2_3_pc": {
+     "columns": [
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_NAME",
+       "string"
+      ],
+      [
+       "NPI",
+       "string"
+      ],
+      [
+       "DEA",
+       "string"
+      ],
+      [
+       "SPECIALTY_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "YEAR_OF_BIRTH",
+       "int"
+      ],
+      [
+       "GENDER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "SPECIALTY_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "SPECIALTY_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "GENDER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "GENDER_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "provider_2_3_pc_db": {
+     "columns": [
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_NAME",
+       "string"
+      ],
+      [
+       "NPI",
+       "string"
+      ],
+      [
+       "DEA",
+       "string"
+      ],
+      [
+       "SPECIALTY_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "YEAR_OF_BIRTH",
+       "int"
+      ],
+      [
+       "GENDER_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "SPECIALTY_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "SPECIALTY_SOURCE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "GENDER_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "GENDER_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "us_sdoh_county_measure": {
+     "columns": [
+      [
+       "State_code",
+       "string"
+      ],
+      [
+       "County_code",
+       "string"
+      ],
+      [
+       "FIPS",
+       "string"
+      ],
+      [
+       "Percent Below 150% Poverty_county",
+       "string"
+      ],
+      [
+       "Percent No High School Diploma_county",
+       "string"
+      ],
+      [
+       "Percent Housing Cost Burden_county",
+       "string"
+      ],
+      [
+       "Percent Aged 65 and Older_county",
+       "string"
+      ],
+      [
+       "Percent No Health Insurance_county",
+       "string"
+      ],
+      [
+       "Percent Civilian with a Disability_county",
+       "string"
+      ],
+      [
+       "Percent Unemployed_county",
+       "string"
+      ],
+      [
+       "Percent Mobile Homes_county",
+       "string"
+      ],
+      [
+       "Percent No Vehicle_county",
+       "string"
+      ],
+      [
+       "Percent Crowding_county",
+       "string"
+      ],
+      [
+       "Percent Multi Unit Structures_county",
+       "string"
+      ],
+      [
+       "Percent Minority_county",
+       "string"
+      ],
+      [
+       "Percent Aged 17 and Younger_county",
+       "string"
+      ],
+      [
+       "Percent English Language Proficiency_county",
+       "string"
+      ],
+      [
+       "Percent Single Parent Households_county",
+       "string"
+      ],
+      [
+       "Percent Group Quarters_county",
+       "string"
+      ],
+      [
+       "Below 150% Poverty_county Percentile",
+       "string"
+      ],
+      [
+       "No High School Diploma_county Percentile",
+       "string"
+      ],
+      [
+       "Housing Cost Burden_county Percentile",
+       "string"
+      ],
+      [
+       "Aged 65 and Older_county Percentile",
+       "string"
+      ],
+      [
+       "No Health Insurance_county Percentile",
+       "string"
+      ],
+      [
+       "Civilian with a Disability_county Percentile",
+       "string"
+      ],
+      [
+       "Unemployed_county Percentile",
+       "string"
+      ],
+      [
+       "Mobile Homes_county Percentile",
+       "string"
+      ],
+      [
+       "No Vehicle_county Percentile",
+       "string"
+      ],
+      [
+       "Crowding_county Percentile",
+       "string"
+      ],
+      [
+       "Multi Unit Structures_county Percentile",
+       "string"
+      ],
+      [
+       "Minority_county Percentile",
+       "string"
+      ],
+      [
+       "Aged 17 and Younger_county Percentile",
+       "string"
+      ],
+      [
+       "English Language Proficiency_county Percentile",
+       "string"
+      ],
+      [
+       "Single Parent Households_county Percentile",
+       "string"
+      ],
+      [
+       "Group Quarters_county Percentile",
+       "string"
+      ],
+      [
+       "Socioeconomic Status_county Percentile",
+       "string"
+      ],
+      [
+       "Racial and Ethnic Minority Status_county Percentile",
+       "string"
+      ],
+      [
+       "Household Characteristics_county Percentile",
+       "string"
+      ],
+      [
+       "Housing Type and Transportation_county Percentile",
+       "string"
+      ],
+      [
+       "Social Vulnerability Index county",
+       "string"
+      ],
+      [
+       "Population_county",
+       "string"
+      ],
+      [
+       "County_name",
+       "string"
+      ],
+      [
+       "State_name",
+       "string"
+      ],
+      [
+       "Area_county",
+       "string"
+      ],
+      [
+       "Area_sqmi_county",
+       "string"
+      ],
+      [
+       "Population_Density_county",
+       "string"
+      ],
+      [
+       "Latitude_county",
+       "string"
+      ],
+      [
+       "Longitude_county",
+       "string"
+      ],
+      [
+       "Percent Cancer (except skin) Disease_county",
+       "string"
+      ],
+      [
+       "Percent Chronic Kidney Disease_county",
+       "string"
+      ],
+      [
+       "Percent Coronary Heart Disease_county",
+       "string"
+      ],
+      [
+       "Percent Current Asthma Disease_county",
+       "string"
+      ],
+      [
+       "Percent Diabetes Disease_county",
+       "string"
+      ],
+      [
+       "Percent Stroke Disease_county",
+       "string"
+      ],
+      [
+       "Cancer (except skin) Disease_county Percentile",
+       "string"
+      ],
+      [
+       "Chronic Kidney Disease_county Percentile",
+       "string"
+      ],
+      [
+       "Coronary Heart Disease_county Percentile",
+       "string"
+      ],
+      [
+       "Current Asthma Disease_county Percentile",
+       "string"
+      ],
+      [
+       "Diabetes Disease_county Percentile",
+       "string"
+      ],
+      [
+       "Stroke Disease_county Percentile",
+       "string"
+      ],
+      [
+       "cluster_labels",
+       "string"
+      ],
+      [
+       "Percent Covid Vacc Primary Series Disease_county",
+       "string"
+      ],
+      [
+       "Covid Vacc Primary Series Disease_county Percentile",
+       "string"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": false,
+     "type": "UploadedFiles"
+    },
+    "visit_by_observation_occurrence": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_by_procedure_occurrence": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": null,
+      "source": "head"
+     },
+     "type": "S3"
+    },
+    "visit_occurrence_2_3_pc": {
+     "columns": [
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "VISIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VISIT_START_DATE",
+       "string"
+      ],
+      [
+       "VISIT_START_DATETIME",
+       "string"
+      ],
+      [
+       "VISIT_END_DATE",
+       "string"
+      ],
+      [
+       "VISIT_END_DATETIME",
+       "string"
+      ],
+      [
+       "VISIT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "VISIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VISIT_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_2_3_pc_0": {
+     "columns": [
+      [
+       "VISIT_OCCURRENCE_ID",
+       "int"
+      ],
+      [
+       "PERSON_ID",
+       "int"
+      ],
+      [
+       "VISIT_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VISIT_START_DATE",
+       "string"
+      ],
+      [
+       "VISIT_START_DATETIME",
+       "string"
+      ],
+      [
+       "VISIT_END_DATE",
+       "string"
+      ],
+      [
+       "VISIT_END_DATETIME",
+       "string"
+      ],
+      [
+       "VISIT_TYPE_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "PROVIDER_ID",
+       "int"
+      ],
+      [
+       "CARE_SITE_ID",
+       "int"
+      ],
+      [
+       "VISIT_SOURCE_VALUE",
+       "string"
+      ],
+      [
+       "VISIT_SOURCE_CONCEPT_ID",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_2_3_pc_1": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "string"
+      ],
+      [
+       "visit_start_datetime",
+       "string"
+      ],
+      [
+       "visit_end_date",
+       "string"
+      ],
+      [
+       "visit_end_datetime",
+       "string"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_2_3_pc_2": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "string"
+      ],
+      [
+       "visit_start_datetime",
+       "string"
+      ],
+      [
+       "visit_end_date",
+       "string"
+      ],
+      [
+       "visit_end_datetime",
+       "string"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_2_3_pc_3": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "string"
+      ],
+      [
+       "visit_start_datetime",
+       "string"
+      ],
+      [
+       "visit_end_date",
+       "string"
+      ],
+      [
+       "visit_end_datetime",
+       "string"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_2_3_pc_db": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_inpatient": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    },
+    "visit_occurrence_stacked": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
+    }
+   },
+   "exists": true,
+   "fetched_at": "2026-11-20T09:41Z",
+   "flow_sources": [
+    "AT_CONCEPT",
+    "AT_CONCEPT_ANCESTOR",
+    "AT_CONCEPT_RELATIONSHIP",
+    "us_sdoh_county_measure"
+   ],
+   "git_references": {},
+   "name": "PREP RWD S3 2.3M (OMOP CDM v5.3)",
+   "probed_at": "2026-11-20T09:41Z",
+   "variables": {
+    "local": {},
+    "standard": {}
+   },
+   "wiki_articles": [],
+   "wiki_version": ""
   },
   "PREP_RWD_SF_1K": {
-   "error": "not on DSS",
-   "exists": false
+   "datasets": {
+    "concept_ancestor_sf": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "bigint"
+      ],
+      [
+       "descendant_concept_id",
+       "bigint"
+      ],
+      [
+       "min_levels_of_separation",
+       "bigint"
+      ],
+      [
+       "max_levels_of_separation",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 72374967,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "concept_sf": {
+     "columns": [
+      [
+       "concept_id",
+       "bigint"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 6088813,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "condition_era_sf": {
+     "columns": [
+      [
+       "condition_era_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "condition_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_era_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_era_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_occurrence_count",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 121386,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "condition_occurrence_sf": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "condition_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_type_concept_id",
+       "bigint"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_status_concept_id",
+       "bigint"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 160322,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "death_sf": {
+     "columns": [
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "death_date",
+       "dateonly"
+      ],
+      [
+       "death_datetime",
+       "datetimenotz"
+      ],
+      [
+       "death_type_concept_id",
+       "bigint"
+      ],
+      [
+       "cause_concept_id",
+       "bigint"
+      ],
+      [
+       "cause_source_value",
+       "string"
+      ],
+      [
+       "cause_source_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 45,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "device_exposure_sf": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "device_concept_id",
+       "bigint"
+      ],
+      [
+       "device_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_type_concept_id",
+       "bigint"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "bigint"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1622,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "drug_era_sf": {
+     "columns": [
+      [
+       "drug_era_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "drug_concept_id",
+       "bigint"
+      ],
+      [
+       "drug_era_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_era_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_count",
+       "bigint"
+      ],
+      [
+       "gap_days",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 52714,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "drug_exposure_sf": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "drug_concept_id",
+       "bigint"
+      ],
+      [
+       "drug_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "verbatim_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_type_concept_id",
+       "bigint"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "double"
+      ],
+      [
+       "days_supply",
+       "bigint"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "bigint"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 49542,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "location_sf": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude_county",
+       "string"
+      ],
+      [
+       "longitude_county",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 626,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "measurement_sf": {
+     "columns": [
+      [
+       "measurement_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "measurement_concept_id",
+       "bigint"
+      ],
+      [
+       "measurement_date",
+       "dateonly"
+      ],
+      [
+       "measurement_datetime",
+       "datetimenotz"
+      ],
+      [
+       "measurement_time",
+       "string"
+      ],
+      [
+       "measurement_type_concept_id",
+       "bigint"
+      ],
+      [
+       "operator_concept_id",
+       "bigint"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_concept_id",
+       "bigint"
+      ],
+      [
+       "range_low",
+       "double"
+      ],
+      [
+       "range_high",
+       "double"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "measurement_source_value",
+       "string"
+      ],
+      [
+       "measurement_source_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "value_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2858,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "observation_period_sf": {
+     "columns": [
+      [
+       "observation_period_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "observation_period_start_date",
+       "dateonly"
+      ],
+      [
+       "observation_period_end_date",
+       "dateonly"
+      ],
+      [
+       "period_type_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1048,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "observation_sf": {
+     "columns": [
+      [
+       "observation_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "observation_concept_id",
+       "bigint"
+      ],
+      [
+       "observation_date",
+       "dateonly"
+      ],
+      [
+       "observation_datetime",
+       "datetimenotz"
+      ],
+      [
+       "observation_type_concept_id",
+       "bigint"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "bigint"
+      ],
+      [
+       "qualifier_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_concept_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "bigint"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 13481,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "person_sf": {
+     "columns": [
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "gender_concept_id",
+       "bigint"
+      ],
+      [
+       "year_of_birth",
+       "bigint"
+      ],
+      [
+       "month_of_birth",
+       "int"
+      ],
+      [
+       "day_of_birth",
+       "int"
+      ],
+      [
+       "birth_datetime",
+       "datetimenotz"
+      ],
+      [
+       "time_of_birth",
+       "string"
+      ],
+      [
+       "race_concept_id",
+       "bigint"
+      ],
+      [
+       "ethnicity_concept_id",
+       "bigint"
+      ],
+      [
+       "location_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "person_source_value",
+       "string"
+      ],
+      [
+       "gender_source_value",
+       "string"
+      ],
+      [
+       "gender_source_concept_id",
+       "bigint"
+      ],
+      [
+       "race_source_value",
+       "string"
+      ],
+      [
+       "race_source_concept_id",
+       "bigint"
+      ],
+      [
+       "ethnicity_source_value",
+       "string"
+      ],
+      [
+       "ethnicity_source_concept_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 1000,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "procedure_occurrence_sf": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "procedure_concept_id",
+       "bigint"
+      ],
+      [
+       "procedure_date",
+       "dateonly"
+      ],
+      [
+       "procedure_datetime",
+       "datetimenotz"
+      ],
+      [
+       "procedure_type_concept_id",
+       "bigint"
+      ],
+      [
+       "modifier_concept_id",
+       "bigint"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "bigint"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 62189,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "visit_occurrence_sf": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "bigint"
+      ],
+      [
+       "person_id",
+       "bigint"
+      ],
+      [
+       "visit_concept_id",
+       "bigint"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "bigint"
+      ],
+      [
+       "provider_id",
+       "bigint"
+      ],
+      [
+       "care_site_id",
+       "bigint"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "bigint"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 17904,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    }
+   },
+   "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
+   "flow_sources": [
+    "PREP_RWD_S3_1K.concept",
+    "PREP_RWD_S3_1K.concept_ancestor",
+    "PREP_RWD_S3_1K.condition_era",
+    "PREP_RWD_S3_1K.condition_occurrence",
+    "PREP_RWD_S3_1K.death",
+    "PREP_RWD_S3_1K.device_exposure",
+    "PREP_RWD_S3_1K.drug_era",
+    "PREP_RWD_S3_1K.drug_exposure",
+    "PREP_RWD_S3_1K.location",
+    "PREP_RWD_S3_1K.measurement",
+    "PREP_RWD_S3_1K.observation",
+    "PREP_RWD_S3_1K.observation_period",
+    "PREP_RWD_S3_1K.person",
+    "PREP_RWD_S3_1K.procedure_occurrence",
+    "PREP_RWD_S3_1K.visit_occurrence"
+   ],
+   "git_references": {},
+   "name": "PREP RWD SF 1K",
+   "probed_at": "2026-11-18T15:14Z",
+   "variables": {
+    "local": {},
+    "standard": {}
+   },
+   "wiki_articles": [],
+   "wiki_version": ""
   },
   "RWD1KDATAPREPDEMO": {
    "datasets": {
@@ -26890,6 +36149,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "AT_CONCEPT",
     "AT_CONCEPT_ANCESTOR",
@@ -26913,6 +36173,7 @@
    ],
    "git_references": {},
    "name": "RWD 1k Data Prep Demo",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -29406,6 +38667,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "charlson_scoring",
     "cohort",
@@ -29447,6 +38709,7 @@
     }
    },
    "name": "RWD Cohort Discovery",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
@@ -33655,6 +42918,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "AT_CONCEPT",
     "AT_CONCEPT_ANCESTOR",
@@ -33680,6 +42944,7 @@
    ],
    "git_references": {},
    "name": "SYNPUF OMOP 100K Data Preparation",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -34043,9 +43308,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 121386,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -34330,9 +43595,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 160322,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -34601,9 +43866,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 45,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -34892,9 +44157,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 1622,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -35155,9 +44420,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 52714,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -35538,9 +44803,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 49542,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -35893,9 +45158,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 626,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -36264,9 +45529,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 2858,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -36703,9 +45968,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 1048,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -36854,9 +46119,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 13481,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -37281,9 +46546,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 1000,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -37660,9 +46925,9 @@
      "connection": "bs-databricks-per-user",
      "managed": true,
      "probe": {
-      "built": "yes",
-      "error": "",
-      "rows": 62189,
+      "built": "unknown",
+      "error": "timeout after 240s",
+      "rows": null,
       "source": "sql"
      },
      "type": "Databricks"
@@ -39212,6 +48477,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -39235,6 +48501,7 @@
    ],
    "git_references": {},
    "name": "SYNPUF OMOP 1k Data Prep RWD v.1.1",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -41814,6 +51081,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "CDM_CARE_SITE",
     "CDM_CONDITION_ERA",
@@ -41837,6 +51105,7 @@
    ],
    "git_references": {},
    "name": "SYNPUF OMOP 1k Redshift Data Preparation",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -47081,6 +56350,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "AT_CONCEPT",
     "AT_CONCEPT_ANCESTOR",
@@ -47089,6 +56359,7 @@
    ],
    "git_references": {},
    "name": "SYNPUF OMOP 2.3% Data Preparation",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -47179,11 +56450,13 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "persons"
    ],
    "git_references": {},
    "name": "TMP RWD SF column-case test",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -49677,6 +58950,7 @@
     }
    },
    "exists": true,
+   "fetched_at": "2026-11-18T15:14Z",
    "flow_sources": [
     "SYNPUFOMOP1KDATAPREPRWDV11.CDM_CONDITION_ERA_1k",
     "SYNPUFOMOP1KDATAPREPRWDV11.CDM_CONDITION_OCCURRENCE_1k",
@@ -49718,6 +58992,7 @@
     }
    },
    "name": "TMP RWD solution v1.1.2 test",
+   "probed_at": "2026-11-18T15:14Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
@@ -49926,6 +59201,5 @@
    ],
    "wiki_version": "1.1.0"
   }
- },
- "refreshed_at": "2026-11-05T15:56Z"
+ }
 }

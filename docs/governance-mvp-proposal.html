@@ -407,7 +407,7 @@ footer{margin-top:56px;border-top:1px solid var(--green);padding-top:12px;font-f
 <thead><tr><th>Step</th><th>Starts when</th><th>Work</th><th>Exit gate</th></tr></thead>
 <tbody>
 <tr><td><strong>F0 Design</strong></td><td>Scope agreed; needs no DSS change, so it can be drafted at any time</td><td>Decisions; user stories; blueprints and role map; protocol and fitness template; read-only access and governance indexes</td><td>Decisions recorded; index shows gaps as issues</td></tr>
-<tr><td><strong>F1 Data</strong></td><td>Migration phase 5 closed</td><td>Data Quality rules on the export tables; dataset acceptance with terms and pins; sign-off 1</td><td><code>DEMO_SF_PREP_OMOP_2M3</code> accepted in Govern</td></tr>
+<tr><td><strong>F1 Data</strong></td><td>Migration phase 6 closed</td><td>Data Quality rules on the export tables; dataset acceptance with terms and pins; sign-off 1</td><td><code>DEMO_SF_PREP_OMOP_2M3</code> accepted in Govern</td></tr>
 <tr><td><strong>F2 Cohorts</strong></td><td>F1</td><td>Pre-assessments; cohort records, fingerprints, composition check; sign-offs 2 and 3</td><td>Governed cohorts approved</td></tr>
 <tr><td><strong>F3 Study</strong></td><td>F2</td><td>Study record; protocol lock (sign-off 4); scenario, diagnostics and attrition steps in <code>DEMO_SF_RWE</code>; governed rebuild; sign-off 5</td><td>Protocol locked before the rebuild's outcome analysis; study reviewed</td></tr>
 <tr><td><strong>F4 Release</strong></td><td>F3</td><td>Bundles, release manifests, Project Standards scope, sign-off 6; gated deployment</td><td>Suite runs on the automation node from approved bundles</td></tr>
@@ -428,7 +428,7 @@ footer{margin-top:56px;border-top:1px solid var(--green);padding-top:12px;font-f
 <div class="scroll"><table>
 <thead><tr><th>Project</th><th>Done by the migration</th><th>New for the framework</th></tr></thead>
 <tbody>
-<tr><td><strong><code>DEMO_SF_PREP_OMOP_2M3</code></strong></td><td>Created as a full copy of the canonical 2.3M set; 15/15 schema pass; row counts match</td><td>Data Quality rules on the 15 tables with a scenario that stops on failure; recorded data cut, vocabulary and ETL versions; data-use terms in the registry</td></tr>
+<tr><td><strong><code>DEMO_SF_PREP_OMOP_2M3</code></strong></td><td>Created as a sync-only variant of the canonical 2.3M set; 15/15 schema pass; row counts match</td><td>Data Quality rules on the 15 tables with a scenario that stops on failure; recorded data cut, vocabulary and ETL versions; data-use terms in the registry</td></tr>
 <tr><td><strong><code>DEMO_SF_RWD</code></strong></td><td>Recreated from the released solution; 45 cohorts rebuilt; counts checked against the reference</td><td>Integrity rules on the cohort table; a composition check against a stored reference; a fingerprint per governed cohort definition; validation source and expected ranges per governed cohort</td></tr>
 <tr><td><strong><code>DEMO_SF_RWE</code></strong></td><td>Inputs repointed to <code>DEMO_SF_RWD</code>; notebook replaced by a Cox recipe and static report</td><td>Protocol and fitness files in the repo; a scenario that runs the study end to end and stops if the protocol is not locked; a balance and overlap diagnostics step before the Cox model; an attrition table; a deviations log</td></tr>
 <tr><td><strong>All three</strong></td><td>Library pinned to the release tag</td><td>Suite groups and export permissions; suite tag and Project Standards; one bundle per release; Govern sync; the deployment gate</td></tr>
@@ -539,7 +539,7 @@ footer{margin-top:56px;border-top:1px solid var(--green);padding-top:12px;font-f
 <tr><td>L4</td><td>Every result pinned to data cut, CDM, vocabulary and ETL versions, cohort hashes and code tag</td><td>Dataset, cohort and study records</td><td><code>governance.tsv</code>; issue <code>VERSION_UNPINNED</code></td></tr>
 <tr><td colspan="4"><strong>Data and cohort validation</strong></td></tr>
 <tr><td>V1</td><td>Schema contract: 15/15 v1.1 pass and built before anything downstream (DEC-RWD-003, gate B2)</td><td>DSS Data Quality rules on the 15 export tables; scenario stops on failure</td><td><code>schema_compliance.tsv</code>; DQ results</td></tr>
-<tr><td>V2</td><td>Demo copy matches its canonical project (DEC-RWD-004, gate B4)</td><td>Row-count rule against <code>PREP_RWD_S3_2M3</code></td><td><code>datasets.tsv</code></td></tr>
+<tr><td>V2</td><td>Demo variant matches its canonical project (DEC-RWD-006, gate B4)</td><td>Row-count rule against <code>PREP_RWD_S3_2M3</code></td><td><code>datasets.tsv</code></td></tr>
 <tr><td>V3</td><td>The 3 sample cohorts give identical counts on SF, DB and RS (E4)</td><td>Release test scenario</td><td><code>dialect_counts</code></td></tr>
 <tr><td>V4</td><td>2.3M counts match the recorded reference (heart failure 188,113, stroke 57,077, AMI 30,784 on 2025-10-06)</td><td>DQ rule on <code>cohort_building_log</code></td><td><code>reference_count</code></td></tr>
 <tr><td>V5</td><td>Cohort integrity: non-null subject, start ≤ end, episode inside an observation period, no duplicates</td><td>DQ rules on <code>cohort</code></td><td><code>dq_result</code></td></tr>

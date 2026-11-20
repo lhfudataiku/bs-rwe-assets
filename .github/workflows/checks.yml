@@ -12,12 +12,19 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04 (2026-11), which has no Python 3.9 build, so
+    # setup-python failed before any check ran. 3.9 stays the compatibility floor; 3.13 is the
+    # Python of the DSS 15.2 code envs the suite runs on.
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.13']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: ${{ matrix.python-version }}
       # Fails on a stale index, a NEW issue (missing project, failing schema row, broken share),
       # or a baseline entry that is fixed but not yet deleted.
       - name: Index and issue baseline

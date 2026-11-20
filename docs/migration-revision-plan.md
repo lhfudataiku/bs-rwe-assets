@@ -2,16 +2,16 @@
 
 Sep 23, 2026 · @Li-Heng Fu
 
-> **Lifecycle:** Planning (active until phase 5 closes) · **Part:** all · **Audience:** asset owners and
+> **Lifecycle:** Planning (active until phase 6 closes) · **Part:** all · **Audience:** asset owners and
 > contributors executing the migration · **Authority:** per-project decisions, step order and gates ·
 > **Update when:** a step completes, a gate changes or an open question is decided. Live state is in
 > `.index/`, not here.
 
 ## Summary and target end state
 
-The suite goes from 11 in-scope projects to 10. Three S3 canonical projects, three sync-only database variants and one full copy for the demo suite replace seven prep projects, and `DEMO_DB_RWD2` is retired once `DEMO_SF_RWE` no longer depends on it. The solution is revised first (Workstream E), its code moves into this repo, and it is tested against every SQL `PREP_RWD_*` project. The demo suite is `DEMO_SF_PREP_OMOP_2M3` → `DEMO_SF_RWD` → `DEMO_SF_RWE`. Publishing it to the automation node is out of scope for now: it needs someone with authority to deploy to that instance.
+The suite goes from 11 in-scope projects to 10. Three S3 canonical projects, four sync-only database variants (three for testing, one for the demo suite) replace seven prep projects, and `DEMO_DB_RWD2` is retired once `DEMO_SF_RWE` no longer depends on it. The solution is revised first (Workstream E), its code moves into this repo, and it is tested against every SQL `PREP_RWD_*` project. The demo suite is `DEMO_SF_PREP_OMOP_2M3` → `DEMO_SF_RWD` → `DEMO_SF_RWE`. Publishing it to the automation node is out of scope for now: it needs someone with authority to deploy to that instance.
 
-*Revised 2026-10-16:* the 2.3M Snowflake set is renamed `DEMO_SF_PREP_OMOP_2M3` and is a full copy of `PREP_RWD_S3_2M3`, the one exception to DEC-RWD-002 ([DEC-RWD-004](decisions/DECISION_REGISTER.md#dec-rwd-004--the-demo-suites-23m-prep-project-is-a-full-copy-of-prep_rwd_s3_2m3)); the `PREP_RWD_*` database variants stay sync-only; `DEMO_SF_RWD` is recreated from the revised solution; Workstream D waits for Workstream E.
+*Revised 2026-10-16:* the 2.3M Snowflake set is renamed `DEMO_SF_PREP_OMOP_2M3` and is a full copy of `PREP_RWD_S3_2M3`, the one exception to DEC-RWD-002 ([DEC-RWD-004](decisions/DECISION_REGISTER.md#dec-rwd-004--the-demo-suites-23m-prep-project-is-a-full-copy-of-prep_rwd_s3_2m3), superseded 2026-11-19 by [DEC-RWD-006](decisions/DECISION_REGISTER.md#dec-rwd-006--the-demo-suites-23m-prep-project-is-a-sync-only-variant-of-prep_rwd_s3_2m3): it is a sync-only variant like the 1K ones); the `PREP_RWD_*` database variants stay sync-only; `DEMO_SF_RWD` is recreated from the revised solution; Workstream D waits for Workstream E.
 
 New prep project keys use the pattern `PREP_RWD_<storage>_<size>`. Projects of the demo suite start with `DEMO_SF_`.
 
@@ -96,7 +96,7 @@ tools/push_wiki.py            # drift report by default, --push to write
 
 ## Workstream B — Rebuild the data prep layer
 
-Build three S3 canonical projects from the two reference workflows, gate them on the schema check, then generate the three `PREP_RWD_*` database variants by sync only (DEC-RWD-002). The demo suite's `DEMO_SF_PREP_OMOP_2M3` is the exception: a full copy of `PREP_RWD_S3_2M3` (DEC-RWD-004). Solid arrows are shares with sync recipes; the dotted arrow is "copied from", and the copy reads no other project at run time.
+Build three S3 canonical projects from the two reference workflows, gate them on the schema check, then generate the three `PREP_RWD_*` database variants by sync only (DEC-RWD-002). The demo suite's `DEMO_SF_PREP_OMOP_2M3` is built the same way from `PREP_RWD_S3_2M3` (DEC-RWD-006). Arrows are shares with sync recipes.
 
 ```mermaid
 flowchart LR
@@ -104,7 +104,7 @@ flowchart LR
   A --> DB1[PREP_RWD_DB_1K]
   A --> RS1[PREP_RWD_RS_1K]
   B[PREP_RWD_S3_100K]
-  C[PREP_RWD_S3_2M3] -.copy.-> SF2[DEMO_SF_PREP_OMOP_2M3]
+  C[PREP_RWD_S3_2M3] --> SF2[DEMO_SF_PREP_OMOP_2M3]
 ```
 
 **B1. Canonical S3 projects**
@@ -119,24 +119,55 @@ Every canonical project exposes exactly the 15 tables with lowercase names `<omo
 
 **B1 status (2026-11-05): `PREP_RWD_S3_1K` created.** Duplicated from `SYNPUFOMOP1KDATAPREPRWDV11` after its scratch notebooks were deleted (one used the removed `solution_rwd-cohort-discovery` code env, which blocks duplication; DSS duplication always copies notebooks). The uploaded raw files came across. Removed: the `SF`, `RS` and `DB` zones with their 49 recipes and 49 datasets (definitions only, no data dropped; nothing kept read them). Zone `redshift` renamed `OMOP CDM export`, holding the 15 tables plus the `visit_*`, `CDM_VISIT_OCCURRENCE_1k` and `CDM_CARE_SITE_prepared` intermediates; the 13 `CDM_*_1k` tables and `visit_occurrence_revised` renamed to `<omop_table>` with storage paths to match. Built with schema auto-update off. 
 
-*`PREP_RWD_S3_100K` (2026-11-05):* duplicated from `SYNPUFOMOP100KDATAPREPARATION` rather than the 1K flow, because that project already has a full S3 workflow whose tables pass v1.1 on 14 of 15, and its raw files differ in layout from the 1K uploads. Removed the `OMOP Output - Snowflake` zone (22 recipes, 22 dataset definitions; nothing kept read them). Added `compute_concept_ancestor` (no steps, Parquet, from the int-typed `AT_CONCEPT_ANCESTOR`, which reads the same Athena file as the 1K). Raw inputs renamed `raw_<table>` to free the OMOP names; the Python recipe `compute_location_prepared` updated to the new names. `visit_occurrence` is `visit_occurrence_revised`, as in 1K. The first build failed on all 17 raw files: they were plain CSV under `.csv.gz` names (checked server-side, no data left DSS), and DSS decompresses by extension. The bucket owner rewrote them as real gzip under the same names, so no paths changed. Built with schema auto-update off; B2 passes 15/15. Row counts (DSS metrics) match the old project's S3 tables on all 13 shared tables plus `concept` (`person` 100,000; `location` 3,090; `condition_occurrence` 12,695,221). `concept_ancestor` has 72,374,967 rows, as in 1K. `visit_occurrence` has 1,802,032 rows against the old 4,785,453, because the v5.3 rules regroup the raw visits. `PREP_RWD_S3_2M3` not started.
+*`PREP_RWD_S3_100K` (2026-11-05):* duplicated from `SYNPUFOMOP100KDATAPREPARATION` rather than the 1K flow, because that project already has a full S3 workflow whose tables pass v1.1 on 14 of 15, and its raw files differ in layout from the 1K uploads. Removed the `OMOP Output - Snowflake` zone (22 recipes, 22 dataset definitions; nothing kept read them). Added `compute_concept_ancestor` (no steps, Parquet, from the int-typed `AT_CONCEPT_ANCESTOR`, which reads the same Athena file as the 1K). Raw inputs renamed `raw_<table>` to free the OMOP names; the Python recipe `compute_location_prepared` updated to the new names. `visit_occurrence` is `visit_occurrence_revised`, as in 1K. The first build failed on all 17 raw files: they were plain CSV under `.csv.gz` names (checked server-side, no data left DSS), and DSS decompresses by extension. The bucket owner rewrote them as real gzip under the same names, so no paths changed. Built with schema auto-update off; B2 passes 15/15. Row counts (DSS metrics) match the old project's S3 tables on all 13 shared tables plus `concept` (`person` 100,000; `location` 3,090; `condition_occurrence` 12,695,221). `concept_ancestor` has 72,374,967 rows, as in 1K. `visit_occurrence` has 1,802,032 rows against the old 4,785,453, because the v5.3 rules regroup the raw visits.
+
+*`PREP_RWD_S3_2M3` (2026-11-19):* duplicated from `SYNPUFOMOP23DATAPREPARATION`, which is unchanged. Its 21 scratch notebooks were deleted. The source's code env `test_fda` no longer exists, so the duplicate remapped it to a new dedicated env `prep_rwd_s3_2m3` (lzop shipped as an env resource, path in `LZOP_BIN`). That env is the project default, and all 51 Python recipes inherit it. Changes against the source:
+
+- Dates: the Prepare steps output `dateonly`/`datetimenotz`, so no table keeps the legacy `date` type.
+- Column case: the final rename steps lowercase the columns, and the vocabulary Prepares no longer uppercase them.
+- v5.2 leftovers: `observation_period` drops its two `*_datetime` columns.
+- `drug_exposure`: the end date is `start + days_supply` when `days_supply` is set (formula `toString(inc(asDate(...), DAYS_SUPPLY, "days"), "yyyy-MM-dd")`; this DSS has no `formatDate`/`parseDate`).
+- Visit type (fixed 2026-11-20): the 2.3M source codes every raw visit 9201, so the 1K/100K inpatient filter cannot be used. `compute_visit_occurrence_inpatient` takes raw inpatient claims by claim-id prefix (`visit_source_value` starting 99, 45, 44, 19, 89, 84, 69, 59, 74, 29 or 14; 731,860 visits, 98.6% multi-day, median stay 4 days, like the raw 9201 claims at 1K and 100K). `compute_visit_occurrence_stacked` unions it with the observation and procedure visit joins. `compute_visit_occurrence` (Top N) keeps one row per `visit_occurrence_id`, ranking 262, 9201, 9203, 9202, 581476, 8676, 45889908. Result: 39,468,906 visits (17.0 per person, as at 1K and 100K); outpatient 77.3%, ER 8.7%, nursing facility 6.4%, inpatient 5.1%, home 1.5%, critical care 1.1%. Inpatient is lower than at 1K and 100K (6.5%) because 2.3M has fewer raw inpatient claims per person (0.31 against about 0.55). Build these steps one job at a time: a multi-target forced build runs them in parallel and the stack reads the inpatient folder while it is rewritten.
+- The 50 lzo parsers call `os.environ["LZOP_BIN"]` and detect a header row: a file whose first field equals the first schema column (any case) is read with `header=0`. Before this, the header line of some parts was read as data.
+- The 15 tables are named `<omop_table>`, with matching storage paths and `compute_<omop_table>` recipes, in zone `OMOP CDM export`, with descriptions.
+- The `condition_era_2_3_pc` uniqueness rule now names `CONDITION_ERA_ID` and no longer runs on build: a COUNT_DISTINCT over the full S3 dataset outlives the metrics worker and blocks the flow. Run it by hand.
+
+The archives (about 25 GB) are downloaded into the project's managed folder. Build parsers that decompress large parts one at a time: three `condition_occurrence`/`procedure_occurrence` parsers decompressing in parallel filled the DSS host disk on the first full build. Built with schema auto-update off. B2 passes 15/15 (index refresh 2026-11-19). `person` has 2,326,856 rows (DSS metric). In a 200k-row sample of `drug_exposure`, every end date is set, and all 175,889 rows with `days_supply` have end = start + days. `location` is built, which clears the old project's unbuilt `location` once D3 retires it.
 
 **B2. Schema gate.** Nothing downstream is built until `schema_compliance.tsv` shows 15/15 pass for the project. Record row counts per table in `datasets.tsv`. The gate applies to every variant and to `DEMO_SF_PREP_OMOP_2M3`, which runs its own transformations.
 
 **B3. Database projects.** Each one is built after its canonical project passes B2.
 
 - *Variants* (`PREP_RWD_SF_1K`, `PREP_RWD_DB_1K`, `PREP_RWD_RS_1K`, DEC-RWD-002): a new project that shares in the 15 canonical tables and has 15 sync recipes and nothing else. Names follow `<omop_table>_<conn>`, for example `person_sf`.
-- *Demo copy* (`DEMO_SF_PREP_OMOP_2M3`, DEC-RWD-004): a duplicate of `PREP_RWD_S3_2M3` with the same zones, recipes and dataset names. Only the managed datasets move to Snowflake. The managed folder that holds the 2.3M lzo archives stays on its own storage.
+- *Demo variant* (`DEMO_SF_PREP_OMOP_2M3`, DEC-RWD-006): built like the 1K variants, from the 15 tables of `PREP_RWD_S3_2M3`, with outputs `<omop_table>_sf`. It keeps its demo-suite key. It replaces DEC-RWD-004's full copy, so the 2.3M download and parse run once, in the canonical project.
 
 Connections and rules for both:
 
 - `PREP_RWD_SF_1K` and `DEMO_SF_PREP_OMOP_2M3`: `bs-snowflake` (DEC-RWD-005). It uses per-user OAuth, so builds run with the run-as user's grant (see Risks). `DEMO_SF_PREP_OMOP_2M3` belongs to the demo suite.
 - `PREP_RWD_DB_1K`: `bs-databricks`, a global personal-access-token connection (tested 2026-11-05), not `bs-databricks-per-user`. The per-user OAuth token expiry made it unreadable during this audit.
 - `PREP_RWD_RS_1K`: `redshift-solutions`.
-- Keep columns lowercase. The solution's import step uppercases them (DEC-RWD-001), so the variants and the demo copy stay faithful to the canonical layer.
-- A canonical change is followed by rebuilding its variants. A change to `PREP_RWD_S3_2M3` is also applied to `DEMO_SF_PREP_OMOP_2M3`, which is then rebuilt and rechecked against B2 and B4. Without a share nothing else keeps the copy in step.
+- Keep columns lowercase. The solution's import step uppercases them (DEC-RWD-001), so the variants and the demo variant stay faithful to the canonical layer.
+- A canonical change is followed by rebuilding its variants, `DEMO_SF_PREP_OMOP_2M3` included, and rechecking them against B2 and B4.
 
-**B4. Verify.** Row counts in each variant and in the demo copy equal the canonical ones, and the solution's "Check OMOP CDM Schema" scenario passes against each of them.
+**B3 status (2026-11-18): `PREP_RWD_SF_1K` created and built.** The 15 tables of `PREP_RWD_S3_1K` are shared to it (share rules added on the canonical project; quick sharing was already on), and 15 sync recipes `sync_<omop_table>` write `<omop_table>_sf` on `bs-snowflake` (`DKU_SOLUTION_DESIGN.SOL_DESIGN.PREP_RWD_SF_1K_<TABLE>_SF`, the old 1K layout). DSS chose the `S3 to Snowflake` fast path (bulk load, not JDBC inserts), so the whole set built in under 3 minutes, including the 72M-row `concept_ancestor`. Columns stay quoted lowercase. Built with schema auto-update off; B2 passes 15/15. Datasets and recipes carry descriptions; there are no zones or wiki yet (A4).
+
+*`PREP_RWD_DB_1K` and `PREP_RWD_RS_1K` (2026-11-18):* built the same way, with share rules on `PREP_RWD_S3_1K`, 15 `sync_<omop_table>` recipes and outputs `<omop_table>_db` on `bs-databricks` (`se-sandbox.business_solutions.PREP_RWD_DB_1K_<table>_db`) and `<omop_table>_rs` on `redshift-solutions` (database `design`, connection default schema). DSS chose the bulk paths `S3 to Databricks` (`COPY INTO`) and `S3 to Redshift` (`COPY`); each set built in about 3 minutes. Columns stay lowercase. One Databricks build failed with `DELTA_METADATA_CHANGED`, most likely because dataset descriptions were being saved during the build (DSS writes them as table comments); a rerun with nothing else running succeeded. So set descriptions before or after a Databricks build, not during it.
+
+*`DEMO_SF_PREP_OMOP_2M3` (2026-11-19):* created as a sync-only variant of `PREP_RWD_S3_2M3` (DEC-RWD-006), the same way as `PREP_RWD_SF_1K`. It has share rules on the canonical project for the 15 tables, and 15 `sync_<omop_table>` recipes writing `<omop_table>_sf` on `bs-snowflake` (`DKU_SOLUTION_DESIGN.SOL_DESIGN.DEMO_SF_PREP_OMOP_2M3_<TABLE>_SF`). Dataset and recipe settings and descriptions are copied from the 1K variant. Every sync used `S3 to Snowflake` (`COPY INTO`), and the whole set built in 7 minutes. Built with schema auto-update off. B2 passes 15/15.
+
+**B4. Verify.** Row counts in each variant and in the demo variant equal the canonical ones, and the solution's "Check OMOP CDM Schema" scenario passes against each of them.
+
+*`PREP_RWD_SF_1K`, `PREP_RWD_DB_1K`, `PREP_RWD_RS_1K` (2026-11-18):* the row counts (SQL) of all three variants equal each other and the 1K counts in every older copy of the same data: the `SYNPUFOMOP1KDATAPREPRWDV11` S3 metrics and its Redshift and Databricks SQL counts (`person` 1,000; `visit_occurrence` 17,904; `concept` 6,088,813; `concept_ancestor` 72,374,967). `PREP_RWD_S3_1K` itself has no record-count metrics, and they were not computed, because a count on large S3 datasets can stall the project. The "Check OMOP CDM Schema" half of B4 runs in E4, when the solution is configured on each variant. B3 and B4 are done for the 1K variants except that check; the demo variant waits for `PREP_RWD_S3_2M3`.
+
+*`DEMO_SF_PREP_OMOP_2M3` (2026-11-19):* row counts (SQL) are `person` 2,326,856, `condition_occurrence` 289,182,385, `visit_occurrence` 39,468,906 (after the 2026-11-20 visit fix, one row per visit) and `location` 3,185. Twelve tables equal the old `SYNPUFOMOP23DATAPREPARATION` S3 metrics. Three do not:
+
+- `condition_occurrence` now has every id from 1 to 289,182,385, once each. The old project had 252,664,961, so it was missing parts.
+- `location` was never built in the old project.
+- `visit_occurrence`: the old project exposed the 111,637,582 raw visits, all coded 9201; this one types visits as described under B1.
+
+The sync loads every file of the canonical tables, and `PREP_RWD_S3_2M3` has no record-count metrics apart from `person` (not computed, for the stall risk). The "Check OMOP CDM Schema" half runs through `DEMO_SF_RWD` in D1.
+
+*Open finding (2026-11-19), fixed for 2.3M on 2026-11-20: duplicate `visit_occurrence_id`.* The canonical flows build `visit_occurrence` as a union of raw inpatient visits and visits typed from observation and procedure codes, which reuse the raw visit id. A visit with several types got several rows. 2.3M now keeps one row per visit (B1). `PREP_RWD_S3_1K` (17,904 rows for 17,041 ids) and `PREP_RWD_S3_100K` (1,802,032 rows for 1,717,287 ids) still repeat ids; the same Top N step would fix them, followed by a resync of the 1K variants and an E4 rerun.
 
 ## Workstream E — `SOL_RWD_COHORT_DISCOVERY` revision
 
@@ -184,17 +215,21 @@ Fix in the manifest code, not in one project's variables, because `DEMO_SF_RWD` 
 
 Before E4, run Reconfigure on Snowflake in the solution: all of its datasets are on Filesystem storage today. That is a DSS change and needs the owner's approval.
 
-**E3. Release candidate.** The release is built on branch `v1-2` with import fixes 1–3, 5 and 6 and the E2 fix. `v1-2` is merged into `main` only when the migration plan closes (phase 5), so until then `SOL_RWD_COHORT_DISCOVERY`, and `DEMO_SF_RWD` once D1 copies it, follow `v1-2` and are resynced after each push. At the merge, tag the merge commit and pin both to the tag. Update the solution's wiki Release Notes and Data Model article (drafts in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`). Rerun column-case tests 1, 3 and 6 in `TMP_RWD_SF_COLCASE_TEST` against the release and turn them into an index check ([appendix](#appendix--column-case-test-evidence-for-dec-rwd-001)).
+**E3. Release candidate.** The release is built on branch `v1-2` with import fixes 1–3, 5 and 6 and the E2 fix. `v1-2` is merged into `main` only when the migration plan closes (phase 6), so until then `SOL_RWD_COHORT_DISCOVERY`, and `DEMO_SF_RWD` once D1 copies it, follow `v1-2` and are resynced after each push. At the merge, tag the merge commit and pin both to the tag. Update the solution's wiki Release Notes and Data Model article (drafts in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`). Rerun column-case tests 1, 3 and 6 in `TMP_RWD_SF_COLCASE_TEST` against the release and turn them into an index check ([appendix](#appendix--column-case-test-evidence-for-dec-rwd-001)).
 
-**Status (2026-11-05):** `SOL_RWD_COHORT_DISCOVERY` pulls `python/solution` from this repo (path `solution`), follows branch `v1-2` and is synced at `a7d922a`; Project Setup renders on that library. Its `main_connection` is `bs-snowflake` in both scopes (DEC-RWD-005). A tag `v1-2-0` was pushed on `2b4341e` before the merge-at-the-end rule; it is re-cut on the merge commit in phase 5. Still open: push the Release Notes (1.2.0) and Overview version drafts with `tools/push_wiki.py --push`, and rerun column-case tests 1, 3 and 6.
+**Status (2026-11-05):** `SOL_RWD_COHORT_DISCOVERY` pulls `python/solution` from this repo (path `solution`), follows branch `v1-2` and is synced at `a7d922a`; Project Setup renders on that library. Its `main_connection` is `bs-snowflake` in both scopes (DEC-RWD-005). A tag `v1-2-0` was pushed on `2b4341e` before the merge-at-the-end rule; it is re-cut on the merge commit in phase 6. Still open: push the Release Notes (1.2.0) and Overview version drafts with `tools/push_wiki.py --push`, and rerun column-case tests 1, 3 and 6.
 
 **E4. Test against every SQL prep project.** For each of `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K`, configure the solution through Project Setup with `main_connection` on the same connection type as the prep set. Then run "Check OMOP CDM Schema", the import, the 3 sample cohorts and the covariate build. Cohort counts must be identical across the three. The S3 canonical projects cannot be inputs: the import runs in-database, and the earlier S3 attempt with `v1-1-2` failed by design. The `PREP_RWD_SF_1K` run is also the import fixes' open Snowflake test. They are covered through their copies. `DEMO_SF_PREP_OMOP_2M3` is tested through `DEMO_SF_RWD` in D1. The release project ends on `PREP_RWD_SF_1K`.
 
-**Done when:** `SOL_RWD_COHORT_DISCOVERY` runs the `v1-2` library from this repo, Project Setup shows no errors, and E4 passes on all three variants. Tagging and pinning happen at the phase 5 merge.
+**E4 status (2026-11-19): passed.** The test set is `cohort_scripts/<dialect>/cohort_metadata_e4.csv` (1 Anemia, 2 Diabetes mellitus type 2, 3 Depression), each dialect with its own scripts. Counts are identical on `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K`: 611, 593 and 247. A first run with the demo's chronic kidney disease, depression and T2DM scripts was discarded. Bundles `e4-pre-test-2026-11-18` and `e4-rerun-pre-2026-11-19` on `SOL_RWD_COHORT_DISCOVERY` are the rollback points. The 16 solution scenarios were switched to run as the tester; their earlier run-as values are kept outside the repo.
+
+**E5. Solution revision.** Before D1 copies the solution, revise it as described in [`solution-revision-plan.md`](solution-revision-plan.md). That covers three Project Setup tickets: table naming in place of the custom JSON mapping; cohort registration with repeated submissions, a list of built cohorts and a guard against id overwrite; and a dashboard precomputed for all cohorts. It also fixes table-path resolution, replaces the `create_cohort` scenario chain with static recipes, cleans up Databricks temporary tables, streamlines the project variables and confirms the code environment. E4 is rerun at the end. This is phase 4.
+
+**Done when:** `SOL_RWD_COHORT_DISCOVERY` runs the `v1-2` library from this repo, Project Setup shows no errors, E5 meets the gate in [`solution-revision-plan.md`](solution-revision-plan.md#order-verification-and-gate), and E4 passes on all three variants after it. Tagging and pinning happen at the phase 6 merge.
 
 ## Workstream D — Demo suite upgrade and retirements
 
-Recreate `DEMO_SF_RWD` from the revised solution and move the cohort library into it, repoint `DEMO_SF_RWE`, and only then drop `DEMO_DB_RWD2` and the superseded prep projects. **D depends on Workstream E:** nothing in D1 or D2 starts before E's gate. `DEMO_SF_RWD` is always a copy of the latest released solution. When a later revision releases a new solution version, the copy is rebuilt the same way.
+Recreate `DEMO_SF_RWD` from the revised solution and move the cohort library into it, repoint `DEMO_SF_RWE`, and only then drop `DEMO_DB_RWD2` and the superseded prep projects. **D depends on Workstream E:** nothing in D1, and only D2 steps 3–7 (the Cox report), start before E's gate. `DEMO_SF_RWD` is always a copy of the latest released solution. When a later revision releases a new solution version, the copy is rebuilt the same way.
 
 **D1. Recreate `DEMO_SF_RWD` from the released solution**
 
@@ -236,15 +271,16 @@ The project owner deletes each project; deletion also drops the managed data, so
 
 ## Sequencing, gates and risks
 
-Run the work in five phases. Each phase ends at a gate the index can check, and nothing is deleted before phase 5 except the old `DEMO_SF_RWD` (D1 step 2).
+Run the work in six phases. Each phase ends at a gate the index can check, and nothing is deleted before phase 6 except the old `DEMO_SF_RWD` (D1 step 2).
 
 | Phase | Work | Gate to exit |
 | --- | --- | --- |
 | 1. Index | Workstream A steps 1–3 | Registry covers 11 projects; compliance and lineage TSVs reproduce this audit |
 | 2. Solution | E1–E3: code moved here, Setup errors fixed, release candidate on `v1-2` with the import fixes | Column-case tests 1, 3 and 6 behave as documented; missing prep project now fails the scenario; Setup shows no errors; the solution's library points at this repo |
-| 3. Data | Workstream B: canonical S3 projects, then 3 variants and the demo copy | 15/15 pass on all 7 prep projects; row counts of each variant and of the demo copy match its canonical |
-| 4. Consumers | E4, then D1 and D2 (D depends on E) | 3 sample cohorts match across SF, DB and RS; 45 cohorts rebuilt on 2.3M; RWE static Cox report matches the notebook baseline, renders without notebook authorization, and passes the internal packaging check |
-| 5. Retire | D3 in order; Workstream A steps 4–6; merge `v1-2` into `main`, tag the merge commit, pin the solution and `DEMO_SF_RWD` to it | Zero broken shares; retired projects archived as bundles; CI green; both solution copies run the tagged library |
+| 3. Data | Workstream B: canonical S3 projects, then 3 variants and the demo variant | 15/15 pass on all 7 prep projects; row counts of each variant and of the demo variant match its canonical |
+| 4. Solution revision | E4 (passed 2026-11-19), then E5 ([`solution-revision-plan.md`](solution-revision-plan.md)) and an E4 rerun | 3 sample cohorts match across SF, DB and RS after the revision; repeated cohort submissions work and a reused id is refused without explicit replace; the dashboard shows every built cohort without a rebuild; the project macro test passes |
+| 5. Consumers | D1 and D2 (D2 steps 3–7 may start during phase 4) | 45 cohorts rebuilt on 2.3M; RWE static Cox report matches the notebook baseline, renders without notebook authorization, and passes the internal packaging check |
+| 6. Retire | D3 in order; Workstream A steps 4–6; merge `v1-2` into `main`, tag the merge commit, pin the solution and `DEMO_SF_RWD` to it | Zero broken shares; retired projects archived as bundles; CI green; both solution copies run the tagged library |
 
 **Risks and mitigations**
 
@@ -254,10 +290,10 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 | CDM v5.2 → v5.3 differences in the 2.3M source | Map columns in `PREP_RWD_S3_2M3` and let the schema gate catch gaps |
 | ~~Id overflow at 2.3M after `bigint` → `int`~~ | Ruled out: measured 2026-10-15: largest 2.3M id 289,182,385 (`condition_occurrence_id`), largest Athena concept id 46,369,944, both well under 2,147,483,647 |
 | Databricks per-user OAuth expiry blocks builds and checks | `PREP_RWD_DB_1K` on the global `bs-databricks` connection |
-| `bs-snowflake` uses per-user OAuth (DEC-RWD-005): builds and scenarios fail, and the index reports `UNREADABLE`, when the run-as user's grant has expired | Run scenarios as a named user with a current grant; reauthorise before phase 3 and 4 builds; rerun `--reprobe` before reading anything into `UNREADABLE` |
+| `bs-snowflake` uses per-user OAuth (DEC-RWD-005): builds and scenarios fail, and the index reports `UNREADABLE`, when the run-as user's grant has expired | Run scenarios as a named user with a current grant; reauthorise before phase 3 to 5 builds; rerun `--reprobe` before reading anything into `UNREADABLE` |
 | SYNPUF licence: data must not leave internal instances | Licence banner on every Part 1 wiki; bundles stored internally only |
-| `DEMO_SF_PREP_OMOP_2M3` drifts from `PREP_RWD_S3_2M3` (DEC-RWD-004) | B2 schema gate on the copy; B4 row counts against the canonical; a change to `PREP_RWD_S3_2M3` is applied to the copy |
-| The 2.3M build in `DEMO_SF_PREP_OMOP_2M3` writes to Snowflake from Python recipes; row-by-row JDBC inserts took about 5 hours for `concept_ancestor` | Check how the copy's recipes write to Snowflake on a 1K build before the first 2.3M build |
+| The demo suite needs `PREP_RWD_S3_2M3` at build time (DEC-RWD-006) | Keep `PREP_RWD_S3_2M3` and its share; a bundle or move of the demo suite takes it along, or moves only the built Snowflake tables |
+| The 2.3M sync to `bs-snowflake` falls back from the bulk path to JDBC inserts | Check that each `sync_<omop_table>` job uses `S3 to Snowflake`, as the 1K variants did, before reading row counts |
 | `.index/dss_snapshot.json` in commit `acbe6cb` holds a GitHub token, from `DEMO_SF_RWD`'s Git reference URL. E1 needs a remote | Revoke the token, purge it from history, and make `build_index.py` redact Git remote credentials before the first push |
 | Deleting `DEMO_SF_RWD` before its copy works | Bundle first; nothing reads it; restore from the bundle if D1 fails |
 
@@ -265,9 +301,9 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 
 - [ ] Name an owner for each part
 - [x] Snowflake connection for the variants and the demo suite: `bs-snowflake` (DEC-RWD-005)
-- [x] Variant layout: separate sync-only projects (DEC-RWD-002), except `DEMO_SF_PREP_OMOP_2M3`, a full copy of `PREP_RWD_S3_2M3` (DEC-RWD-004)
-- [x] Solution code sits in `solution/` (Git reference path `solution`); release work happens on `v1-2`, merged at the end of phase 5
-- [ ] What happens to `dataiku/bs-rwd-cohort-discovery` after the phase 5 merge (archive or read-only mirror)
+- [x] Variant layout: separate sync-only projects (DEC-RWD-002), `DEMO_SF_PREP_OMOP_2M3` included (DEC-RWD-006, superseding DEC-RWD-004's full copy)
+- [x] Solution code sits in `solution/` (Git reference path `solution`); release work happens on `v1-2`, merged at the end of phase 6
+- [ ] What happens to `dataiku/bs-rwd-cohort-discovery` after the phase 6 merge (archive or read-only mirror)
 - [ ] 100K has no SQL variant, so E4 never tests the solution on it: add `PREP_RWD_SF_100K`, or accept
 
 ## Appendix — Column-case test (evidence for DEC-RWD-001)
