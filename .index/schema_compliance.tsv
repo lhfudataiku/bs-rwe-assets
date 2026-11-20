@@ -227,7 +227,7 @@ PREP_RWD_SF_1K	snowflake	concept_ancestor	concept_ancestor_sf	pass	yes
 PREP_RWD_DB_1K	databricks	person	person_db	pass	yes	
 PREP_RWD_DB_1K	databricks	observation_period	observation_period_db	pass	yes	
 PREP_RWD_DB_1K	databricks	visit_occurrence	visit_occurrence_db	pass	yes	
-PREP_RWD_DB_1K	databricks	condition_occurrence	condition_occurrence_db	pass	unknown	
+PREP_RWD_DB_1K	databricks	condition_occurrence	condition_occurrence_db	pass	yes	
 PREP_RWD_DB_1K	databricks	drug_exposure	drug_exposure_db	pass	yes	
 PREP_RWD_DB_1K	databricks	procedure_occurrence	procedure_occurrence_db	pass	yes	
 PREP_RWD_DB_1K	databricks	device_exposure	device_exposure_db	pass	yes	
