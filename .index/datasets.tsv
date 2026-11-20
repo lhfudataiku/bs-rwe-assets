@@ -925,7 +925,7 @@ PREP_RWD_S3_2M3	observation_period	S3	dataiku-managed-storage	yes	5	s3	observati
 PREP_RWD_S3_2M3	observation_period_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
 PREP_RWD_S3_2M3	payer_plan_period_2_3_pc	S3	dataiku-managed-storage	yes	7			-			
 PREP_RWD_S3_2M3	payer_plan_period_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
-PREP_RWD_S3_2M3	person	S3	dataiku-managed-storage	yes	18	s3	person	yes		head	
+PREP_RWD_S3_2M3	person	S3	dataiku-managed-storage	yes	18	s3	person	yes	2326856	metric	
 PREP_RWD_S3_2M3	person_2_3_pc	S3	dataiku-managed-storage	yes	18			-			
 PREP_RWD_S3_2M3	procedure_occurrence	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes		head	
 PREP_RWD_S3_2M3	procedure_occurrence_2_3_pc	S3	dataiku-managed-storage	yes	13			-			
@@ -946,6 +946,7 @@ PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_2	S3	dataiku-managed-storage	yes	12			-
 PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_3	S3	dataiku-managed-storage	yes	12			-			
 PREP_RWD_S3_2M3	visit_occurrence_2_3_pc_db	S3	dataiku-managed-storage	yes	17			-			
 PREP_RWD_S3_2M3	visit_occurrence_inpatient	S3	dataiku-managed-storage	yes	17			-			
+PREP_RWD_S3_2M3	visit_occurrence_stacked	S3	dataiku-managed-storage	yes	17			-			
 PREP_RWD_SF_1K	concept_ancestor_sf	Snowflake	bs-snowflake	yes	4	snowflake	concept_ancestor	yes	72374967	sql	
 PREP_RWD_SF_1K	concept_sf	Snowflake	bs-snowflake	yes	10	snowflake	concept	yes	6088813	sql	
 PREP_RWD_SF_1K	condition_era_sf	Snowflake	bs-snowflake	yes	6	snowflake	condition_era	yes	121386	sql	
@@ -991,3 +992,18 @@ PREP_RWD_RS_1K	observation_rs	Redshift	redshift-solutions	yes	18	redshift	observ
 PREP_RWD_RS_1K	person_rs	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
 PREP_RWD_RS_1K	procedure_occurrence_rs	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
 PREP_RWD_RS_1K	visit_occurrence_rs	Redshift	redshift-solutions	yes	17	redshift	visit_occurrence	yes	17904	sql	
+DEMO_SF_PREP_OMOP_2M3	concept_ancestor_sf	Snowflake	bs-snowflake	yes	4	snowflake	concept_ancestor	yes	72374967	sql	
+DEMO_SF_PREP_OMOP_2M3	concept_sf	Snowflake	bs-snowflake	yes	10	snowflake	concept	yes	6088813	sql	
+DEMO_SF_PREP_OMOP_2M3	condition_era_sf	Snowflake	bs-snowflake	yes	6	snowflake	condition_era	yes	223393336	sql	
+DEMO_SF_PREP_OMOP_2M3	condition_occurrence_sf	Snowflake	bs-snowflake	yes	16	snowflake	condition_occurrence	yes	289182385	sql	
+DEMO_SF_PREP_OMOP_2M3	death_sf	Snowflake	bs-snowflake	yes	7	snowflake	death	yes	107644	sql	
+DEMO_SF_PREP_OMOP_2M3	device_exposure_sf	Snowflake	bs-snowflake	yes	15	snowflake	device_exposure	yes	4465485	sql	
+DEMO_SF_PREP_OMOP_2M3	drug_era_sf	Snowflake	bs-snowflake	yes	7	snowflake	drug_era	yes	125872351	sql	
+DEMO_SF_PREP_OMOP_2M3	drug_exposure_sf	Snowflake	bs-snowflake	yes	23	snowflake	drug_exposure	yes	126048050	sql	
+DEMO_SF_PREP_OMOP_2M3	location_sf	Snowflake	bs-snowflake	yes	10	snowflake	location	yes	3185	sql	
+DEMO_SF_PREP_OMOP_2M3	measurement_sf	Snowflake	bs-snowflake	yes	20	snowflake	measurement	yes	74128429	sql	
+DEMO_SF_PREP_OMOP_2M3	observation_period_sf	Snowflake	bs-snowflake	yes	5	snowflake	observation_period	yes	2098515	sql	
+DEMO_SF_PREP_OMOP_2M3	observation_sf	Snowflake	bs-snowflake	yes	18	snowflake	observation	yes	37531051	sql	
+DEMO_SF_PREP_OMOP_2M3	person_sf	Snowflake	bs-snowflake	yes	18	snowflake	person	yes	2326856	sql	
+DEMO_SF_PREP_OMOP_2M3	procedure_occurrence_sf	Snowflake	bs-snowflake	yes	14	snowflake	procedure_occurrence	yes	278769529	sql	
+DEMO_SF_PREP_OMOP_2M3	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	39468906	sql	

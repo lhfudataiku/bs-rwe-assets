@@ -4,6 +4,7 @@
   "DATABRICKSSYNPUFOMOP23DATAPREPERATION",
   "DEMO_DB_RWD2",
   "DEMO_SF_OMOP2M_DATAPREP",
+  "DEMO_SF_PREP_OMOP_2M3",
   "DEMO_SF_RWD",
   "DEMO_SF_RWE",
   "PREP_RWD_DB_1K",
@@ -23,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1300,
+ "dss_project_count": 1308,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -9865,9 +9866,991 @@
    "wiki_version": "0.1.0"
   },
   "DEMO_SF_PREP_OMOP_2M3": {
-   "error": "not on DSS",
-   "exists": false,
-   "fetched_at": "2026-11-19T13:59Z"
+   "datasets": {
+    "concept_ancestor_sf": {
+     "columns": [
+      [
+       "ancestor_concept_id",
+       "int"
+      ],
+      [
+       "descendant_concept_id",
+       "int"
+      ],
+      [
+       "min_levels_of_separation",
+       "int"
+      ],
+      [
+       "max_levels_of_separation",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 72374967,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "concept_sf": {
+     "columns": [
+      [
+       "concept_id",
+       "int"
+      ],
+      [
+       "concept_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "vocabulary_id",
+       "string"
+      ],
+      [
+       "concept_class_id",
+       "string"
+      ],
+      [
+       "standard_concept",
+       "string"
+      ],
+      [
+       "concept_code",
+       "string"
+      ],
+      [
+       "valid_start_date",
+       "dateonly"
+      ],
+      [
+       "valid_end_date",
+       "dateonly"
+      ],
+      [
+       "invalid_reason",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 6088813,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "condition_era_sf": {
+     "columns": [
+      [
+       "condition_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_era_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_era_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_occurrence_count",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 223393336,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "condition_occurrence_sf": {
+     "columns": [
+      [
+       "condition_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "condition_concept_id",
+       "int"
+      ],
+      [
+       "condition_start_date",
+       "dateonly"
+      ],
+      [
+       "condition_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_end_date",
+       "dateonly"
+      ],
+      [
+       "condition_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "condition_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "condition_source_value",
+       "string"
+      ],
+      [
+       "condition_source_concept_id",
+       "int"
+      ],
+      [
+       "condition_status_source_value",
+       "string"
+      ],
+      [
+       "condition_status_concept_id",
+       "int"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 289182385,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "death_sf": {
+     "columns": [
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "death_date",
+       "dateonly"
+      ],
+      [
+       "death_datetime",
+       "datetimenotz"
+      ],
+      [
+       "death_type_concept_id",
+       "int"
+      ],
+      [
+       "cause_concept_id",
+       "int"
+      ],
+      [
+       "cause_source_value",
+       "string"
+      ],
+      [
+       "cause_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 107644,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "device_exposure_sf": {
+     "columns": [
+      [
+       "device_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "device_concept_id",
+       "int"
+      ],
+      [
+       "device_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "device_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "device_type_concept_id",
+       "int"
+      ],
+      [
+       "unique_device_id",
+       "string"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "device_source_value",
+       "string"
+      ],
+      [
+       "device_source_concept_id",
+       "int"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 4465485,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "drug_era_sf": {
+     "columns": [
+      [
+       "drug_era_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_era_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_era_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_count",
+       "int"
+      ],
+      [
+       "gap_days",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 125872351,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "drug_exposure_sf": {
+     "columns": [
+      [
+       "drug_exposure_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "drug_concept_id",
+       "int"
+      ],
+      [
+       "drug_exposure_start_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_exposure_end_date",
+       "dateonly"
+      ],
+      [
+       "drug_exposure_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "drug_type_concept_id",
+       "int"
+      ],
+      [
+       "stop_reason",
+       "string"
+      ],
+      [
+       "refills",
+       "int"
+      ],
+      [
+       "quantity",
+       "float"
+      ],
+      [
+       "days_supply",
+       "int"
+      ],
+      [
+       "sig",
+       "string"
+      ],
+      [
+       "route_concept_id",
+       "int"
+      ],
+      [
+       "lot_number",
+       "string"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "drug_source_value",
+       "string"
+      ],
+      [
+       "drug_source_concept_id",
+       "int"
+      ],
+      [
+       "route_source_value",
+       "string"
+      ],
+      [
+       "dose_unit_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "verbatim_end_date",
+       "dateonly"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 126048050,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "location_sf": {
+     "columns": [
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "address_1",
+       "string"
+      ],
+      [
+       "address_2",
+       "string"
+      ],
+      [
+       "city",
+       "string"
+      ],
+      [
+       "state",
+       "string"
+      ],
+      [
+       "zip",
+       "string"
+      ],
+      [
+       "county",
+       "string"
+      ],
+      [
+       "location_source_value",
+       "string"
+      ],
+      [
+       "latitude",
+       "float"
+      ],
+      [
+       "longtitude",
+       "float"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 3185,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "measurement_sf": {
+     "columns": [
+      [
+       "measurement_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "measurement_concept_id",
+       "int"
+      ],
+      [
+       "measurement_date",
+       "dateonly"
+      ],
+      [
+       "measurement_datetime",
+       "datetimenotz"
+      ],
+      [
+       "measurement_type_concept_id",
+       "int"
+      ],
+      [
+       "operator_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "range_low",
+       "float"
+      ],
+      [
+       "range_high",
+       "float"
+      ],
+      [
+       "measurement_source_value",
+       "string"
+      ],
+      [
+       "measurement_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "value_source_value",
+       "string"
+      ],
+      [
+       "measurement_time",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 74128429,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "observation_period_sf": {
+     "columns": [
+      [
+       "observation_period_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_period_start_date",
+       "dateonly"
+      ],
+      [
+       "observation_period_end_date",
+       "dateonly"
+      ],
+      [
+       "period_type_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2098515,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "observation_sf": {
+     "columns": [
+      [
+       "observation_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "observation_concept_id",
+       "int"
+      ],
+      [
+       "observation_date",
+       "dateonly"
+      ],
+      [
+       "observation_datetime",
+       "datetimenotz"
+      ],
+      [
+       "observation_type_concept_id",
+       "int"
+      ],
+      [
+       "value_as_number",
+       "float"
+      ],
+      [
+       "value_as_string",
+       "string"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "qualifier_concept_id",
+       "int"
+      ],
+      [
+       "unit_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "observation_source_value",
+       "string"
+      ],
+      [
+       "observation_source_concept_id",
+       "int"
+      ],
+      [
+       "unit_source_value",
+       "string"
+      ],
+      [
+       "qualifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 37531051,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "person_sf": {
+     "columns": [
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "gender_concept_id",
+       "int"
+      ],
+      [
+       "year_of_birth",
+       "int"
+      ],
+      [
+       "month_of_birth",
+       "int"
+      ],
+      [
+       "day_of_birth",
+       "int"
+      ],
+      [
+       "birth_datetime",
+       "datetimenotz"
+      ],
+      [
+       "race_concept_id",
+       "int"
+      ],
+      [
+       "ethnicity_concept_id",
+       "int"
+      ],
+      [
+       "location_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "person_source_value",
+       "string"
+      ],
+      [
+       "gender_source_value",
+       "string"
+      ],
+      [
+       "gender_source_concept_id",
+       "int"
+      ],
+      [
+       "race_source_value",
+       "string"
+      ],
+      [
+       "race_source_concept_id",
+       "int"
+      ],
+      [
+       "ethnicity_source_value",
+       "string"
+      ],
+      [
+       "ethnicity_source_concept_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 2326856,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "procedure_occurrence_sf": {
+     "columns": [
+      [
+       "procedure_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "procedure_concept_id",
+       "int"
+      ],
+      [
+       "procedure_date",
+       "dateonly"
+      ],
+      [
+       "procedure_datetime",
+       "datetimenotz"
+      ],
+      [
+       "procedure_type_concept_id",
+       "int"
+      ],
+      [
+       "modifier_concept_id",
+       "int"
+      ],
+      [
+       "quantity",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "procedure_source_value",
+       "string"
+      ],
+      [
+       "procedure_source_concept_id",
+       "int"
+      ],
+      [
+       "modifier_source_value",
+       "string"
+      ],
+      [
+       "visit_detail_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 278769529,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    },
+    "visit_occurrence_sf": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "probe": {
+      "built": "yes",
+      "error": "",
+      "rows": 39468906,
+      "source": "sql"
+     },
+     "type": "Snowflake"
+    }
+   },
+   "exists": true,
+   "fetched_at": "2026-11-20T09:41Z",
+   "flow_sources": [
+    "PREP_RWD_S3_2M3.concept",
+    "PREP_RWD_S3_2M3.concept_ancestor",
+    "PREP_RWD_S3_2M3.condition_era",
+    "PREP_RWD_S3_2M3.condition_occurrence",
+    "PREP_RWD_S3_2M3.death",
+    "PREP_RWD_S3_2M3.device_exposure",
+    "PREP_RWD_S3_2M3.drug_era",
+    "PREP_RWD_S3_2M3.drug_exposure",
+    "PREP_RWD_S3_2M3.location",
+    "PREP_RWD_S3_2M3.measurement",
+    "PREP_RWD_S3_2M3.observation",
+    "PREP_RWD_S3_2M3.observation_period",
+    "PREP_RWD_S3_2M3.person",
+    "PREP_RWD_S3_2M3.procedure_occurrence",
+    "PREP_RWD_S3_2M3.visit_occurrence"
+   ],
+   "git_references": {},
+   "name": "DEMO SF PREP OMOP 2M3",
+   "probed_at": "2026-11-20T09:41Z",
+   "variables": {
+    "local": {},
+    "standard": {}
+   },
+   "wiki_articles": [],
+   "wiki_version": ""
   },
   "DEMO_SF_RWD": {
    "datasets": {
@@ -30076,8 +31059,8 @@
      "probe": {
       "built": "yes",
       "error": "",
-      "rows": null,
-      "source": "head"
+      "rows": 2326856,
+      "source": "metric"
      },
      "type": "S3"
     },
@@ -31556,10 +32539,85 @@
      "connection": "dataiku-managed-storage",
      "managed": true,
      "type": "S3"
+    },
+    "visit_occurrence_stacked": {
+     "columns": [
+      [
+       "visit_occurrence_id",
+       "int"
+      ],
+      [
+       "person_id",
+       "int"
+      ],
+      [
+       "visit_concept_id",
+       "int"
+      ],
+      [
+       "visit_start_date",
+       "dateonly"
+      ],
+      [
+       "visit_start_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_end_date",
+       "dateonly"
+      ],
+      [
+       "visit_end_datetime",
+       "datetimenotz"
+      ],
+      [
+       "visit_type_concept_id",
+       "int"
+      ],
+      [
+       "provider_id",
+       "int"
+      ],
+      [
+       "care_site_id",
+       "int"
+      ],
+      [
+       "visit_source_value",
+       "string"
+      ],
+      [
+       "visit_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_concept_id",
+       "int"
+      ],
+      [
+       "admitting_source_value",
+       "string"
+      ],
+      [
+       "discharge_to_concept_id",
+       "int"
+      ],
+      [
+       "discharge_to_source_value",
+       "string"
+      ],
+      [
+       "preceding_visit_occurrence_id",
+       "int"
+      ]
+     ],
+     "connection": "dataiku-managed-storage",
+     "managed": true,
+     "type": "S3"
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-19T13:59Z",
+   "fetched_at": "2026-11-20T09:41Z",
    "flow_sources": [
     "AT_CONCEPT",
     "AT_CONCEPT_ANCESTOR",
@@ -31568,7 +32626,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 2.3M (OMOP CDM v5.3)",
-   "probed_at": "2026-11-19T13:59Z",
+   "probed_at": "2026-11-20T09:41Z",
    "variables": {
     "local": {},
     "standard": {}

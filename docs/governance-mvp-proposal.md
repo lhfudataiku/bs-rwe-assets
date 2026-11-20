@@ -252,7 +252,7 @@ project's owner is unassigned.
 
 | Project | Done by the migration | New for the framework |
 | --- | --- | --- |
-| `DEMO_SF_PREP_OMOP_2M3` | Created as a full copy of `PREP_RWD_S3_2M3`; 15/15 schema pass; row counts match | Data Quality rules on the 15 tables with a scenario that stops on failure; recorded data cut, vocabulary version and ETL version; data-use terms in the registry |
+| `DEMO_SF_PREP_OMOP_2M3` | Created as a sync-only variant of `PREP_RWD_S3_2M3`; 15/15 schema pass; row counts match | Data Quality rules on the 15 tables with a scenario that stops on failure; recorded data cut, vocabulary version and ETL version; data-use terms in the registry |
 | `DEMO_SF_RWD` | Recreated from the released solution; 45 cohorts rebuilt; counts checked against the reference | Integrity rules on `cohort`; a composition check (age, sex, index year) against a stored reference; a fingerprint per governed cohort definition; validation source and expected ranges per governed cohort |
 | `DEMO_SF_RWE` | 9 inputs repointed to `DEMO_SF_RWD`; notebook replaced by a Cox recipe and static report | Protocol and fitness files in the repo; a scenario that runs the study end to end and stops if the protocol is not locked; a balance and overlap diagnostics step between the propensity model and the Cox model; an attrition table; a deviations log |
 | All three | Library pinned to the release tag at the phase 5 merge | Suite groups and export permissions; the `rwd-suite` tag and Project Standards; one bundle per release; Govern sync; the deployment gate |
@@ -427,7 +427,7 @@ Every control states where DSS or Govern enforces it and which automated evidenc
 | # | Control | Enforced in | Evidence |
 | --- | --- | --- | --- |
 | V1 | Schema contract: 15/15 v1.1 pass and built before anything downstream builds (DEC-RWD-003) | DSS Data Quality rules on the 15 export tables (schema, non-empty, id unique); scenario stops on failure | `schema_compliance.tsv`; DQ results |
-| V2 | The demo copy matches its canonical project (DEC-RWD-004) | Row-count DQ rule against `PREP_RWD_S3_2M3` | `datasets.tsv` |
+| V2 | The demo variant matches its canonical project (DEC-RWD-006) | Row-count DQ rule against `PREP_RWD_S3_2M3` | `datasets.tsv` |
 | V3 | Cohort reproducibility: the 3 sample cohorts give identical counts on SF, DB and RS | Release test scenario; the migration's E4 result is the first evidence | `dialect_counts` |
 | V4 | Cohort regression: 2.3M counts match the recorded reference (for example heart failure 188,113, stroke 57,077, AMI 30,784 on 2025-10-06) | DQ rule on `cohort_building_log` | `reference_count` |
 | V5 | Cohort integrity: `subject_id` not null, `cohort_start_date <= cohort_end_date`, each episode inside an observation period, no duplicate episodes | DQ rules on `cohort` | `dq_result` |
