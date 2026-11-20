@@ -12,7 +12,7 @@ Oct 22, 2026 · @Li-Heng Fu
 [`governance-mvp-proposal.html`](governance-mvp-proposal.html) and follows the same order: market need,
 opportunity, today's process, the process with the MVP, scope, stakeholders, then the technical
 specification as an appendix. Two things changed in this revision. **The governance work now starts
-after the migration closes** (phase 5 of `migration-revision-plan.md`); it no longer rides on the
+after the migration closes** (phase 6 of `migration-revision-plan.md`); it no longer rides on the
 migration phases. And a new section lists the changes the demo suite needs.
 
 **What we need:** agreement on the MVP scope in section 5. User stories are written after that.
@@ -222,7 +222,7 @@ stable suite and not on projects about to be recreated.
 | Step | Starts when | Work | Exit gate |
 | --- | --- | --- | --- |
 | F0 Design | Scope agreed; needs no DSS change, so it can be drafted at any time | Decisions; user stories; blueprints and role map in `govern/`; protocol and fitness template in `studies/`; read-only `access.tsv` and `governance.tsv` | Decisions recorded; index shows access and governance gaps as issues |
-| F1 Data | Migration phase 5 closed | Data Quality rules on the export tables; dataset acceptance with terms and pins; G1 | `DEMO_SF_PREP_OMOP_2M3` accepted in Govern |
+| F1 Data | Migration phase 6 closed | Data Quality rules on the export tables; dataset acceptance with terms and pins; G1 | `DEMO_SF_PREP_OMOP_2M3` accepted in Govern |
 | F2 Cohorts | F1 | Pre-assessments; cohort records, fingerprints, composition check; G2, G3 | Governed cohorts approved |
 | F3 Study | F2 | Study record; protocol lock (G4); scenario, diagnostics and attrition steps in `DEMO_SF_RWE`; governed rebuild; G5 | Protocol locked before the rebuild's outcome analysis; study reviewed |
 | F4 Release | F3 | Bundles, release manifests, Project Standards scope, G6; gated deployment | Suite runs on the automation node from approved bundles; smoke test green |
@@ -255,7 +255,7 @@ project's owner is unassigned.
 | `DEMO_SF_PREP_OMOP_2M3` | Created as a sync-only variant of `PREP_RWD_S3_2M3`; 15/15 schema pass; row counts match | Data Quality rules on the 15 tables with a scenario that stops on failure; recorded data cut, vocabulary version and ETL version; data-use terms in the registry |
 | `DEMO_SF_RWD` | Recreated from the released solution; 45 cohorts rebuilt; counts checked against the reference | Integrity rules on `cohort`; a composition check (age, sex, index year) against a stored reference; a fingerprint per governed cohort definition; validation source and expected ranges per governed cohort |
 | `DEMO_SF_RWE` | 9 inputs repointed to `DEMO_SF_RWD`; notebook replaced by a Cox recipe and static report | Protocol and fitness files in the repo; a scenario that runs the study end to end and stops if the protocol is not locked; a balance and overlap diagnostics step between the propensity model and the Cox model; an attrition table; a deviations log |
-| All three | Library pinned to the release tag at the phase 5 merge | Suite groups and export permissions; the `rwd-suite` tag and Project Standards; one bundle per release; Govern sync; the deployment gate |
+| All three | Library pinned to the release tag at the phase 6 merge | Suite groups and export permissions; the `rwd-suite` tag and Project Standards; one bundle per release; Govern sync; the deployment gate |
 
 Points that need care:
 

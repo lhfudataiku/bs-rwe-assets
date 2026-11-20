@@ -2,7 +2,7 @@
 
 Sep 23, 2026 · @Li-Heng Fu
 
-> **Lifecycle:** Planning (active until phase 5 closes) · **Part:** all · **Audience:** asset owners and
+> **Lifecycle:** Planning (active until phase 6 closes) · **Part:** all · **Audience:** asset owners and
 > contributors executing the migration · **Authority:** per-project decisions, step order and gates ·
 > **Update when:** a step completes, a gate changes or an open question is decided. Live state is in
 > `.index/`, not here.
@@ -215,17 +215,21 @@ Fix in the manifest code, not in one project's variables, because `DEMO_SF_RWD` 
 
 Before E4, run Reconfigure on Snowflake in the solution: all of its datasets are on Filesystem storage today. That is a DSS change and needs the owner's approval.
 
-**E3. Release candidate.** The release is built on branch `v1-2` with import fixes 1–3, 5 and 6 and the E2 fix. `v1-2` is merged into `main` only when the migration plan closes (phase 5), so until then `SOL_RWD_COHORT_DISCOVERY`, and `DEMO_SF_RWD` once D1 copies it, follow `v1-2` and are resynced after each push. At the merge, tag the merge commit and pin both to the tag. Update the solution's wiki Release Notes and Data Model article (drafts in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`). Rerun column-case tests 1, 3 and 6 in `TMP_RWD_SF_COLCASE_TEST` against the release and turn them into an index check ([appendix](#appendix--column-case-test-evidence-for-dec-rwd-001)).
+**E3. Release candidate.** The release is built on branch `v1-2` with import fixes 1–3, 5 and 6 and the E2 fix. `v1-2` is merged into `main` only when the migration plan closes (phase 6), so until then `SOL_RWD_COHORT_DISCOVERY`, and `DEMO_SF_RWD` once D1 copies it, follow `v1-2` and are resynced after each push. At the merge, tag the merge commit and pin both to the tag. Update the solution's wiki Release Notes and Data Model article (drafts in `docs/wiki/SOL_RWD_COHORT_DISCOVERY/`). Rerun column-case tests 1, 3 and 6 in `TMP_RWD_SF_COLCASE_TEST` against the release and turn them into an index check ([appendix](#appendix--column-case-test-evidence-for-dec-rwd-001)).
 
-**Status (2026-11-05):** `SOL_RWD_COHORT_DISCOVERY` pulls `python/solution` from this repo (path `solution`), follows branch `v1-2` and is synced at `a7d922a`; Project Setup renders on that library. Its `main_connection` is `bs-snowflake` in both scopes (DEC-RWD-005). A tag `v1-2-0` was pushed on `2b4341e` before the merge-at-the-end rule; it is re-cut on the merge commit in phase 5. Still open: push the Release Notes (1.2.0) and Overview version drafts with `tools/push_wiki.py --push`, and rerun column-case tests 1, 3 and 6.
+**Status (2026-11-05):** `SOL_RWD_COHORT_DISCOVERY` pulls `python/solution` from this repo (path `solution`), follows branch `v1-2` and is synced at `a7d922a`; Project Setup renders on that library. Its `main_connection` is `bs-snowflake` in both scopes (DEC-RWD-005). A tag `v1-2-0` was pushed on `2b4341e` before the merge-at-the-end rule; it is re-cut on the merge commit in phase 6. Still open: push the Release Notes (1.2.0) and Overview version drafts with `tools/push_wiki.py --push`, and rerun column-case tests 1, 3 and 6.
 
 **E4. Test against every SQL prep project.** For each of `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K`, configure the solution through Project Setup with `main_connection` on the same connection type as the prep set. Then run "Check OMOP CDM Schema", the import, the 3 sample cohorts and the covariate build. Cohort counts must be identical across the three. The S3 canonical projects cannot be inputs: the import runs in-database, and the earlier S3 attempt with `v1-1-2` failed by design. The `PREP_RWD_SF_1K` run is also the import fixes' open Snowflake test. They are covered through their copies. `DEMO_SF_PREP_OMOP_2M3` is tested through `DEMO_SF_RWD` in D1. The release project ends on `PREP_RWD_SF_1K`.
 
-**Done when:** `SOL_RWD_COHORT_DISCOVERY` runs the `v1-2` library from this repo, Project Setup shows no errors, and E4 passes on all three variants. Tagging and pinning happen at the phase 5 merge.
+**E4 status (2026-11-19): passed.** The test set is `cohort_scripts/<dialect>/cohort_metadata_e4.csv` (1 Anemia, 2 Diabetes mellitus type 2, 3 Depression), each dialect with its own scripts. Counts are identical on `PREP_RWD_SF_1K`, `PREP_RWD_DB_1K` and `PREP_RWD_RS_1K`: 611, 593 and 247. A first run with the demo's chronic kidney disease, depression and T2DM scripts was discarded. Bundles `e4-pre-test-2026-11-18` and `e4-rerun-pre-2026-11-19` on `SOL_RWD_COHORT_DISCOVERY` are the rollback points. The 16 solution scenarios were switched to run as the tester; their earlier run-as values are kept outside the repo.
+
+**E5. Solution revision.** Before D1 copies the solution, revise it as described in [`solution-revision-plan.md`](solution-revision-plan.md). That covers three Project Setup tickets: table naming in place of the custom JSON mapping; cohort registration with repeated submissions, a list of built cohorts and a guard against id overwrite; and a dashboard precomputed for all cohorts. It also fixes table-path resolution, replaces the `create_cohort` scenario chain with static recipes, cleans up Databricks temporary tables, streamlines the project variables and confirms the code environment. E4 is rerun at the end. This is phase 4.
+
+**Done when:** `SOL_RWD_COHORT_DISCOVERY` runs the `v1-2` library from this repo, Project Setup shows no errors, E5 meets the gate in [`solution-revision-plan.md`](solution-revision-plan.md#order-verification-and-gate), and E4 passes on all three variants after it. Tagging and pinning happen at the phase 6 merge.
 
 ## Workstream D — Demo suite upgrade and retirements
 
-Recreate `DEMO_SF_RWD` from the revised solution and move the cohort library into it, repoint `DEMO_SF_RWE`, and only then drop `DEMO_DB_RWD2` and the superseded prep projects. **D depends on Workstream E:** nothing in D1 or D2 starts before E's gate. `DEMO_SF_RWD` is always a copy of the latest released solution. When a later revision releases a new solution version, the copy is rebuilt the same way.
+Recreate `DEMO_SF_RWD` from the revised solution and move the cohort library into it, repoint `DEMO_SF_RWE`, and only then drop `DEMO_DB_RWD2` and the superseded prep projects. **D depends on Workstream E:** nothing in D1, and only D2 steps 3–7 (the Cox report), start before E's gate. `DEMO_SF_RWD` is always a copy of the latest released solution. When a later revision releases a new solution version, the copy is rebuilt the same way.
 
 **D1. Recreate `DEMO_SF_RWD` from the released solution**
 
@@ -267,15 +271,16 @@ The project owner deletes each project; deletion also drops the managed data, so
 
 ## Sequencing, gates and risks
 
-Run the work in five phases. Each phase ends at a gate the index can check, and nothing is deleted before phase 5 except the old `DEMO_SF_RWD` (D1 step 2).
+Run the work in six phases. Each phase ends at a gate the index can check, and nothing is deleted before phase 6 except the old `DEMO_SF_RWD` (D1 step 2).
 
 | Phase | Work | Gate to exit |
 | --- | --- | --- |
 | 1. Index | Workstream A steps 1–3 | Registry covers 11 projects; compliance and lineage TSVs reproduce this audit |
 | 2. Solution | E1–E3: code moved here, Setup errors fixed, release candidate on `v1-2` with the import fixes | Column-case tests 1, 3 and 6 behave as documented; missing prep project now fails the scenario; Setup shows no errors; the solution's library points at this repo |
 | 3. Data | Workstream B: canonical S3 projects, then 3 variants and the demo variant | 15/15 pass on all 7 prep projects; row counts of each variant and of the demo variant match its canonical |
-| 4. Consumers | E4, then D1 and D2 (D depends on E) | 3 sample cohorts match across SF, DB and RS; 45 cohorts rebuilt on 2.3M; RWE static Cox report matches the notebook baseline, renders without notebook authorization, and passes the internal packaging check |
-| 5. Retire | D3 in order; Workstream A steps 4–6; merge `v1-2` into `main`, tag the merge commit, pin the solution and `DEMO_SF_RWD` to it | Zero broken shares; retired projects archived as bundles; CI green; both solution copies run the tagged library |
+| 4. Solution revision | E4 (passed 2026-11-19), then E5 ([`solution-revision-plan.md`](solution-revision-plan.md)) and an E4 rerun | 3 sample cohorts match across SF, DB and RS after the revision; repeated cohort submissions work and a reused id is refused without explicit replace; the dashboard shows every built cohort without a rebuild; the project macro test passes |
+| 5. Consumers | D1 and D2 (D2 steps 3–7 may start during phase 4) | 45 cohorts rebuilt on 2.3M; RWE static Cox report matches the notebook baseline, renders without notebook authorization, and passes the internal packaging check |
+| 6. Retire | D3 in order; Workstream A steps 4–6; merge `v1-2` into `main`, tag the merge commit, pin the solution and `DEMO_SF_RWD` to it | Zero broken shares; retired projects archived as bundles; CI green; both solution copies run the tagged library |
 
 **Risks and mitigations**
 
@@ -285,7 +290,7 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 | CDM v5.2 → v5.3 differences in the 2.3M source | Map columns in `PREP_RWD_S3_2M3` and let the schema gate catch gaps |
 | ~~Id overflow at 2.3M after `bigint` → `int`~~ | Ruled out: measured 2026-10-15: largest 2.3M id 289,182,385 (`condition_occurrence_id`), largest Athena concept id 46,369,944, both well under 2,147,483,647 |
 | Databricks per-user OAuth expiry blocks builds and checks | `PREP_RWD_DB_1K` on the global `bs-databricks` connection |
-| `bs-snowflake` uses per-user OAuth (DEC-RWD-005): builds and scenarios fail, and the index reports `UNREADABLE`, when the run-as user's grant has expired | Run scenarios as a named user with a current grant; reauthorise before phase 3 and 4 builds; rerun `--reprobe` before reading anything into `UNREADABLE` |
+| `bs-snowflake` uses per-user OAuth (DEC-RWD-005): builds and scenarios fail, and the index reports `UNREADABLE`, when the run-as user's grant has expired | Run scenarios as a named user with a current grant; reauthorise before phase 3 to 5 builds; rerun `--reprobe` before reading anything into `UNREADABLE` |
 | SYNPUF licence: data must not leave internal instances | Licence banner on every Part 1 wiki; bundles stored internally only |
 | The demo suite needs `PREP_RWD_S3_2M3` at build time (DEC-RWD-006) | Keep `PREP_RWD_S3_2M3` and its share; a bundle or move of the demo suite takes it along, or moves only the built Snowflake tables |
 | The 2.3M sync to `bs-snowflake` falls back from the bulk path to JDBC inserts | Check that each `sync_<omop_table>` job uses `S3 to Snowflake`, as the 1K variants did, before reading row counts |
@@ -297,8 +302,8 @@ Run the work in five phases. Each phase ends at a gate the index can check, and 
 - [ ] Name an owner for each part
 - [x] Snowflake connection for the variants and the demo suite: `bs-snowflake` (DEC-RWD-005)
 - [x] Variant layout: separate sync-only projects (DEC-RWD-002), `DEMO_SF_PREP_OMOP_2M3` included (DEC-RWD-006, superseding DEC-RWD-004's full copy)
-- [x] Solution code sits in `solution/` (Git reference path `solution`); release work happens on `v1-2`, merged at the end of phase 5
-- [ ] What happens to `dataiku/bs-rwd-cohort-discovery` after the phase 5 merge (archive or read-only mirror)
+- [x] Solution code sits in `solution/` (Git reference path `solution`); release work happens on `v1-2`, merged at the end of phase 6
+- [ ] What happens to `dataiku/bs-rwd-cohort-discovery` after the phase 6 merge (archive or read-only mirror)
 - [ ] 100K has no SQL variant, so E4 never tests the solution on it: add `PREP_RWD_SF_100K`, or accept
 
 ## Appendix — Column-case test (evidence for DEC-RWD-001)
