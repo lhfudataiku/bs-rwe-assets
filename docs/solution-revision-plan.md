@@ -273,14 +273,17 @@ drops those of the same script. A run that fails midway leaves them until that c
 | `standard` | Shipped defaults and tunables, documented in the wiki | `days_prior_to_cohort_startdate` (365), `enable_pipeline` (false), `cohort_script_table_naming` (atlas), `temp_schema` (empty) |
 | `local` | Whatever Project Setup writes | connections, prep project, import lists, table mapping, `cohort_script_table_prefix`, `cohort_submission` |
 
+- Values stay in the project's variables (owner, 2026-11-23). The library holds the reader and the
+  contract of keys, not the values: Setup writes `local`, and `${...}` in recipes and scenarios
+  resolves only project variables.
 - One reader, `solution/utils/variables.py:get_setting(name)` (moved from `setup/choices.py:scoped_variable`):
   `local`, then `standard`. Use it in all repo code and scenario steps.
 - Delete "Update project variables" and its four call sites.
 - Delete the unused keys. `cohort_definition_id` and `cdm_standard_tables_map` go with R3 and R1.
 - `tests/test_variables.py` fails when code or the Setup manifest uses a key that is not in the table above.
 
-**Open question.** `condition_count_for_charlson_score` is unused: the Charlson recipes do not read it.
-Wire it into the Charlson logic or drop it.
+**Decided 2026-11-23 (owner).** `condition_count_for_charlson_score` is unused: the Charlson recipes do
+not read it. It is dropped with the other unused keys.
 
 ## R8. Code environment
 
@@ -441,7 +444,39 @@ tiles for the frequency tables. Open question 4 is closed.
 | 2. Cohort build | R5, R6 | Offline tests (statement splitter on every script in `cohort_scripts/`, literal escaping); E4 rerun; a forced failure on Databricks leaves no `rwdtmp_` table |
 | 3. Setup | R1, R2; regenerate tiles with `tools/app_manifest.py` | Two submissions in a row; a reused id is refused without **Replace** and accepted with it; "Built cohorts" lists both batches |
 | 4. Dashboard | R3 | All cohorts selectable by filter; the three E4 cohorts' figures equal the single-cohort build |
-| 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
+| 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 03, 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
+
+**Step 1 status (2026-11-23): repo part done; DSS part not started.**
+
+- **R4.** `get_sql_path()` returns `quotedResolvedTableName`, and `set_table_variables()` is gone. A
+  dataset that is not on Snowflake, Databricks or Redshift raises with the supported list
+  (`tests/test_sql_paths.py`).
+- **R7.** `solution/utils/variables.py:get_setting(name, variables=None, default=None)` is the one
+  reader. A key that is absent, None or `""` falls through to the next scope; `False`, `0` and `[]`
+  count as values. All repo reads use it.
+  - The contract (`STANDARD_DEFAULTS`, `LOCAL_KEYS`, `RETIRING_KEYS`) is in `solution/variables.py`.
+    `tests/test_variables.py` fails on a key outside it and on direct scope access.
+    `tools/app_manifest.py --check` also names Setup parameters outside it; the live manifest has none.
+  - `write_cohorts()` no longer writes `cohort_build_error`.
+  - `tools/app_manifest.py` inlines `get_setting` into the tiles, so the live tiles now differ from the
+    repo until the manifest is reapplied.
+- **R8.** `tests/test_imports.py` fails if `solution/` imports anything outside the standard library,
+  `dataiku`, `dataikuapi`, `pandas`, `numpy` and the project libraries. The technical requirements
+  draft (wiki 03) states the default-environment requirement.
+
+DSS part, each change after the owner's approval:
+
+1. No separate bundle export: the owner leaves it to the project macro test (2026-11-23).
+2. Resync the library and reapply the patched manifest.
+3. Scenarios:
+   - delete "Update project variables" and its call steps in "Build Cohort Dashboard", "Create Cohort
+     Scripts", "Import Datasets from DataPrep Project" and "Reconfigure Connections";
+   - switch the `standard` reads in "Reconfigure Connections" (`enable_pipeline`) and "⚠️ Format
+     Solution⚠️" (the two import lists) to `get_setting()`.
+4. Variables: reduce `standard` to the contract's defaults (keeping `cdm_standard_tables_map` and
+   `cohort_definition_id` until R1 and R3), and drop `cohort_build_error` from `local`. First check
+   that no recipe or insight uses a dropped key as `${...}`.
+5. Verify: rerun E4 on SF, DB and RS; the counts stay 611, 593 and 247.
 
 **Gate to exit phase 4:**
 
@@ -456,7 +491,8 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 ## Open questions
 
 - [ ] Keep the metadata CSV as a hidden bulk-import path, or drop it (recommendation: drop)
-- [ ] `condition_count_for_charlson_score`: wire into the Charlson logic or drop
+- [x] `condition_count_for_charlson_score`: wire into the Charlson logic or drop. Dropped (owner,
+  2026-11-23; R7)
 - [ ] Databricks scratch schema: the connection default, or a dedicated `temp_schema`
 - [x] If dashboard filters do not reach statistics cards: charts or a summary table instead. They do not
   (spike, 2026-11-20): charts for the distributions, dataset-table tiles for the frequency tables (R3)

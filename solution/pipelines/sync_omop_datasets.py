@@ -12,6 +12,7 @@ from dku_utils.projects.datasets.dataset_commons import get_dataset_schema, set_
 from dku_utils.type_checking import check_project_key_exists
 
 from solution.variables import OMOP_CDM_KEYS, MANDATORY_TABLES, MANDATORY_VOCABULARY
+from solution.utils.variables import get_setting
 
 # Constants
 OBJECT_TYPE_DATASET = "DATASET"
@@ -143,11 +144,11 @@ def sync_omop_datasets():
     project, variables = get_current_project_and_variables()
     current_project_key = project.project_key
 
-    new_data_prep_project_key = variables['local']['data_preparation_project_key']
-    connection_name = variables['local']['main_connection']
+    new_data_prep_project_key = get_setting('data_preparation_project_key', variables)
+    connection_name = get_setting('main_connection', variables)
 
-    datasets_included = list(set(MANDATORY_TABLES + variables['local']['omop_cdm_standard_tables_import']))
-    vocabulary_included = list(set(MANDATORY_VOCABULARY + variables['local']['omop_standardised_vocabulary_tables_import']))
+    datasets_included = list(set(MANDATORY_TABLES + get_setting('omop_cdm_standard_tables_import', variables, [])))
+    vocabulary_included = list(set(MANDATORY_VOCABULARY + get_setting('omop_standardised_vocabulary_tables_import', variables, [])))
 
     omop_tables_config = {'standard_tables': datasets_included, 'standard_vocabulary': vocabulary_included}
     datasets_to_import_names = datasets_included + vocabulary_included
@@ -168,7 +169,7 @@ def sync_omop_datasets():
         for target_output_dataset_name in dataset_output_names_list:
             logger.info(f"Processing dataset {target_output_dataset_name} in category {category}")
 
-            source_dataset_name_in_prep = variables['local'][target_output_dataset_name]
+            source_dataset_name_in_prep = get_setting(target_output_dataset_name, variables)
 
             try:
                 share_object_with_name(new_data_prep_project, source_dataset_name_in_prep, OBJECT_TYPE_DATASET, current_project_key, True)

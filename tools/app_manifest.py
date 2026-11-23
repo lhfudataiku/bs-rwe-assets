@@ -8,9 +8,12 @@ reordered manifest fails instead of patching the wrong tile. Applying the output
 approved step: `dku app-designer set-definition -P <KEY> <out.json>`.
 
     python3 tools/app_manifest.py manifest.json --out patched.json   # write the patched manifest
-    python3 tools/app_manifest.py manifest.json --check              # exit 1 if any tile differs
+    python3 tools/app_manifest.py manifest.json --check              # exit 1 if any tile differs,
+                                                                     # or a Setup key is outside the
+                                                                     # variable contract
 
-Each tile gets solution/setup/choices.py inlined ahead of its wrapper: a tile's Python process does
+Each tile gets solution/setup/choices.py (with solution/utils/variables.py in place of its import)
+inlined ahead of its wrapper: a tile's Python process does
 not see the project library (tested on DSS 15.2, 2026-11-05: wrappers that import solution.setup fail
 with "Failed to get test result for ui" even when the library has it). --import writes the bare
 wrappers instead, for re-testing that on a later DSS version.
@@ -23,7 +26,9 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TILES_DIR = os.path.join(ROOT, "app_manifest", "tiles")
 CHOICES = os.path.join(ROOT, "solution", "setup", "choices.py")
+READER = os.path.join(ROOT, "solution", "utils", "variables.py")
 IMPORT = "from solution.setup.choices import "
+READER_IMPORT = "from solution.utils.variables import get_setting"
 
 # (section index, tile index) -> (wrapper file, how the tile is recognised)
 TILES = {
@@ -58,6 +63,11 @@ def tile_code(fname, inline=True):
         raise SystemExit("%s does not start with %r" % (fname, IMPORT))
     with open(CHOICES) as fh:
         library = fh.read()
+    if READER_IMPORT not in library:
+        raise SystemExit("solution/setup/choices.py no longer has %r" % READER_IMPORT)
+    with open(READER) as fh:
+        reader = fh.read()
+    library = library.replace(READER_IMPORT, "# Inlined from solution/utils/variables.py\n" + reader, 1)
     return "# Inlined from solution/setup/choices.py by tools/app_manifest.py --inline\n" + library \
         + "\n\n# Tile wrapper (" + fname + ")\n" + "\n".join(lines[1:]).lstrip("\n")
 
@@ -74,6 +84,22 @@ def patch(manifest, inline=True):
     return changed
 
 
+def unknown_variables(manifest):
+    """Setup parameters outside solution.variables.VARIABLE_CONTRACT, as 'section i tile j: key'."""
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    from solution.variables import VARIABLE_CONTRACT
+    found = []
+    for i, section in enumerate(manifest.get("homepageSections", [])):
+        for j, tile in enumerate(section.get("tiles", [])):
+            if tile.get("type") != "PROJECT_VARIABLES_EDIT":
+                continue
+            for param in tile.get("params") or []:
+                if param.get("name") and param["name"] not in VARIABLE_CONTRACT:
+                    found.append("section %d tile %d: %s" % (i, j, param["name"]))
+    return found
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("manifest", help="manifest JSON from dku app-designer get -o json")
@@ -87,8 +113,11 @@ def main():
         manifest = json.load(fh)
     changed = patch(manifest, inline=not args.import_)
     if args.check:
+        unknown = unknown_variables(manifest)
         print("\n".join("differs: " + c for c in changed) or "all Setup tiles match app_manifest/tiles/")
-        return 1 if changed else 0
+        print("\n".join("not in the variable contract: " + u for u in unknown)
+              or "all Setup variables are in the variable contract")
+        return 1 if changed or unknown else 0
     with open(args.out, "w") as fh:
         json.dump(manifest, fh, indent=2)
         fh.write("\n")

@@ -26,15 +26,6 @@ def client(local=None, standard=None, projects=("SOL", PREP), conn_type="Snowfla
     return cl, prep
 
 
-class ScopedVariable(unittest.TestCase):
-    def test_local_wins_then_standard_then_none(self):
-        v = {"local": {"a": "L", "b": ""}, "standard": {"a": "S", "b": "S", "c": "S"}}
-        self.assertEqual([c.scoped_variable(v, k) for k in "abcd"], ["L", "S", "S", None])
-
-    def test_missing_scopes(self):
-        self.assertIsNone(c.scoped_variable({}, "a"))
-
-
 class OmopTableChoices(unittest.TestCase):
     def test_lists_datasets_on_main_connection_type_sorted(self):
         cl, prep = client(local={"data_preparation_project_key": PREP, "main_connection": MAIN})
@@ -114,7 +105,8 @@ class ManifestTool(unittest.TestCase):
         tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
         tool.patch(m)  # inline is the default
         code = m["homepageSections"][8]["tiles"][1]["python"]
-        self.assertNotIn("from solution.setup", code)
+        self.assertNotIn("from solution.", code)
+        self.assertIn("def get_setting(", code)
         ns = {}
         exec(compile(code, "tile", "exec"), ns)
         ds = mock.MagicMock()
@@ -122,6 +114,22 @@ class ManifestTool(unittest.TestCase):
         ds.iter_tuples.return_value = iter([(3,)])
         with mock.patch.dict(ns, {"_dataiku": lambda: mock.MagicMock(Dataset=lambda name: ds)}):
             self.assertEqual(ns["do"]({}, {}, {}, []), {"choices": [{"value": 3, "label": 3}]})
+
+    def test_inline_omop_tile_reads_variables_without_the_library(self):
+        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
+        tool.patch(m)
+        ns = {}
+        exec(compile(m["homepageSections"][2]["tiles"][3]["python"], "tile", "exec"), ns)
+        cl, _ = client(local={"data_preparation_project_key": PREP, "main_connection": MAIN})
+        with mock.patch.dict(ns, {"_client": lambda client: cl, "_current_project_key": lambda key: "SOL"}):
+            self.assertEqual([x["value"] for x in ns["do"]({}, {}, {}, [])["choices"]], ["concept_sf", "person_sf"])
+
+    def test_check_names_setup_keys_outside_the_contract(self):
+        tool = load_tool()
+        m = {"homepageSections": [{"tiles": [
+            {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "main_connection"}, {"name": "connection_type"}]},
+            {"type": "SCENARIO_RUN", "params": [{"name": "anything"}]}]}]}
+        self.assertEqual(tool.unknown_variables(m), ["section 0 tile 0: connection_type"])
 
     def test_wrappers_compile_and_name_real_functions(self):
         tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")

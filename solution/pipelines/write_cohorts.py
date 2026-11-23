@@ -15,6 +15,7 @@ from solution.recipes.sql_script_function import (
     create_sql_script_scenario_step,
     validate_cdm_tables
 )
+from solution.utils.variables import get_setting
 
 
 # Configure logging
@@ -130,14 +131,11 @@ def write_cohorts():
     try:
         # Initialize project and variables
         project, variables = get_current_project_and_variables()
-        main_connection = variables['local']['main_connection']
+        main_connection = get_setting('main_connection', variables)
         
         # Get dataset settings
         _, dataset_settings_dict = get_dataset_settings_and_dictionary(project, "cohort_metadata_copy")
         connection_type = dataset_settings_dict.get("type", "")
-        
-        # Reset cohort build error
-        project.update_variables({'cohort_build_error': 0}, type='local')
         
         # Initialize folders and datasets
         handle = dataiku.Folder("lMM00YKr")

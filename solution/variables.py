@@ -10,6 +10,29 @@ OMOP_CDM_KEYS = [
 
 OMOP_RESULTS_SCHEMA_KEYS = ["cohort", "cohort_definition"]
 
+# Project variable contract (solution-revision-plan.md, R7). `standard` holds shipped defaults and
+# tunables; `local` holds whatever Project Setup writes. Code reads both through
+# solution.utils.variables.get_setting (local, then standard). tests/test_variables.py and
+# `tools/app_manifest.py --check` fail on a key outside this contract.
+STANDARD_DEFAULTS = {
+    "days_prior_to_cohort_startdate": 365,
+    "enable_pipeline": False,
+    "cohort_script_table_naming": "atlas",  # R1
+    "temp_schema": "",  # R6
+}
+
+LOCAL_KEYS = frozenset([
+    "main_connection", "folder_connection", "data_preparation_project_key",
+    "omop_cdm_standard_tables_import", "omop_standardised_vocabulary_tables_import",
+    "cohort_script_table_prefix",  # R1
+    "cohort_submission",  # R2
+] + OMOP_CDM_KEYS)
+
+# Still in use until the named item removes them.
+RETIRING_KEYS = {"cdm_standard_tables_map": "R1", "cohort_definition_id": "R3"}
+
+VARIABLE_CONTRACT = frozenset(STANDARD_DEFAULTS) | LOCAL_KEYS | frozenset(RETIRING_KEYS)
+
 MANDATORY_TABLES = [
     "person", "observation_period", "visit_occurrence", "condition_occurrence", "drug_exposure",
     "death", "location", "condition_era"]

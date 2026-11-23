@@ -7,6 +7,7 @@ from dku_utils.projects.project_commons import get_current_project_and_variables
 
 from solution.utils.folder_utils import get_folder_item_names, check_item_in_folder
 from solution.variables import OMOP_CDM_KEYS, OMOP_RESULTS_SCHEMA_KEYS
+from solution.utils.variables import get_setting
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ def _get_omop_keys_v53() -> List[str]:
 def check_omop_table_names() -> None:
     """Main function to check OMOP table names against the mapping file."""
     project, variables = get_current_project_and_variables()
-    key_map_name = variables['local']['cdm_standard_tables_map']
+    key_map_name = get_setting('cdm_standard_tables_map', variables)
     folder_id = "4ktqvA1F"
     
     has_errors = False

@@ -5,6 +5,7 @@ from dku_utils.projects.project_commons import get_current_project_and_variables
 from dku_utils.projects.datasets.dataset_commons import get_dataset_schema
 from solution.schema.cdm_schema import CDM_SCHEMA
 from solution.variables import MANDATORY_TABLES, MANDATORY_VOCABULARY
+from solution.utils.variables import get_setting
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -67,11 +68,11 @@ def _check_table_schema(dataset: str, imported_table_name: str, source_project,
 def check_omop_schemas() -> None:
     """Main function to check OMOP schemas."""
     project, variables = get_current_project_and_variables()
-    new_data_prep_project_key = variables['local']['data_preparation_project_key']
+    new_data_prep_project_key = get_setting('data_preparation_project_key', variables)
     
     # Load selected datasets
-    datasets_included = list(set(MANDATORY_TABLES + variables['local']['omop_cdm_standard_tables_import']))
-    vocabulary_included = list(set(MANDATORY_VOCABULARY + variables['local']['omop_standardised_vocabulary_tables_import']))
+    datasets_included = list(set(MANDATORY_TABLES + get_setting('omop_cdm_standard_tables_import', variables, [])))
+    vocabulary_included = list(set(MANDATORY_VOCABULARY + get_setting('omop_standardised_vocabulary_tables_import', variables, [])))
     
     omop_tables = {'standard_tables': datasets_included, 'standard_vocabulary': vocabulary_included}
     source_project, _ = get_project_and_variables(new_data_prep_project_key)
@@ -87,7 +88,7 @@ def check_omop_schemas() -> None:
                 required_schema = set([t[:2] for t in CDM_SCHEMA[dataset] if t[2]])
                 optional_schema = {t[0]: t[1] for t in CDM_SCHEMA[dataset] if not t[2]}
                 
-                imported_table_name = variables['local'].get(dataset, "")
+                imported_table_name = get_setting(dataset, variables, "")
                 
                 # Check schema for this table
                 table_error, table_optional_error = _check_table_schema(

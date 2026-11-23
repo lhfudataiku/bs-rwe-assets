@@ -8,6 +8,8 @@ instead of an error.
 """
 import logging
 
+from solution.utils.variables import get_setting
+
 logger = logging.getLogger(__name__)
 
 NO_PREP_PROJECT = {"value": "", "label": "Select a data preparation project first"}
@@ -25,19 +27,6 @@ def _client(client):
 
 def _current_project_key(project_key):
     return project_key or _dataiku().get_custom_variables()["projectKey"]
-
-
-def scoped_variable(variables, name):
-    """Return a project variable from the `local` scope, falling back to `standard`.
-
-    Project Setup writes `local`, which the solution code reads; `standard` may still hold an older
-    value. Missing and empty values both return None.
-    """
-    for scope in ("local", "standard"):
-        value = (variables.get(scope) or {}).get(name)
-        if value:
-            return value
-    return None
 
 
 def _options(values):
@@ -58,11 +47,11 @@ def omop_table_choices(client=None, project_key=None):
     client = _client(client)
     variables = client.get_project(_current_project_key(project_key)).get_variables()
 
-    prep_key = scoped_variable(variables, "data_preparation_project_key")
+    prep_key = get_setting("data_preparation_project_key", variables)
     if not prep_key or prep_key not in set(client.list_project_keys()):
         return {"choices": [NO_PREP_PROJECT]}
 
-    main_connection = scoped_variable(variables, "main_connection")
+    main_connection = get_setting("main_connection", variables)
     if not main_connection:
         return {"choices": [NO_MAIN_CONNECTION]}
     try:

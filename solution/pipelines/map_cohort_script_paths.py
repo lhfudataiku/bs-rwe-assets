@@ -12,6 +12,7 @@ from solution.recipes.sql_script_function import (
     create_cohort_definition_table_script,
     validate_cdm_tables
 )
+from solution.utils.variables import get_setting
 
 
 # Configure logging
@@ -135,7 +136,7 @@ def map_cohort_script_paths():
     try:
         # Initialize project and variables
         project, variables = get_current_project_and_variables()
-        main_connection = variables['local']['main_connection']
+        main_connection = get_setting('main_connection', variables)
         logger.info(f"Initialized project with main connection: {main_connection}")
         
         # Get dataset settings
@@ -152,7 +153,7 @@ def map_cohort_script_paths():
         logger.info("Initialized all required folders and datasets")
         
         # Load key map
-        key_map_name = variables['local']['cdm_standard_tables_map']
+        key_map_name = get_setting('cdm_standard_tables_map', variables)
         key_map = load_key_map(map_handle, key_map_name)
         
         # Process cohort metadata

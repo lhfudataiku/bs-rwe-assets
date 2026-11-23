@@ -133,59 +133,24 @@ def return_script_cdm_tables(sql_code, key_map):
 
 
 def get_sql_path(table):
+    """Return the table's SQL name exactly as DSS writes it in its own recipes.
+
+    DSS resolves the catalog or database, the schema, variables such as ${projectKey} and the
+    quoting of each dialect (spike 2026-11-20, solution-revision-plan.md R4). Only the connection
+    types in SQL_SCRIPT are supported; any other raises before SQL is built.
+    """
     _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, table)
     connection_type = dataset_settings_dict.get("type", "")
-    dataset_params = dataset_settings_dict.get("params", {})
-    return set_table_variables(connection_type, dataset_params)
-
-
-# Check if all connection types are included here !!!
-def set_table_variables(connection_type, dataset_params):
-    custom_variables = dataiku.get_custom_variables()
-    table_name = dataset_params.get("table", "")
-
-    if connection_type == "Snowflake":
-        schema = dataset_params.get("schema", "")
-        replacement = {
-            "${TENANT}": custom_variables.get("TENANT", ""),
-            "${NODE}": custom_variables.get("NODE", ""),
-            "${projectKey}": custom_variables.get("projectKey", ""),
-        }
-
-        def replace_match(match):
-            return replacement[match.group(0)]
-
-        pattern = re.compile("|".join(re.escape(key) for key in replacement.keys()))
-        table_name = pattern.sub(replace_match, table_name)
-        table_path = f'"{table_name}"' if not schema else f'"{schema}"."{table_name}"'
-        return table_path
-
-    elif connection_type == "Databricks":
-        schema = dataset_params.get("schema", "")
-        replacement = {
-            "${catalog}": custom_variables.get("catalog", ""),
-            "${projectKey}": custom_variables.get("projectKey", ""),
-        }
-
-        def replace_match(match):
-            return replacement[match.group(0)]
-
-        pattern = re.compile("|".join(re.escape(key) for key in replacement.keys()))
-        table_name = pattern.sub(replace_match, table_name)
-        table_path = f"`{table_name}`" if not schema else f"`{schema}`.`{table_name}`"
-        return table_path
-    
-    elif connection_type == "Redshift":
-        replacement = {
-            "${projectKey}": custom_variables.get("projectKey", ""),
-        }
-
-        def replace_match(match):
-            return replacement[match.group(0)]
-
-        pattern = re.compile("|".join(re.escape(key) for key in replacement.keys()))
-        table_name = pattern.sub(replace_match, table_name)
-    return table_name
+    if connection_type not in SQL_SCRIPT:
+        raise ValueError(
+            f"Dataset '{table}' is on a {connection_type or 'unknown'} connection; the solution supports "
+            f"{', '.join(sorted(SQL_SCRIPT))}. Run 'Reconfigure' in Project Setup on a supported connection."
+        )
+    info = dataiku.Dataset(table).get_location_info().get("info", {})
+    table_path = info.get("quotedResolvedTableName")
+    if not table_path:
+        raise ValueError(f"DSS returned no resolved table name for dataset '{table}' ({connection_type})")
+    return table_path
 
 
 def create_cdm_table_paths(key_map, script_cdm_table_names):
