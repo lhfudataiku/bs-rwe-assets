@@ -349,10 +349,10 @@
       "role": "release",
       "sample_size": "1K",
       "connections": [
-        "managed-snowflake"
+        "bs-snowflake"
       ],
       "upstream": [
-        "SYNPUFOMOP1KDATAPREPRWDV11"
+        "PREP_RWD_SF_1K"
       ],
       "owner": "solution",
       "personas": [
@@ -361,8 +361,8 @@
       ],
       "library": {
         "python/solution": {
-          "branch": "v1-2",
-          "hash": "a7d922a3304ef8e28536854198b032d8a1e6e756"
+          "branch": "solution-revision-v1-2",
+          "hash": "2f06afa05857f5537f7de66667e8be8a1097d715"
         },
         "python/ds_common": {
           "branch": "v2-3-1",

@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1302,
+ "dss_project_count": 1303,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-20T15:09Z",
+   "fetched_at": "2026-11-23T08:14Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-20T15:16Z",
+   "probed_at": "2026-11-23T08:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-20T15:09Z",
+   "fetched_at": "2026-11-23T08:14Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-20T15:16Z",
+   "probed_at": "2026-11-23T08:14Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -38667,7 +38667,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-20T15:09Z",
+   "fetched_at": "2026-11-23T08:14Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38699,13 +38699,13 @@
      "remote": "git@github.com:dataiku/bs-commons.git"
     },
     "python/solution": {
-     "checkout": "v1-2",
-     "hash": "a7d922a3304ef8e28536854198b032d8a1e6e756",
+     "checkout": "solution-revision-v1-2",
+     "hash": "2f06afa05857f5537f7de66667e8be8a1097d715",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-20T15:16Z",
+   "probed_at": "2026-11-23T08:14Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
