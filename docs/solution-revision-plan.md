@@ -523,7 +523,7 @@ DSS part, approved by the owner on 2026-11-23:
      - `map_cohort_script_paths.py` reports every per-cohort error as "Missing required OMOP tables
        across cohorts". R2 rewrites ingestion.
 
-**Step 2 status (2026-11-23): repo part done (`0c4b88a`, error cleanup after it); DSS part done; E4 and the Databricks forced failure passed. Step 2 is done.**
+**Step 2 status (2026-11-23): repo part done (`0c4b88a`, error cleanup `a764faa`); DSS part done, both projects on `a764faa`; E4 and the Databricks forced failure passed. Step 2 is done.**
 
 - **R5.** `solution/pipelines/build_cohorts.py:build_cohorts()` is the body of a static Python recipe
   `build_cohorts`. `write_cohorts.py` and its scenario helpers are gone.
@@ -588,14 +588,15 @@ DSS part, approved by the owner on 2026-11-23, on `SOL_RWD_COHORT_DISCOVERY` and
    - Rerunning "Create Cohort Scripts" restored the script, and the next build gave 611 / 593 / 247.
 6. **Findings.**
    - The stored error first kept the `None: b"..."` wrapper and Java stack lines. `clean_error()`
-     now removes them; this needs a resync.
+     removes them (`a764faa`, resynced; not yet seen in a live failure).
    - A FAILED row carries the cohort's current count. Cohort 2 kept 593 rows from the previous run,
      because the script failed before its `DELETE`.
    - **Open, for step 5.** "⚠️ Format Solution⚠️" step 8 still syncs `cohort` and
      `cohort_building_log` to the filesystem and back through a sync recipe. That would give them a
      second producer next to `build_cohorts`. The project macro test runs it.
    - "Reconfigure Connections" again left 34 managed `TMP_RWD_SOL_V112_TEST_*` tables in
-     `business_solutions.default` on `bs-databricks-per-user`.
+     `business_solutions.default` on `bs-databricks-per-user`. Dropped with the owner's approval and
+     checked absent by name.
    - TMP still has stale `sync_*` recipes reading `PREP_RWD_S3_1K`; they log graph errors in jobs.
      TMP is deleted in D3 step 6.
 
