@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1303,
+ "dss_project_count": 1304,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T08:14Z",
+   "fetched_at": "2026-11-23T09:24Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-23T08:14Z",
+   "probed_at": "2026-11-23T09:24Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T08:14Z",
+   "fetched_at": "2026-11-23T09:24Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-23T08:14Z",
+   "probed_at": "2026-11-23T09:24Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -38667,7 +38667,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T08:14Z",
+   "fetched_at": "2026-11-23T09:24Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38700,16 +38700,15 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "2f06afa05857f5537f7de66667e8be8a1097d715",
+     "hash": "d0a11e9b3c422e8b8210e77b1fecefa05ecd7b3e",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-23T08:14Z",
+   "probed_at": "2026-11-23T09:24Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
-     "cohort_build_error": 0,
      "concept": "concept_sf",
      "concept_ancestor": "concept_ancestor_sf",
      "condition_era": "condition_era_sf",
@@ -38750,68 +38749,12 @@
      "visit_occurrence": "visit_occurrence_sf"
     },
     "standard": {
-     "advanced_file_format": false,
-     "care_site": "care_site",
      "cdm_standard_tables_map": "omop_cdm_atlas",
-     "cohort_build_error": 0,
      "cohort_definition_id": 1,
-     "concept": "concept_sf",
-     "concept_ancestor": "concept_ancestor_sf",
-     "concept_class": "concept_class",
-     "concept_relationship": "concept_relationship",
-     "concept_synonym": "concept_synonym",
-     "condition_count_for_charlson_score": 2,
-     "condition_era": "condition_era_sf",
-     "condition_occurrence": "condition_occurrence_sf",
-     "connection_type": "PostgreSQL",
-     "cost": "cost table:",
-     "data_preparation_project_key": "PREP_RWD_SF_1K",
+     "cohort_script_table_naming": "atlas",
      "days_prior_to_cohort_startdate": 365,
-     "death": "death_sf",
-     "device_exposure": "device_exposure_sf",
-     "domain": "domain",
-     "dose_era": "dose_era",
-     "drug_era": "drug_era_sf",
-     "drug_exposure": "drug_exposure_sf",
-     "drug_strength": "drug_strength",
      "enable_pipeline": false,
-     "fact_relationship": "fact_relationship",
-     "folder_connection": "filesystem_folders",
-     "location": "location_sf",
-     "main_connection": "bs-snowflake",
-     "measurement": "measurement_sf",
-     "note": "note",
-     "note_nlp": "note_nlp",
-     "observation": "observation_sf",
-     "observation_period": "observation_period_sf",
-     "omop_cdm_standard_tables_import": [
-      "person",
-      "observation_period",
-      "visit_occurrence",
-      "condition_occurrence",
-      "drug_exposure",
-      "procedure_occurrence",
-      "device_exposure",
-      "measurement",
-      "observation",
-      "death",
-      "location",
-      "drug_era",
-      "condition_era"
-     ],
-     "omop_standardised_vocabulary_tables_import": [
-      "concept",
-      "concept_ancestor"
-     ],
-     "payer_plan_period": "payer_plan_period",
-     "person": "person_sf",
-     "procedure_occurrence": "procedure_occurrence_sf",
-     "provider": "provider",
-     "relationship": "relationship",
-     "source_to_concept_map": "source_to_concept_map",
-     "specimen": "specimen",
-     "visit_occurrence": "visit_occurrence_sf",
-     "vocabulary": "vocabulary"
+     "temp_schema": ""
     }
    },
    "wiki_articles": [

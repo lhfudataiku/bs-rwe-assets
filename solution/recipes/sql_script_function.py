@@ -136,7 +136,8 @@ def get_sql_path(table):
     """Return the table's SQL name exactly as DSS writes it in its own recipes.
 
     DSS resolves the catalog or database, the schema, variables such as ${projectKey} and the
-    quoting of each dialect (spike 2026-11-20, solution-revision-plan.md R4). Only the connection
+    quoting of each dialect (spike 2026-11-20, solution-revision-plan.md R4). Works in recipes that do
+    not declare the dataset as an input or output. Only the connection
     types in SQL_SCRIPT are supported; any other raises before SQL is built.
     """
     _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, table)
@@ -146,7 +147,9 @@ def get_sql_path(table):
             f"Dataset '{table}' is on a {connection_type or 'unknown'} connection; the solution supports "
             f"{', '.join(sorted(SQL_SCRIPT))}. Run 'Reconfigure' in Project Setup on a supported connection."
         )
-    info = dataiku.Dataset(table).get_location_info().get("info", {})
+    # ignore_flow: the mapping runs inside a Python recipe that does not declare the CDM and cohort
+    # tables, and dataiku.Dataset refuses undeclared datasets there (E4 rerun, 2026-11-23).
+    info = dataiku.Dataset(table, ignore_flow=True).get_location_info().get("info", {})
     table_path = info.get("quotedResolvedTableName")
     if not table_path:
         raise ValueError(f"DSS returned no resolved table name for dataset '{table}' ({connection_type})")

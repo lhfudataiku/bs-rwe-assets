@@ -32,7 +32,7 @@ class GetSqlPath(unittest.TestCase):
             with self.subTest(connection_type=connection_type):
                 ds = self.patch(connection_type, {"quotedResolvedTableName": name, "table": "ignored"})
                 self.assertEqual(f.get_sql_path("person"), name)
-                ds.assert_called_with("person")
+                ds.assert_called_with("person", ignore_flow=True)  # usable from recipes that do not declare it
 
     def test_unsupported_connection_type_raises_with_supported_list(self):
         self.patch("Filesystem", {})

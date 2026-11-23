@@ -446,7 +446,7 @@ tiles for the frequency tables. Open question 4 is closed.
 | 4. Dashboard | R3 | All cohorts selectable by filter; the three E4 cohorts' figures equal the single-cohort build |
 | 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 03, 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
 
-**Step 1 status (2026-11-23): repo part done; DSS part not started.**
+**Step 1 status (2026-11-23): repo part done (`d0a11e9`); DSS part done; E4 not passed yet.**
 
 - **R4.** `get_sql_path()` returns `quotedResolvedTableName`, and `set_table_variables()` is gone. A
   dataset that is not on Snowflake, Databricks or Redshift raises with the supported list
@@ -464,19 +464,51 @@ tiles for the frequency tables. Open question 4 is closed.
   `dataiku`, `dataikuapi`, `pandas`, `numpy` and the project libraries. The technical requirements
   draft (wiki 03) states the default-environment requirement.
 
-DSS part, each change after the owner's approval:
+DSS part, approved by the owner on 2026-11-23:
 
-1. No separate bundle export: the owner leaves it to the project macro test (2026-11-23).
-2. Resync the library and reapply the patched manifest.
-3. Scenarios:
-   - delete "Update project variables" and its call steps in "Build Cohort Dashboard", "Create Cohort
-     Scripts", "Import Datasets from DataPrep Project" and "Reconfigure Connections";
-   - switch the `standard` reads in "Reconfigure Connections" (`enable_pipeline`) and "⚠️ Format
-     Solution⚠️" (the two import lists) to `get_setting()`.
-4. Variables: reduce `standard` to the contract's defaults (keeping `cdm_standard_tables_map` and
-   `cohort_definition_id` until R1 and R3), and drop `cohort_build_error` from `local`. First check
-   that no recipe or insight uses a dropped key as `${...}`.
-5. Verify: rerun E4 on SF, DB and RS; the counts stay 611, 593 and 247.
+1. **Bundle export.** None separately; the owner leaves it to the project macro test.
+2. **Library.** Resynced to `d0a11e9`.
+   - **Manifest: reapplied.** Only the Python of the 4 tiles changed, and `tools/app_manifest.py --check`
+     on the refetched manifest passes, variable contract included.
+   - The deployed code of section 2 tiles 0, 3 and 5 was run outside DSS against the live project. It
+     lists `PREP_RWD_SF_1K`, and the prep project's 15 Snowflake tables for both table tiles.
+   - Not checked: the Setup page in the browser, and the cohort tile (section 8 tile 1), which needs
+     DSS's own Python process.
+3. **Scenarios: done.**
+   - "Update project variables" is deleted, along with its call steps in "Build Cohort Dashboard",
+     "Create Cohort Scripts", "Import Datasets from DataPrep Project" and "Reconfigure Connections".
+   - Five scope reads now use `get_setting()`:
+     - "Reconfigure Connections": `main_connection`, `folder_connection` and `enable_pipeline`;
+     - "⚠️ Format Solution⚠️": the prep project key and the two import lists.
+   - No scenario reads a scope directly any more.
+4. **Variables: done.**
+   - Only `days_prior_to_cohort_startdate` (4 recipes) and `cohort_definition_id` (1 recipe) are used
+     as `${...}`. No dataset, recipe, scenario, insight, dashboard or folder uses any other key.
+   - `standard` now holds `days_prior_to_cohort_startdate`, `enable_pipeline`,
+     `cohort_script_table_naming`, `temp_schema`, `cdm_standard_tables_map` and `cohort_definition_id`.
+   - `local` lost `cohort_build_error`, and nothing outside the contract remains.
+   - The values from before the change are kept outside the repo.
+5. **Verify: first E4 rerun failed (2026-11-23).** The counts must stay 611, 593 and 247 on SF, DB and
+   RS.
+   - **R4 regression.** On `d0a11e9`, "Create mapped scripts" failed on SF (SOL) and RS (TMP):
+     `Dataset cohort cannot be used : declare it as input or output of your recipe`.
+     - The mapping runs in the Python recipe `compute_lMM00YKr`, which declares no CDM or cohort
+       tables, and `dataiku.Dataset(...)` refuses undeclared datasets inside a recipe.
+     - The spike called `get_location_info()` from a scenario step, so it did not catch this.
+     - `map_cohort_script_paths.py` then reports it as "Missing required OMOP tables", which is
+       misleading.
+     - Fix, not yet on DSS: `dataiku.Dataset(table, ignore_flow=True)`.
+     - R5's `build_cohorts` declares every table it reads anyway.
+   - **Snowflake, without the mapping.** "Write Cohort to Datasets" reran the 11-19 mapped scripts,
+     whose paths were built the old way. That still exercised `write_cohorts()` and the edited scenarios.
+     - It gave 611, 593 and 247 with the same checksums as 11-19.
+     - "Build Covariate Datasets" succeeded.
+   - **Redshift.** In TMP (library now `solution-revision-v1-2`), "Check OMOP CDM Schema" and the import
+     succeeded on the new library.
+   - **Databricks: not run.** `bs-databricks` returned `403 API tokens are disabled for your
+     organization`, even for `SELECT 1`, so a DSS admin must fix the connection first.
+   - **Covariate date warnings.** `OUTPUT_DATA_BAD_DATE`: 0 on SF now (11,295 on 11-19), and 22,590 on RS
+     as before. Unexplained.
 
 **Gate to exit phase 4:**
 
