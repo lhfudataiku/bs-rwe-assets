@@ -11,8 +11,10 @@ are Delta tables named `rwdtmp_<project key>__c<id>_<name>` in the scratch schem
 before and after each cohort, and any left by an earlier crash at the start of the build. A failed
 cohort is logged and the build moves on; the recipe fails at the end if any cohort failed.
 """
+import ast
 import datetime
 import logging
+import re
 
 import dataiku
 from dataiku import SQLExecutor2
@@ -40,6 +42,19 @@ def scratch_schema(connection_type):
         return None
     configured = get_setting("temp_schema")
     return quote_databricks_name(configured) if configured else table_qualifier(get_sql_path("cohort"))
+
+
+def clean_error(exc):
+    """A readable one-line error: no `None: b"..."` bytes wrapper, no Java stack frames."""
+    text = str(exc)
+    m = re.match(r"^(?:\w+: )?(b(['\"]).*\2)$", text, flags=re.S)
+    if m:
+        try:
+            text = ast.literal_eval(m.group(1)).decode("utf-8", "replace")
+        except (ValueError, SyntaxError):
+            pass
+    text = re.split(r"\n\s*at [\w$.]+\(", text)[0]
+    return " ".join(text.split())[:MAX_ERROR_LENGTH]
 
 
 def run(executor, statements, connection_type, query="SELECT 1"):
@@ -82,12 +97,12 @@ def build_one(executor, cohort, script, connection_type, project_key, schema, co
         return "SUCCESS", int(df.iloc[0, 0]), ""
     except Exception as e:
         logger.error("Cohort %s (%s) failed: %s", cohort["id"], cohort["name"], e)
-        error = " ".join(str(e).split())
+        error = clean_error(e)
         try:  # what the table holds now: the previous rows, or none (Databricks commits per statement)
             count = cohort_count(executor, cohort_table, cohort["id"])
         except Exception:
             count = 0
-        return "FAILED", count, error[:MAX_ERROR_LENGTH]
+        return "FAILED", count, error
     finally:
         try:
             drop_tables(executor, scratch, connection_type)
@@ -132,7 +147,7 @@ def build_cohorts():
             with folder.get_download_stream("cohort_%d" % cohort["id"]) as f:
                 script = f.read().decode("utf-8")
         except Exception as e:
-            status, count, error = "FAILED", 0, " ".join(str(e).split())[:MAX_ERROR_LENGTH]
+            status, count, error = "FAILED", 0, clean_error(e)
         else:
             status, count, error = build_one(executor, cohort, script, connection_type, project_key, schema,
                                              cohort_table)

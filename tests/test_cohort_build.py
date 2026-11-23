@@ -168,6 +168,20 @@ class BuildOne(unittest.TestCase):
         self.assertTrue(call.kwargs["pre_queries"][0].startswith("CREATE TABLE abCodesets"))
 
 
+class CleanError(unittest.TestCase):
+    def test_bytes_wrapper_and_java_frames_are_removed(self):
+        raw = ('None: b"During pre-query \'SELECT * FROM missing\': [TABLE_OR_VIEW_NOT_FOUND] The table '
+               '`missing` cannot be found.\\nSearch path: [x].\\n\\tat org.apache.Foo.bar(Foo.java:1)'
+               '\\n\\tat org.apache.Baz.qux(Baz.java:2)"')
+        self.assertEqual(b.clean_error(Exception(raw)),
+                         "During pre-query 'SELECT * FROM missing': [TABLE_OR_VIEW_NOT_FOUND] The table "
+                         "`missing` cannot be found. Search path: [x].")
+
+    def test_plain_message_is_kept_and_capped(self):
+        self.assertEqual(b.clean_error(ValueError("a\n  b")), "a b")
+        self.assertEqual(len(b.clean_error(ValueError("x" * 5000))), b.MAX_ERROR_LENGTH)
+
+
 class BuildCohorts(unittest.TestCase):
     def test_continues_past_a_failure_logs_every_cohort_then_fails(self):
         batch = [{"id": 1, "name": "A", "tables": ["person"], "script_file": "a.sql"},

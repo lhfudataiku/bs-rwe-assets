@@ -523,7 +523,7 @@ DSS part, approved by the owner on 2026-11-23:
      - `map_cohort_script_paths.py` reports every per-cohort error as "Missing required OMOP tables
        across cohorts". R2 rewrites ingestion.
 
-**Step 2 status (2026-11-23): repo part written, not yet in DSS.**
+**Step 2 status (2026-11-23): repo part done (`0c4b88a`, error cleanup after it); DSS part done; E4 and the Databricks forced failure passed. Step 2 is done.**
 
 - **R5.** `solution/pipelines/build_cohorts.py:build_cohorts()` is the body of a static Python recipe
   `build_cohorts`. `write_cohorts.py` and its scenario helpers are gone.
@@ -557,24 +557,47 @@ DSS part, approved by the owner on 2026-11-23:
 
   Both are checked in the DSS part.
 
-DSS part, to run after the owner's approval, on `SOL_RWD_COHORT_DISCOVERY` (and TMP for DB and RS):
+DSS part, approved by the owner on 2026-11-23, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
 
-1. Resync `python/solution`.
-2. Flow:
-   - Create the Python recipe `build_cohorts` in zone "Cohorts" on the default code env.
-     - Inputs: folder `lMM00YKr`, `uploaded_cohort_definition` and the imported OMOP tables.
+1. **Library.** Both resynced to `0c4b88a`.
+2. **Flow.**
+   - `build_cohorts` is in zone "Cohorts" on the inherited code env.
+     - Inputs: `lMM00YKr`, `uploaded_cohort_definition` and the 15 imported OMOP tables.
      - Outputs: `cohort` and `cohort_building_log`, both in append mode.
-     - Body: `from solution.pipelines.build_cohorts import build_cohorts; build_cohorts()`.
-   - Delete the recipes `create_cohort` and `compute_cohort_building_log`, keeping their datasets.
-3. Scenarios:
-   - "Write Cohort to Datasets" becomes one non-recursive forced build of `cohort` and
-     `cohort_building_log`.
-   - Delete "Drop SQL Temporary Tables", "Build Cohort Dataset" and "Build Cohort Log Dataset".
-   - Remove the "Move recipe to zone" step.
-4. Verify:
-   - E4 rerun on SF, DB and RS (611 / 593 / 247 and the step 1 checksums).
-   - A forced failure on Databricks leaves no `rwdtmp_` table. Break one statement of a mapped script,
-     build, check the log row says FAILED, and list the scratch schema.
+   - `create_cohort` and `compute_cohort_building_log` are deleted, and their datasets kept.
+   - DSS accepts a Python recipe whose SQL outputs are written only through `SQLExecutor2`.
+3. **Scenarios.**
+   - "Write Cohort to Datasets" is one non-recursive forced build of the two outputs.
+   - "Drop SQL Temporary Tables", "Build Cohort Dataset" and "Build Cohort Log Dataset" are deleted.
+   - In "⚠️ Format Solution⚠️", step 8 deletes only `compute_cohort_definition`, and only if it exists.
+     The step that cleared "Drop SQL Temporary Tables" is removed.
+   - The pre-change definitions are kept outside the repo.
+4. **Verify: E4 passes on SF, DB and RS.** Counts are 611 / 593 / 247, and checksums equal step 1 on
+   every database. Every log row says SUCCESS with an empty error.
+   - Snowflake ran in SOL; the covariate build after it succeeded.
+   - Redshift ran in TMP, before and after the Databricks leg.
+   - Databricks ran in TMP on `PREP_RWD_DB_1K` / `bs-databricks-per-user`; TMP is back on Redshift.
+   - The mapped scripts keep `@temp_database_schema.`.
+   - The start-of-build sweep ran `SHOW TABLES IN `business_solutions`.`default` LIKE
+     'rwdtmp_tmp_rwd_sol_v112_test__c*'` through `SQLExecutor2` and found nothing to drop.
+5. **Forced failure on Databricks.** `SELECT * FROM rwd_forced_failure_missing_table` was inserted
+   into cohort 2's mapped script, right after its Codesets temp table was filled.
+   - The build logged cohort 2 FAILED with the `TABLE_OR_VIEW_NOT_FOUND` error, and cohorts 1 and 3
+     SUCCESS. The recipe then failed.
+   - All 18 expected `rwdtmp_` tables of the three cohorts were probed by name. None exists.
+   - Rerunning "Create Cohort Scripts" restored the script, and the next build gave 611 / 593 / 247.
+6. **Findings.**
+   - The stored error first kept the `None: b"..."` wrapper and Java stack lines. `clean_error()`
+     now removes them; this needs a resync.
+   - A FAILED row carries the cohort's current count. Cohort 2 kept 593 rows from the previous run,
+     because the script failed before its `DELETE`.
+   - **Open, for step 5.** "⚠️ Format Solution⚠️" step 8 still syncs `cohort` and
+     `cohort_building_log` to the filesystem and back through a sync recipe. That would give them a
+     second producer next to `build_cohorts`. The project macro test runs it.
+   - "Reconfigure Connections" again left 34 managed `TMP_RWD_SOL_V112_TEST_*` tables in
+     `business_solutions.default` on `bs-databricks-per-user`.
+   - TMP still has stale `sync_*` recipes reading `PREP_RWD_S3_1K`; they log graph errors in jobs.
+     TMP is deleted in D3 step 6.
 
 **Gate to exit phase 4:**
 

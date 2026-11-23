@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1300,
+ "dss_project_count": 1302,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -21959,7 +21959,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T10:31Z",
+   "fetched_at": "2026-11-23T14:29Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -21979,7 +21979,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD RS 1K",
-   "probed_at": "2026-11-23T10:31Z",
+   "probed_at": "2026-11-23T14:30Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T13:07Z",
+   "fetched_at": "2026-11-23T14:29Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-23T13:07Z",
+   "probed_at": "2026-11-23T14:30Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T13:07Z",
+   "fetched_at": "2026-11-23T14:29Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-23T13:07Z",
+   "probed_at": "2026-11-23T14:30Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -38667,7 +38667,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T13:07Z",
+   "fetched_at": "2026-11-23T14:29Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38700,12 +38700,12 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "9f3f381680726bba0c2e2c482e9e70b1d39394ce",
+     "hash": "0c4b88ad665a7b885f84dbcef0c50e801508f7d4",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-23T13:07Z",
+   "probed_at": "2026-11-23T14:30Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
@@ -58905,7 +58905,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T10:31Z",
+   "fetched_at": "2026-11-23T14:29Z",
    "flow_sources": [
     "PREP_RWD_RS_1K.concept_ancestor_rs",
     "PREP_RWD_RS_1K.concept_rs",
@@ -58938,12 +58938,12 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "e41c6d3f9436ce09df1041195bfbb0adbe91b799",
+     "hash": "0c4b88ad665a7b885f84dbcef0c50e801508f7d4",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "TMP RWD solution v1.1.2 test",
-   "probed_at": "2026-11-23T10:31Z",
+   "probed_at": "2026-11-23T14:30Z",
    "variables": {
     "local": {
      "cdm_standard_tables_map": "omop_cdm_atlas",
