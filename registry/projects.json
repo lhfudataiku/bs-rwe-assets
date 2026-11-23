@@ -362,7 +362,7 @@
       "library": {
         "python/solution": {
           "branch": "solution-revision-v1-2",
-          "hash": "d0a11e9b3c422e8b8210e77b1fecefa05ecd7b3e"
+          "hash": "e41c6d3f94"
         },
         "python/ds_common": {
           "branch": "v2-3-1",
@@ -466,17 +466,17 @@
       "role": "scratch",
       "sample_size": "1K",
       "connections": [
-        "bs-snowflake"
+        "redshift-solutions"
       ],
       "upstream": [
-        "SYNPUFOMOP1KDATAPREPRWDV11"
+        "PREP_RWD_RS_1K"
       ],
       "owner": "solution",
       "personas": [],
       "library": {
         "python/solution": {
-          "branch": "",
-          "hash": "a7794f0"
+          "branch": "solution-revision-v1-2",
+          "hash": "e41c6d3f94"
         }
       },
       "lifecycle": "active",
@@ -638,7 +638,7 @@
       "role": "variant",
       "sample_size": "1K",
       "connections": [
-        "bs-databricks"
+        "bs-databricks-per-user"
       ],
       "upstream": [
         "PREP_RWD_S3_1K"

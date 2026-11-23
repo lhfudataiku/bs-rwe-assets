@@ -144,7 +144,7 @@ The archives (about 25 GB) are downloaded into the project's managed folder. Bui
 Connections and rules for both:
 
 - `PREP_RWD_SF_1K` and `DEMO_SF_PREP_OMOP_2M3`: `bs-snowflake` (DEC-RWD-005). It uses per-user OAuth, so builds run with the run-as user's grant (see Risks). `DEMO_SF_PREP_OMOP_2M3` belongs to the demo suite.
-- `PREP_RWD_DB_1K`: `bs-databricks`, a global personal-access-token connection (tested 2026-11-05), not `bs-databricks-per-user`. The per-user OAuth token expiry made it unreadable during this audit.
+- `PREP_RWD_DB_1K`: `bs-databricks-per-user` since 2026-11-23 (catalog `business_solutions`, schema `default`, table prefix `design_${projectKey}_`). It was on `bs-databricks`, a global personal-access-token connection (tested 2026-11-05), because the per-user OAuth token expiry had made the per-user connection unreadable during the audit. On 2026-11-23 `bs-databricks` refused every query (`403 API tokens are disabled for your organization`), and `bs-databricks-per-user` reaches another workspace that has no `se-sandbox` catalog. So the owner had the 15 outputs repointed and rebuilt from `PREP_RWD_S3_1K`, after a bundle `pre-per-user-2026-11-23`. The old `se-sandbox.business_solutions.PREP_RWD_DB_1K_*_db` tables stay behind until `bs-databricks` can be reached to drop them.
 - `PREP_RWD_RS_1K`: `redshift-solutions`.
 - Keep columns lowercase. The solution's import step uppercases them (DEC-RWD-001), so the variants and the demo variant stay faithful to the canonical layer.
 - A canonical change is followed by rebuilding its variants, `DEMO_SF_PREP_OMOP_2M3` included, and rechecking them against B2 and B4.
@@ -291,7 +291,7 @@ Run the work in six phases. Each phase ends at a gate the index can check, and n
 | Dropping `DEMO_DB_RWD2` early breaks `DEMO_SF_RWE` | Retirement is gated on D2 and on the lineage check |
 | CDM v5.2 → v5.3 differences in the 2.3M source | Map columns in `PREP_RWD_S3_2M3` and let the schema gate catch gaps |
 | ~~Id overflow at 2.3M after `bigint` → `int`~~ | Ruled out: measured 2026-10-15: largest 2.3M id 289,182,385 (`condition_occurrence_id`), largest Athena concept id 46,369,944, both well under 2,147,483,647 |
-| Databricks per-user OAuth expiry blocks builds and checks | `PREP_RWD_DB_1K` on the global `bs-databricks` connection |
+| Databricks per-user OAuth expiry blocks builds and checks | Since 2026-11-23, `PREP_RWD_DB_1K` is on `bs-databricks-per-user`, because tokens are disabled on the global `bs-databricks`. Reauthorise before Databricks builds and E4; rerun `--reprobe` before reading anything into `UNREADABLE` |
 | `bs-snowflake` uses per-user OAuth (DEC-RWD-005): builds and scenarios fail, and the index reports `UNREADABLE`, when the run-as user's grant has expired | Run scenarios as a named user with a current grant; reauthorise before phase 3 to 5 builds; rerun `--reprobe` before reading anything into `UNREADABLE` |
 | SYNPUF licence: data must not leave internal instances | Licence banner on every Part 1 wiki; bundles stored internally only |
 | The demo suite needs `PREP_RWD_S3_2M3` at build time (DEC-RWD-006) | Keep `PREP_RWD_S3_2M3` and its share; a bundle or move of the demo suite takes it along, or moves only the built Snowflake tables |

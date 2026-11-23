@@ -446,7 +446,7 @@ tiles for the frequency tables. Open question 4 is closed.
 | 4. Dashboard | R3 | All cohorts selectable by filter; the three E4 cohorts' figures equal the single-cohort build |
 | 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 03, 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
 
-**Step 1 status (2026-11-23): repo part done (`d0a11e9`); DSS part done; E4 not passed yet.**
+**Step 1 status (2026-11-23): repo part done (`d0a11e9`, fix `e41c6d3`); DSS part done; E4 passed on SF, DB and RS. Step 1 is done.**
 
 - **R4.** `get_sql_path()` returns `quotedResolvedTableName`, and `set_table_variables()` is gone. A
   dataset that is not on Snowflake, Databricks or Redshift raises with the supported list
@@ -488,27 +488,40 @@ DSS part, approved by the owner on 2026-11-23:
      `cohort_script_table_naming`, `temp_schema`, `cdm_standard_tables_map` and `cohort_definition_id`.
    - `local` lost `cohort_build_error`, and nothing outside the contract remains.
    - The values from before the change are kept outside the repo.
-5. **Verify: first E4 rerun failed (2026-11-23).** The counts must stay 611, 593 and 247 on SF, DB and
-   RS.
-   - **R4 regression.** On `d0a11e9`, "Create mapped scripts" failed on SF (SOL) and RS (TMP):
-     `Dataset cohort cannot be used : declare it as input or output of your recipe`.
+5. **Verify: E4 passes on SF, DB and RS (2026-11-23).**
+   - On `e41c6d3`, cohorts 1 / 2 / 3 give 611 / 593 / 247 on all three databases.
+     - Checksums are identical everywhere and equal to 11-19: subject-id sums 321170 / 313922 / 129590,
+       plus the summed start and end offsets.
+     - Snowflake ran in SOL; Databricks and Redshift ran in TMP, whose `python/solution` now follows
+       `solution-revision-v1-2`.
+     - "Create Cohort Scripts", "Write Cohort to Datasets" and "Build Covariate Datasets" succeeded on
+       each; the covariate build ends in WARNING on DB and RS (bad-date warnings below).
+   - **The new mapped scripts use `quotedResolvedTableName`.** That is their only difference from the
+     11-19 scripts:
+     - Snowflake gains the database;
+     - Databricks gains the catalog;
+     - Redshift gains quotes.
+
+     Atlas scratch names stay bare.
+   - **First rerun on `d0a11e9` failed (R4 regression, fixed in `e41c6d3`).** "Create mapped scripts"
+     raised `Dataset cohort cannot be used : declare it as input or output of your recipe`.
      - The mapping runs in the Python recipe `compute_lMM00YKr`, which declares no CDM or cohort
-       tables, and `dataiku.Dataset(...)` refuses undeclared datasets inside a recipe.
-     - The spike called `get_location_info()` from a scenario step, so it did not catch this.
-     - `map_cohort_script_paths.py` then reports it as "Missing required OMOP tables", which is
-       misleading.
-     - Fix, not yet on DSS: `dataiku.Dataset(table, ignore_flow=True)`.
-     - R5's `build_cohorts` declares every table it reads anyway.
-   - **Snowflake, without the mapping.** "Write Cohort to Datasets" reran the 11-19 mapped scripts,
-     whose paths were built the old way. That still exercised `write_cohorts()` and the edited scenarios.
-     - It gave 611, 593 and 247 with the same checksums as 11-19.
-     - "Build Covariate Datasets" succeeded.
-   - **Redshift.** In TMP (library now `solution-revision-v1-2`), "Check OMOP CDM Schema" and the import
-     succeeded on the new library.
-   - **Databricks: not run.** `bs-databricks` returned `403 API tokens are disabled for your
-     organization`, even for `SELECT 1`, so a DSS admin must fix the connection first.
-   - **Covariate date warnings.** `OUTPUT_DATA_BAD_DATE`: 0 on SF now (11,295 on 11-19), and 22,590 on RS
-     as before. Unexplained.
+       tables. `get_sql_path()` now opens datasets with `ignore_flow=True`.
+     - The spike had called `get_location_info()` from a scenario step, so it did not catch this.
+   - **Databricks moved to `bs-databricks-per-user`.** `bs-databricks` refused every query (`403 API
+     tokens are disabled for your organization`). With the owner's approval, `PREP_RWD_DB_1K` was
+     repointed and rebuilt on `bs-databricks-per-user` (migration plan, B3).
+     - The solution's DB run used `main_connection` = `bs-databricks-per-user`.
+     - No Atlas or `rwdtmp_` scratch table was left behind.
+     - TMP is back on `PREP_RWD_RS_1K` / `redshift-solutions`, with its variables restored.
+   - **Open findings:**
+     - `OUTPUT_DATA_BAD_DATE` warnings in the covariate build: 22,590 on DB and RS, 0 on SF (11,295 on
+       11-19). Unexplained.
+     - "Reconfigure Connections" moves datasets but does not drop their old tables. TMP's DB run left 34
+       managed `tmp_rwd_sol_v112_test_*` tables in `business_solutions.default` on
+       `bs-databricks-per-user`.
+     - `map_cohort_script_paths.py` reports every per-cohort error as "Missing required OMOP tables
+       across cohorts". R2 rewrites ingestion.
 
 **Gate to exit phase 4:**
 
