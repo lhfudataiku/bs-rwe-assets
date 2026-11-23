@@ -1,7 +1,4 @@
-"""Offline tests for the Project Setup choices (E2) and the manifest patch tool."""
-import copy
-import importlib.util
-import os
+"""Offline tests for the Project Setup choices (E2). The manifest tool is in test_app_manifest.py."""
 import unittest
 from unittest import mock
 
@@ -70,74 +67,6 @@ class CohortDefinitionChoices(unittest.TestCase):
         ds = self.dataset(["COHORT_DEFINITION_ID"], [])
         ds.iter_tuples.side_effect = Exception("dataset is not built")
         self.assertEqual(c.cohort_definition_choices(ds), {"choices": []})
-
-
-def load_tool():
-    path = os.path.join(stubs.ROOT, "tools", "app_manifest.py")
-    spec = importlib.util.spec_from_file_location("app_manifest", path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
-class ManifestTool(unittest.TestCase):
-    MANIFEST = {"homepageSections": [
-        {"tiles": []}, {"tiles": []},
-        {"tiles": [{"module": "input_data_source_project_selectbox", "python": "old"}, {}, {},
-                   {"params": [{"name": "person"}], "python": "old"}, {},
-                   {"params": [{"name": "concept"}], "python": "old"}]},
-        {}, {}, {}, {}, {},
-        {"tiles": [{}, {"params": [{"name": "cohort_definition_id"}], "python": "old"}]}]}
-
-    def test_replaces_the_four_tiles_and_nothing_else(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        self.assertEqual(len(tool.patch(m, inline=False)), 4)
-        self.assertIn("omop_table_choices()", m["homepageSections"][2]["tiles"][3]["python"])
-        self.assertEqual(tool.patch(m, inline=False), [])  # idempotent
-
-    def test_refuses_a_reordered_manifest(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        m["homepageSections"][2]["tiles"][3]["params"][0]["name"] = "concept"
-        with self.assertRaises(SystemExit):
-            tool.patch(m)
-
-    def test_inline_tiles_run_without_the_library(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        tool.patch(m)  # inline is the default
-        code = m["homepageSections"][8]["tiles"][1]["python"]
-        self.assertNotIn("from solution.", code)
-        self.assertIn("def get_setting(", code)
-        ns = {}
-        exec(compile(code, "tile", "exec"), ns)
-        ds = mock.MagicMock()
-        ds.read_schema.return_value = [{"name": "COHORT_DEFINITION_ID"}]
-        ds.iter_tuples.return_value = iter([(3,)])
-        with mock.patch.dict(ns, {"_dataiku": lambda: mock.MagicMock(Dataset=lambda name: ds)}):
-            self.assertEqual(ns["do"]({}, {}, {}, []), {"choices": [{"value": 3, "label": 3}]})
-
-    def test_inline_omop_tile_reads_variables_without_the_library(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        tool.patch(m)
-        ns = {}
-        exec(compile(m["homepageSections"][2]["tiles"][3]["python"], "tile", "exec"), ns)
-        cl, _ = client(local={"data_preparation_project_key": PREP, "main_connection": MAIN})
-        with mock.patch.dict(ns, {"_client": lambda client: cl, "_current_project_key": lambda key: "SOL"}):
-            self.assertEqual([x["value"] for x in ns["do"]({}, {}, {}, [])["choices"]], ["concept_sf", "person_sf"])
-
-    def test_check_names_setup_keys_outside_the_contract(self):
-        tool = load_tool()
-        m = {"homepageSections": [{"tiles": [
-            {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "main_connection"}, {"name": "connection_type"}]},
-            {"type": "SCENARIO_RUN", "params": [{"name": "anything"}]}]}]}
-        self.assertEqual(tool.unknown_variables(m), ["section 0 tile 0: connection_type"])
-
-    def test_wrappers_compile_and_name_real_functions(self):
-        tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")
-        for fname in os.listdir(tiles):
-            ns = {}
-            with open(os.path.join(tiles, fname)) as fh:
-                exec(compile(fh.read(), fname, "exec"), ns)
-            self.assertTrue(callable(ns["do"]), fname)
 
 
 if __name__ == "__main__":

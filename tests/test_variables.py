@@ -38,6 +38,8 @@ def keys_used(code):
         func = node.func.attr if isinstance(node.func, ast.Attribute) else getattr(node.func, "id", "")
         if func == "get_setting" and node.args and isinstance(node.args[0], ast.Constant):
             keys.add(node.args[0].value)
+        elif func == "set_local" and len(node.args) > 1 and isinstance(node.args[1], ast.Constant):
+            keys.add(node.args[1].value)
         elif func in WRITERS:
             for arg in node.args:
                 if isinstance(arg, ast.Dict):
@@ -61,6 +63,19 @@ class GetSetting(unittest.TestCase):
         self.assertIsNone(get_setting("a", {"local": None, "standard": None}))
 
 
+class SetLocal(unittest.TestCase):
+    def test_writes_local_only(self):
+        from unittest import mock
+        from solution.utils.variables import set_local
+        project = mock.MagicMock()
+        project.get_variables.return_value = {"standard": {"a": 1}, "local": {}}
+        self.assertEqual(set_local(project, "cohort_submission", [1]), [1])
+        project.set_variables.assert_called_once_with({"standard": {"a": 1}, "local": {"cohort_submission": [1]}})
+
+    def test_set_local_keys_are_checked(self):
+        self.assertEqual(keys_used("set_local(p, 'cohort_submission', [])"), {"cohort_submission"})
+
+
 class Contract(unittest.TestCase):
     def test_scopes_do_not_overlap(self):
         self.assertFalse(set(v.STANDARD_DEFAULTS) & v.LOCAL_KEYS)
@@ -81,7 +96,7 @@ class Contract(unittest.TestCase):
 
     def test_dropped_keys_are_gone(self):
         dropped = {"advanced_file_format", "condition_count_for_charlson_score", "connection_type",
-                   "cohort_build_error"}
+                   "cohort_build_error", "cdm_standard_tables_map"}
         self.assertFalse(dropped & v.VARIABLE_CONTRACT)
 
 

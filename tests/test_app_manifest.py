@@ -1,0 +1,161 @@
+"""tools/app_manifest.py: the repo's Project Setup layout (R1, R2), applied by identity, inline."""
+import copy
+import importlib.util
+import io
+import os
+import sys
+import unittest
+from unittest import mock
+
+import stubs
+
+stubs.install()
+
+
+def load_tool():
+    path = os.path.join(stubs.ROOT, "tools", "app_manifest.py")
+    spec = importlib.util.spec_from_file_location("app_manifest", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def scenario(sid):
+    return {"type": "SCENARIO_RUN", "scenarioId": sid, "prompt": sid}
+
+
+# The live layout before step 3, reduced to what the tool looks at.
+MANIFEST = {"homepageSections": [
+    {"sectionTitle": "Pipeline Configuration"},
+    {"sectionTitle": "Connections", "tiles": [{"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "main_connection"}]}]},
+    {"sectionTitle": "Connect OMOP", "tiles": [
+        {"type": "PROJECT_VARIABLES_EDIT", "module": "input_data_source_project_selectbox", "python": "old"},
+        {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "person"}], "python": "old"},
+        {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "concept"}], "python": "old"},
+        scenario("IMPORTDATASETSFROMDATAPREPPROJECT")]},
+    {"sectionTitle": "Custom mapping", "tiles": [
+        {"type": "MANAGED_FOLDER_ADD_FILE"}, {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cdm_standard_tables_map"}]},
+        scenario("CHECKOMOPTABLEVARIABLESMAPPING")]},
+    {"sectionTitle": "Cohort Ingestion"},
+    {"sectionTitle": "Upload scripts and metadata", "tiles": [
+        {"type": "MANAGED_FOLDER_ADD_FILE"}, {"type": "UPLOAD_DATASET_SET_FILE"}, scenario("CREATECOHORTSCRIPTS"),
+        {"type": "MANAGED_FOLDER_LINK"}]},
+    {"sectionTitle": "Write", "tiles": [scenario("WRITECOHORTTODATASETS")]},
+    {"sectionTitle": "Dashboard", "tiles": [{"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cohort_definition_id"}], "python": "old"}]},
+]}
+
+
+def by_title(manifest, title):
+    return next(s for s in manifest["homepageSections"] if s.get("sectionTitle") == title)
+
+
+class Apply(unittest.TestCase):
+    def setUp(self):
+        self.tool, self.m = load_tool(), copy.deepcopy(MANIFEST)
+        self.changes = self.tool.apply(self.m)
+
+    def test_step3_layout(self):
+        titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
+        self.assertNotIn("Custom mapping", titles)  # R1: S3 is gone
+        upload = by_title(self.m, "Upload and Register Cohort SQL Scripts")
+        self.assertEqual([t.get("type") if not t.get("module") else t["module"] for t in upload["tiles"]],
+                         ["MANAGED_FOLDER_ADD_FILE", "register_cohorts", "SCENARIO_RUN", "MANAGED_FOLDER_LINK"])
+        self.assertEqual(upload["tiles"][2]["prompt"], "Ingest registered cohorts")
+        self.assertEqual(by_title(self.m, "Write")["tiles"][-1]["module"], "built_cohorts")
+        omop = by_title(self.m, "Connect OMOP")["tiles"]
+        self.assertEqual(omop[3]["params"][0]["name"], "cohort_script_table_naming")
+        self.assertEqual(omop[4]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")
+        self.assertEqual(self.tool.unknown_variables(self.m), [])
+
+    def test_idempotent(self):
+        self.assertTrue(self.changes)
+        self.assertEqual(self.tool.apply(self.m), [])
+
+    def test_python_tiles_are_found_after_sections_move(self):
+        self.assertIn("omop_table_choices()", by_title(self.m, "Connect OMOP")["tiles"][1]["python"])
+        self.assertIn("cohort_definition_choices()", by_title(self.m, "Dashboard")["tiles"][0]["python"])
+
+    def test_ambiguous_tile_is_refused(self):
+        m = copy.deepcopy(MANIFEST)
+        m["homepageSections"][2]["tiles"][2]["params"][0]["name"] = "person"
+        with self.assertRaises(SystemExit):
+            self.tool.apply(m)
+
+    def test_check_names_setup_keys_outside_the_contract(self):
+        m = {"homepageSections": [{"tiles": [
+            {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "main_connection"}, {"name": "connection_type"}]},
+            {"type": "SCENARIO_RUN", "params": [{"name": "anything"}]}]}]}
+        self.assertEqual(self.tool.unknown_variables(m), ["section 0 tile 0: connection_type"])
+
+
+class InlineTiles(unittest.TestCase):
+    """Inlined tile code runs with only `dataiku` available, as in a DSS tile process."""
+
+    def setUp(self):
+        self.tool = load_tool()
+        self.m = copy.deepcopy(MANIFEST)
+        self.tool.apply(self.m)
+
+    def tile(self, module):
+        code = next(t for _, _, t in self.tool.all_tiles(self.m) if t.get("module") == module)["python"]
+        self.assertNotIn("from solution.", code)
+        ns = {}
+        exec(compile(code, module, "exec"), ns)
+        return ns["do"]
+
+    def fake_dataiku(self, registered_rows=(), variables=None):
+        dk = mock.MagicMock()
+        folder = dk.Folder.return_value
+        folder.list_paths_in_partition.return_value = ["/a.sql"]
+        folder.get_download_stream.side_effect = lambda p: mock.MagicMock(
+            __enter__=lambda s: io.BytesIO(b"-- name: Crohn's\nSELECT 1;"), __exit__=lambda *a: None)
+        ds = dk.Dataset.return_value
+        ds.read_schema.return_value = [{"name": "COHORT_DEFINITION_ID"}, {"name": "COHORT_DEFINITION_NAME"}]
+        ds.iter_tuples.side_effect = lambda: iter(registered_rows)
+        project = dk.api_client.return_value.get_default_project.return_value
+        project.get_variables.return_value = variables or {"standard": {}, "local": {}}
+        return dk, project
+
+    def test_register_tile_loads_and_saves(self):
+        do = self.tile("register_cohorts")
+        dk, project = self.fake_dataiku(registered_rows=[(1, "Old")])
+        with mock.patch.dict(sys.modules, {"dataiku": dk}):
+            loaded = do({"action": "load"}, {}, {}, [])
+            self.assertEqual(loaded["registered_ids"], [1])
+            self.assertEqual([(r["file"], r["id"], r["name"]) for r in loaded["rows"]], [("a.sql", 2, "Crohn's")])
+            refused = do({"action": "save", "rows": [dict(loaded["rows"][0], id=1)]}, {}, {}, [])
+            self.assertFalse(refused["ok"])
+            self.assertIn("already exists", refused["errors"][0])
+            project.set_variables.assert_not_called()
+            self.assertEqual(do({"action": "save", "rows": loaded["rows"]}, {}, {}, []), {"ok": True, "saved": 1})
+        saved = project.set_variables.call_args.args[0]["local"]["cohort_submission"]
+        self.assertEqual(saved, [{"id": 2, "name": "Crohn's", "description": "", "file": "a.sql", "replace": False}])
+
+    def test_register_tile_returns_sentences_not_tracebacks(self):
+        do = self.tile("register_cohorts")
+        dk, _ = self.fake_dataiku()
+        dk.Folder.side_effect = Exception("folder missing")
+        with mock.patch.dict(sys.modules, {"dataiku": dk}):
+            self.assertEqual(do({"action": "load"}, {}, {}, []),
+                             {"ok": False, "errors": ["Could not read the scripts or registered cohorts: folder missing"]})
+
+    def test_built_tile_lists_cohorts(self):
+        do = self.tile("built_cohorts")
+        dk, _ = self.fake_dataiku(registered_rows=[(1, "A")])
+        with mock.patch.dict(sys.modules, {"dataiku": dk}):
+            result = do({}, {}, {}, [])
+        self.assertTrue(result["ok"])
+        self.assertEqual([(r["id"], r["name"]) for r in result["rows"]], [(1, "A")])
+
+    def test_wrappers_compile_and_define_do(self):
+        tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")
+        for fname in sorted(os.listdir(tiles)):
+            if fname.endswith(".py"):
+                ns = {}
+                with open(os.path.join(tiles, fname)) as fh:
+                    exec(compile(fh.read(), fname, "exec"), ns)
+                self.assertTrue(callable(ns["do"]), fname)
+
+
+if __name__ == "__main__":
+    unittest.main()

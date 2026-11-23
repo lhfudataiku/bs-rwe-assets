@@ -1,0 +1,17 @@
+<div ng-controller="BuiltCohortsController" class="rwd-built-cohorts">
+    <p ng-if="loading">Reading the registered cohorts&hellip;</p>
+    <p ng-if="!loading && rows.length === 0 && errors.length === 0">No cohort is registered yet.</p>
+    <table class="table table-condensed" ng-if="rows.length">
+        <thead>
+            <tr><th>Id</th><th>Name</th><th>Description</th><th>Script</th><th>Subjects</th><th>Status</th><th>Last built</th></tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in rows">
+                <td>{{row.id}}</td><td>{{row.name}}</td><td>{{row.description}}</td><td>{{row.script}}</td>
+                <td>{{row.subjects === null ? '' : row.subjects}}</td><td>{{row.status}}</td><td>{{row.last_built}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <ul class="text-error" ng-if="errors.length"><li ng-repeat="e in errors">{{e}}</li></ul>
+    <button class="btn btn--secondary" ng-click="load()">Refresh</button>
+</div>

@@ -29,7 +29,7 @@ LOCAL_KEYS = frozenset([
 ] + OMOP_CDM_KEYS)
 
 # Still in use until the named item removes them.
-RETIRING_KEYS = {"cdm_standard_tables_map": "R1", "cohort_definition_id": "R3"}
+RETIRING_KEYS = {"cohort_definition_id": "R3"}
 
 VARIABLE_CONTRACT = frozenset(STANDARD_DEFAULTS) | LOCAL_KEYS | frozenset(RETIRING_KEYS)
 

@@ -28,3 +28,15 @@ def get_setting(name, variables=None, default=None):
         if _is_set(value):
             return value
     return default
+
+
+def set_local(project, name, value):
+    """Write project variable `name` in the `local` scope (what Project Setup writes) and save.
+
+    The one writer, next to the one reader: `tests/test_variables.py` checks that `name` is in the
+    variable contract.
+    """
+    variables = project.get_variables()
+    variables.setdefault("local", {})[name] = value
+    project.set_variables(variables)
+    return value

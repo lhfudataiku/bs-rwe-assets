@@ -600,6 +600,78 @@ DSS part, approved by the owner on 2026-11-23, on `SOL_RWD_COHORT_DISCOVERY` and
    - TMP still has stale `sync_*` recipes reading `PREP_RWD_S3_1K`; they log graph errors in jobs.
      TMP is deleted in D3 step 6.
 
+**Step 3 status (2026-11-23): repo part written, not yet in DSS.**
+
+- **R1.** `solution/setup/table_naming.py:key_map(naming, prefix)` builds the key map from
+  `cohort_script_table_naming` (`atlas`, `plain` or `prefix`) and `cohort_script_table_prefix`.
+  - The `atlas` and `plain` maps equal `omop_cdm_atlas.json` and `omop_cdm_standard.json`.
+  - `unmapped_references()` names every `@schema.table` the choice does not cover, except
+    `@temp_database_schema`. Every shipped script is covered under `atlas`.
+  - `cdm_standard_tables_map` left the contract. `check_omop_table_names.py` and
+    `utils/folder_utils.py` are gone.
+- **R2, registration.** `solution/setup/registration.py` is import-free, so it can be inlined into the
+  Setup tiles.
+  - It builds the tile rows (*new*, *registered*, *changed*, or *submitted, not ingested*), checks a
+    batch, and builds the "Built cohorts" listing.
+  - The script and its SHA-256 are stored as JSON in `cohort_definition_syntax`. That is how a script
+    is recognised as registered or changed. The cohort table's schema is unchanged.
+  - **Deviation from the text above:** cohort id 0 is accepted (whole numbers, 0 or more), because
+    the 45-cohort demo library uses it.
+- **R2, ingestion.** `solution/pipelines/register_cohorts.py:register_cohorts()` is the body of one
+  static Python recipe. It replaces the CSV copy, `compute_lMM00YKr`, `compute_cohort_definition` and
+  `map_cohort_script_paths.py`.
+  - It reads `cohort_submission` and checks the whole batch before writing anything: the tile's
+    checks against `cohort_definition`, R1 coverage, and the OMOP tables.
+  - Every error of the batch is reported at once, and each names its cohort. This also replaces the
+    misleading "Missing required OMOP tables" message.
+  - It then writes the mapped scripts and the escaped definitions in one session.
+  - R5's separate `register_cohorts` and mapping steps are merged into this one recipe.
+- **Tiles.** In `app_manifest/tiles/`:
+  - `register_cohorts.{py,html,js}`: load and save. `save` writes `cohort_submission` through
+    `set_local()`, the one writer next to `get_setting()`. Errors come back as sentences.
+  - `built_cohorts.{py,html,js}`: read-only.
+- **Manifest tool.** `tools/app_manifest.py` applies a declared layout. It finds tiles by module or
+  first parameter, not position, and inlines any `solution.*` import. On the step 1 manifest it:
+  - removes S3 and the CSV tile;
+  - renames S5 and its button ("Ingest registered cohorts");
+  - adds the naming, register and built tiles;
+  - refreshes the 4 wrapper tiles, whose inlined variables module gained `set_local`.
+
+  A second run makes no change.
+- **Bulk path.** `tools/register_cohorts.py <metadata.csv>` prints the submission. With
+  `--project KEY --apply` it writes it; the demo library gives 45 cohorts.
+- **Not tested offline:**
+  - the HTML and JS in DSS's Setup page;
+  - the naming tile's `visibilityCondition` syntax;
+  - folder and dataset access from a tile process.
+
+DSS part, to run after the owner's approval, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
+
+1. **Backups:** export the manifest, scenarios, recipes and variables.
+2. **Library:** resync both projects.
+3. **Flow:**
+   - Create the Python recipe `register_cohorts`. Its input is "Original Scripts" (`PqOBn6B3`); its
+     outputs are `lMM00YKr`, `cohort_definition` and `uploaded_cohort_definition`, in append mode.
+   - Delete the recipes `compute_lMM00YKr`, `compute_cohort_definition` and the one that builds
+     `cohort_metadata_copy`.
+   - Delete the datasets `cohort_metadata` and `cohort_metadata_copy`, and the folder `4ktqvA1F`.
+4. **Scenarios:**
+   - "Create Cohort Scripts" becomes one non-recursive forced build of `register_cohorts`'s outputs.
+   - Delete "Check OMOP Table Variables Mapping", "Check Uploaded Cohort Metadata Schema" and
+     "Build Cohort Metadata Dataset".
+   - Check "⚠️ Format Solution⚠️" for references to the removed objects.
+5. **Variables:** remove `cdm_standard_tables_map`.
+6. **Manifest:** build it with `tools/app_manifest.py --out`, apply it to SOL, and check it with
+   `--check`.
+7. **Verify on SOL (Snowflake):**
+   - In the browser, the naming tile's prefix field shows only for "Custom prefix".
+   - The E4 scripts come up as *new*. Ids 1–3 are refused without Replace and accepted with it.
+     Ingest, write, then E4 must give 611 / 593 / 247.
+   - A second batch, one more script named with a quote, ingests as a new id.
+   - "Built cohorts" lists both batches.
+8. **Verify on TMP:** E4 on Redshift and Databricks through `tools/register_cohorts.py --apply`.
+   This covers the Databricks literal escaping.
+
 **Gate to exit phase 4:**
 
 - E4 rerun gives identical counts on SF, DB and RS and equals 611, 593 and 247;
@@ -612,7 +684,8 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 
 ## Open questions
 
-- [ ] Keep the metadata CSV as a hidden bulk-import path, or drop it (recommendation: drop)
+- [x] Keep the metadata CSV as a hidden bulk-import path, or drop it. Dropped (owner, 2026-11-23);
+  `tools/register_cohorts.py` registers a library from a metadata CSV (R2)
 - [x] `condition_count_for_charlson_score`: wire into the Charlson logic or drop. Dropped (owner,
   2026-11-23; R7)
 - [ ] Databricks scratch schema: the connection default, or a dedicated `temp_schema`
