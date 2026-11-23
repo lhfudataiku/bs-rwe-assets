@@ -29,9 +29,8 @@ def create_cohort_sql_script(
     replacement = create_cdm_table_paths(
         key_map, script_cdm_table_names
     )
-    # Create replacement for temporary table names in cohort scripts from Atlas
-    temp_map = create_temp_table_map(sql_code)
-    replacement.update(temp_map)
+    # Atlas temporary tables (@temp_database_schema.<name>) stay as placeholders: build_cohorts renders
+    # them per dialect at run time (R6).
     # Replace cohort sql variables
     new_script = replace_sql_script_variables(sql_code, replacement)
     # Replace cohort id variables
@@ -68,22 +67,15 @@ def create_cohort_definition_table_script(cohort_ids, row_values, uploaded_row_v
     return replace_sql_script_variables(cohort_definition_script, replacement)
 
 
-def create_cohort_log_script(row_values):
-    cohort_log_script = get_script_by_connection_type("cohort_log_script")
-    row_values = ",\n".join(row_values)
-    replacement = {
-        "@cohort_building_log": get_sql_path("cohort_building_log"),
-        "@cohort_log": row_values,
-    }
-    return replace_sql_script_variables(cohort_log_script, replacement)
+
+def cohort_connection_type():
+    """Connection type of the `cohort` dataset, which sits on the project's main connection."""
+    _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, "cohort")
+    return dataset_settings_dict.get("type", "")
 
 
 def get_script_by_connection_type(script_name):
-    # Connection type = project main connection
-    _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, "cohort")
-    connection_type = dataset_settings_dict.get("type", "")
-    script = SQL_SCRIPT[connection_type][script_name]
-    return script
+    return SQL_SCRIPT[cohort_connection_type()][script_name]
 
 
 def create_cdm_table_map(key_map):
@@ -93,13 +85,6 @@ def create_cdm_table_map(key_map):
             cdm_standard_table[v] = k
     return cdm_standard_table
 
-
-def create_temp_table_map(sql_code):
-    replacement = {}
-    pattern = re.compile(r"@temp_database_schema\.\w*", re.IGNORECASE)
-    for table_name in set(pattern.findall(sql_code)):
-        replacement[table_name.lower()] = table_name.split(".")[1]
-    return replacement
 
 
 def return_script_cdm_tables(sql_code, key_map):
@@ -180,34 +165,6 @@ def replace_sql_script_variables(sql_script, replacement):
     return new_script
 
 
-def create_clear_temp_tables_script(sql_script):
-    clear_temp_tables_script = ""
-
-    pattern = re.compile(r"(DROP TABLE) (\W?\w*;)", re.IGNORECASE)
-    for table_name in set(pattern.findall(sql_script)):
-        clear_temp_tables_script += " IF EXISTS ".join(table_name)
-        clear_temp_tables_script += "\n"
-    return clear_temp_tables_script
-
-
-def create_sql_script_scenario_step(connection_type, sql_script):    
-    scenario_steps = [
-        {'id': 'sql_null',
-        'type': 'exec_sql',
-        'name': 'Step #1',
-        'enabled': True,
-        'runConditionType': 'RUN_IF_STATUS_MATCH',
-        'runConditionStatuses': ['SUCCESS', 'WARNING'],
-        'runConditionExpression': '',
-        'resetScenarioStatus': False,
-        'delayBetweenRetries': 10,
-        'maxRetriesOnFail': 0,
-        'params': {'connection': connection_type,
-        'sql': sql_script,
-        'overrideDefaultLimit': False,
-        'extraConf': [],
-        'proceedOnFailure': False}}]
-    return scenario_steps
 
 
 def validate_cdm_tables(script_cdm_table_names, project, cohort_info=None):

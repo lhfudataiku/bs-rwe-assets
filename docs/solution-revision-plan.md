@@ -17,9 +17,8 @@ between the data layer (phase 3) and the demo suite (phase 5). D1 copies the rel
 `DEMO_SF_RWD`, so revising first avoids building the demo twice. D2 steps 3–7 (the RWE Cox report) do not
 depend on this work and can run in parallel. `v1-2` is merged into `main` and closed (2026-11-20). The
 revision is on branch `solution-revision-v1-2`, cut from `main` at `c0a1b01`, and ships as 1.2.0, which
-has not been released yet. The solution still pulls `python/solution` from `refs/heads/v1-2` @ `a7d922a`,
-whose `solution/` is identical to the branch point. Before the first DSS test of revised code, the branch
-is pushed and that Git reference repointed to it; both need the owner's approval.
+has not been released yet. The solution pulls `python/solution` from `solution-revision-v1-2` (public
+repo, no stored credentials since 2026-11-23); each resync needs the owner's approval.
 
 A later v2.0, the Cohort Workbench webapp, is proposed separately in
 [`proposal-v2-cohort-workbench.md`](proposal-v2-cohort-workbench.md). It builds on R4–R7 and would
@@ -519,9 +518,63 @@ DSS part, approved by the owner on 2026-11-23:
        11-19). Unexplained.
      - "Reconfigure Connections" moves datasets but does not drop their old tables. TMP's DB run left 34
        managed `tmp_rwd_sol_v112_test_*` tables in `business_solutions.default` on
-       `bs-databricks-per-user`.
+       `bs-databricks-per-user`. Dropped with the owner's approval on 2026-11-23; each was then
+       checked absent by name (`information_schema` still listed them for a while afterwards).
      - `map_cohort_script_paths.py` reports every per-cohort error as "Missing required OMOP tables
        across cohorts". R2 rewrites ingestion.
+
+**Step 2 status (2026-11-23): repo part written, not yet in DSS.**
+
+- **R5.** `solution/pipelines/build_cohorts.py:build_cohorts()` is the body of a static Python recipe
+  `build_cohorts`. `write_cohorts.py` and its scenario helpers are gone.
+  - It reads the batch from `uploaded_cohort_definition` and each mapped script from the folder.
+  - Per cohort, one `SQLExecutor2.query_to_df(count, pre_queries=statements, post_queries=commit)`.
+    `commit` is `["COMMIT"]` on Snowflake and Redshift and empty on Databricks.
+  - A failed cohort is logged with the table's current count and the error (1,000 characters at most).
+    The build continues, appends every row to `cohort_building_log` in one session, then raises.
+  - `register_cohorts` is not in this step. It needs `cohort_submission` (R2), so it lands in step 3
+    with the removal of `compute_cohort_definition` and "Build Cohort Metadata Dataset".
+- **Splitter and literals.** `solution/recipes/sql_text.py` holds both, with no imports.
+  - `split_statements()` splits on `;` outside quotes, backticks and comments. Tests cover every
+    script in `cohort_scripts/{snowflake,databricks,redshift,postgre}`; the E4 Anemia script gives
+    the spike's 21 statements.
+  - `sql_literal()` doubles backslashes on all three dialects. It doubles quotes on Snowflake and
+    Redshift and escapes them as `\'` on Databricks.
+  - The ingestion (`map_cohort_script_paths.py`) already uses it for names, descriptions and
+    filenames. The rest of R2 is unchanged.
+- **R6.** Mapped scripts now keep `@temp_database_schema.<name>`. `build_cohorts` renders it:
+  - the bare name on Snowflake and Redshift;
+  - `<scratch>.rwdtmp_<project key>__c<id>_<name>` on Databricks.
+
+  The scratch schema is `temp_schema` if set, else the schema of the `cohort` table. A cohort's
+  scratch tables are dropped first and again in `finally`. Every build starts by dropping
+  `rwdtmp_<project key>__c*` tables left by a crash, using `SHOW TABLES ... LIKE`; this sweep never
+  fails the build. Scripts mapped before this change hold bare names and still run, but without R6.
+  Rerun "Create Cohort Scripts" first.
+- **Not tested offline:**
+  - that DSS accepts a Python recipe whose SQL outputs are written only through `SQLExecutor2`;
+  - `SHOW TABLES ... LIKE` through `SQLExecutor2` on Databricks.
+
+  Both are checked in the DSS part.
+
+DSS part, to run after the owner's approval, on `SOL_RWD_COHORT_DISCOVERY` (and TMP for DB and RS):
+
+1. Resync `python/solution`.
+2. Flow:
+   - Create the Python recipe `build_cohorts` in zone "Cohorts" on the default code env.
+     - Inputs: folder `lMM00YKr`, `uploaded_cohort_definition` and the imported OMOP tables.
+     - Outputs: `cohort` and `cohort_building_log`, both in append mode.
+     - Body: `from solution.pipelines.build_cohorts import build_cohorts; build_cohorts()`.
+   - Delete the recipes `create_cohort` and `compute_cohort_building_log`, keeping their datasets.
+3. Scenarios:
+   - "Write Cohort to Datasets" becomes one non-recursive forced build of `cohort` and
+     `cohort_building_log`.
+   - Delete "Drop SQL Temporary Tables", "Build Cohort Dataset" and "Build Cohort Log Dataset".
+   - Remove the "Move recipe to zone" step.
+4. Verify:
+   - E4 rerun on SF, DB and RS (611 / 593 / 247 and the step 1 checksums).
+   - A forced failure on Databricks leaves no `rwdtmp_` table. Break one statement of a mapped script,
+     build, check the log row says FAILED, and list the scratch schema.
 
 **Gate to exit phase 4:**
 

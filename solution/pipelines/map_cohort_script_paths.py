@@ -13,6 +13,7 @@ from solution.recipes.sql_script_function import (
     validate_cdm_tables
 )
 from solution.utils.variables import get_setting
+from solution.recipes.sql_text import sql_literal
 
 
 # Configure logging
@@ -87,13 +88,17 @@ def process_cohort_metadata(metadata, handle, output, key_map, project):
             
             # Collect metadata
             input_cdm_table = "|".join(set(input_cdm_table_names))
-            cohort_ids.append(cohort_definition_id)
+            cohort_ids.append(str(int(cohort_definition_id)))
             
             # Get timestamp based on connection type
             timestamp = "GETDATE()" if connection_type == "Redshift" else "CURRENT_TIMESTAMP()"
             
-            row_values.append(f"({cohort_definition_id}, '{cohort_name}', '{cohort_description}', 0, '', 0, {timestamp})")
-            uploaded_row_values.append(f"({cohort_definition_id}, '{cohort_name}', '{cohort_description}','{input_cdm_table}','{filename}')")
+            # Every text value goes through sql_literal, so quotes in names cannot break the SQL (R2).
+            cohort_id = int(cohort_definition_id)
+            name, description, tables, script_file = (
+                sql_literal(v, connection_type) for v in (cohort_name, cohort_description, input_cdm_table, filename))
+            row_values.append(f"({cohort_id}, {name}, {description}, 0, '', 0, {timestamp})")
+            uploaded_row_values.append(f"({cohort_id}, {name}, {description}, {tables}, {script_file})")
             
         except Exception as e:
             error_msg = f'Error processing script: {str(e)}'
