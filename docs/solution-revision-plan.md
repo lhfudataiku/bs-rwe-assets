@@ -28,7 +28,7 @@ supersede R2 and R3. This plan stays the scope of 1.2 until the owner decides ot
 | --- | --- | --- |
 | [R1](#r1-cohort-script-table-naming-ticket-1) | Cohort script table naming replaces the custom JSON mapping | Ticket 1 |
 | [R2](#r2-cohort-registration-ticket-2) | Cohort registration: repeated submissions, list of built cohorts, guard against id overwrite | Ticket 2 |
-| [R3](#r3-dashboard-for-all-cohorts-ticket-3) | Dashboard precomputed for all cohorts; dashboard section removed from Setup | Ticket 3 |
+| [R3](#r3-dashboard-for-all-cohorts-ticket-3) | Cohort characterization in FeatureExtraction's format, every cohort against the population, with standardized differences; dashboard filtered by cohort; dashboard section removed from Setup (revised 2026-11-24) | Ticket 3 |
 | [R4](#r4-resolved-table-paths) | `sql_script_function.py`: table paths resolved by DSS | Review |
 | [R5](#r5-cohort-build-as-one-static-recipe) | Cohort build as one static recipe instead of the `create_cohort` scenario chain | Review |
 | [R6](#r6-databricks-temporary-tables) | Databricks temporary tables left behind | Review |
@@ -137,7 +137,8 @@ Recommendation: drop it; the 45-cohort demo library can be registered once by a 
 shows 25 charts and 5 statistics cards from 11 of them. Switching cohorts means picking one in S8 and
 force-rebuilding about 20 datasets.
 
-**Proposal.** Precompute every cohort and filter on the dashboard.
+**Proposal (superseded on 2026-11-24 by [R3 as decided](#r3-as-decided-owner-2026-11-24)).** Precompute
+every cohort and filter on the dashboard.
 
 - Drop the `${cohort_definition_id}` filter. Carry `COHORT_DEFINITION_ID` and `COHORT_DEFINITION_NAME`
   through the 30 downstream datasets. Four chart datasets lose the id today
@@ -199,6 +200,91 @@ force-rebuilding about 20 datasets.
 - **Alternative: per-cohort copies of the population (as R3 reads now).**
   - Fewer recipe changes, but the dataset size above applies.
   - The charts would have to move to the full dataset or to in-database aggregation.
+
+### R3 as decided (owner, 2026-11-24)
+
+**Discussion summary (2026-11-24).**
+
+- **Dialect check.** Registration did not check that a script's SQL fits the connection. It now does
+  (step 3, `solution/setup/sql_dialect.py`).
+- **Atlas sample.** Five atlas-demo cohorts were rendered for Snowflake, Databricks and Redshift.
+  - The three dialects share one statement skeleton and the same placeholders. They differ only in
+    scratch tables, date arithmetic and a few clauses.
+  - A cohort built here is therefore exactly an Atlas cohort, and Atlas-style characterization
+    applies to it.
+- **Pairwise comparison (owner's point 1).** Atlas recomputes for each characterization job, but
+  the standardized difference itself is arithmetic on two cohorts' stored figures. Stored per
+  cohort, any pair is a join, with nothing rebuilt.
+- **Our covariates against Atlas's (point 2).** Today's dashboard is a hand-built subset of what
+  FeatureExtraction, the covariate library behind Atlas, computes:
+
+  | Today | FeatureExtraction preset |
+  | --- | --- |
+  | Sex, race | DemographicsGender, DemographicsRace |
+  | Age | DemographicsAge, DemographicsAgeGroup |
+  | Cohort duration, prior and follow-up observation | DemographicsTimeInCohort, DemographicsPriorObservationTime, DemographicsPostObservationTime |
+  | Charlson score (own categories; fewer than 2 occurrences counts 0) | CharlsonIndex (Romano adaptation) |
+  | Condition groups | ConditionGroupEra, in windows before index |
+  | Drug groups | DrugGroupEra, in windows before index |
+  | Visits by type | VisitConceptCount, in windows before index |
+  | Before and after cohort start | no preset looks after index |
+
+- **Downstream (point 3).** `DEMO_SF_RWE` reads 9 datasets, today from `DEMO_DB_RWD2` and after D2
+  from `DEMO_SF_RWD`:
+  - `cohort`, `cohort_definition`, `concept` and `concept_ancestor`;
+  - the 5 person-level covariate tables `charlson_score_occurrence`, `condition_group_occurrence`,
+    `drug_class_exposure`, `person_location_joined` and `visit_occurrence_labeled`.
+
+  It reads none of the 30 dashboard datasets. Its propensity and Cox models need person-level
+  features, which FeatureExtraction's aggregated output does not give.
+- **v2.0 (point 4).** The v2.0 proposal already plans FeatureExtraction presets, results stored per
+  cohort and a two-cohort comparison. Tables in that format let v2.0 change only what fills them.
+
+**Decisions (owner, 2026-11-24).**
+
+1. **Reference group: the population.** The cohort is compared with the whole population, not with
+   "everyone else". The population is characterized once per import and shared by every cohort.
+   There is no per-cohort copy of the population.
+2. **Format and definitions: FeatureExtraction's.** The results are written as FeatureExtraction's
+   aggregated output:
+   - binary covariates: cohort, covariate, sum and average;
+   - continuous covariates: cohort, covariate, count, minimum, maximum, average, standard
+     deviation, median and the 10th, 25th, 75th and 90th percentiles;
+   - `covariate_ref` and `analysis_ref`, with covariate ids as FeatureExtraction defines them.
+3. **Standardized differences are added.** Each cohort is compared with the population:
+   - binary: `(p1 − p2) / sqrt((p1(1−p1) + p2(1−p2)) / 2)`;
+   - continuous: `(m1 − m2) / sqrt((s1² + s2²) / 2)`.
+4. **Covariates: FeatureExtraction presets only.** No hand-built covariates and no after-index views
+   on the dashboard.
+
+**Design.**
+
+- **Engine.** FeatureExtraction's SQL templates (Apache-2.0) for the chosen presets are rendered
+  offline, once per dialect, and checked into the repo like `cohort_scripts/`.
+  - The table names stay as placeholders, mapped as in R1.
+  - They run with the R5 build machinery: statement splitter, Databricks scratch tables, one
+    session with its commit.
+  - No SQL renderer runs inside DSS; the renderer port stays in v2.0 (its M3).
+  - Rendering needs Java (available locally, OpenJDK 21) and the SqlRender jar.
+- **When.**
+  - After "Build cohorts", for the cohorts of the batch only: delete and insert by cohort id, as
+    the cohort build does.
+  - The population, after "Import Datasets".
+  - Standardized differences are recomputed for the batch's cohorts.
+- **Dashboard.**
+  - One single-select filter on cohort name, on both pages.
+  - Every chart reads a small result table in full, so the filter is exact.
+  - The 5 statistics cards become charts or dataset tables.
+  - "Build Cohort Dashboard" becomes "Refresh Dashboard", for manual use.
+- **Removed.**
+  - The 29 recipes and 30 datasets downstream of `compute_cohort_definition_filtered`, after a
+    backup;
+  - Setup's dashboard section;
+  - `cohort_definition_id` and its tile wrapper `section8_tile1.py`.
+- **Kept.** The 5 person-level covariate tables, unchanged, as the contract with `DEMO_SF_RWE`.
+- **For the decision register** (meets its admission rule; to add when the owner agrees): the
+  FeatureExtraction result format as the contract between 1.2, the demo copy and v2.0, and the 5
+  person-level tables as the contract with `DEMO_SF_RWE`.
 
 ## R4. Resolved table paths
 
@@ -475,7 +561,7 @@ tiles for the frequency tables. Open question 4 is closed.
 | 1. Foundation | R4, R7, R8 | Offline tests; E4 counts unchanged |
 | 2. Cohort build | R5, R6 | Offline tests (statement splitter on every script in `cohort_scripts/`, literal escaping); E4 rerun; a forced failure on Databricks leaves no `rwdtmp_` table |
 | 3. Setup | R1, R2; regenerate tiles with `tools/app_manifest.py` | Two submissions in a row; a reused id is refused without **Replace** and accepted with it; "Built cohorts" lists both batches |
-| 4. Dashboard | R3 | All cohorts selectable by filter; the three E4 cohorts' figures equal the single-cohort build |
+| 4. Characterization and dashboard | R3 as decided | Same results on SF, DB and RS for the E4 cohorts; independent SQL checks of a binary, a continuous and a concept covariate; standardized differences equal a hand calculation; all cohorts selectable by filter; the 9 `DEMO_SF_RWE` inputs unchanged. See the [step 4 work session](#step-4-work-session-draft-2026-11-24) |
 | 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 03, 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
 
 **Step 1 status (2026-11-23): repo part done (`d0a11e9`, fix `e41c6d3`); DSS part done; E4 passed on SF, DB and RS. Step 1 is done.**
@@ -793,11 +879,79 @@ DSS part as run, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
 8. **Verify on TMP:** E4 on Redshift and Databricks through `tools/register_cohorts.py --apply`.
    This covers the Databricks literal escaping.
 
+### Step 4 work session (draft, 2026-11-24)
+
+The repo part comes first, with offline tests. The DSS part follows, with the owner's approval.
+
+0. **Decide the open items** (see Open questions):
+   - the population's definition and index date;
+   - the presets and windows;
+   - the quarterly prevalence and county incidence views.
+
+   Output: a mapping table in this plan, from today's figures to presets, noting where figures will
+   differ and why.
+1. **Rendering toolchain.**
+   - `tools/render_feature_extraction.py` pins a FeatureExtraction release (templates and
+     `PrespecAnalyses.csv`) and the SqlRender jar.
+   - It renders the chosen presets with fixed parameters and translates them to Snowflake, Spark
+     and Redshift.
+   - It writes `solution/characterization/sql/<dialect>/` with a NOTICE. A rerun reproduces the
+     files byte for byte.
+2. **Offline checks of the rendered SQL.**
+   - Every file splits into statements, its placeholders are covered by the R1 mapping, and its
+     scratch tables render.
+   - The dialect fingerprint matches its folder.
+3. **Engine.** `solution/pipelines/characterize_cohorts.py`, the body of one static recipe:
+   - characterize the batch's cohorts and the population pseudo-cohort (reserved id −1, never
+     written to `cohort`);
+   - write `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`;
+   - delete and insert by cohort id, in one session; a failed cohort is logged and does not stop
+     the others, as in R5.
+4. **Standardized differences.** `covariate_balance`, with one row per cohort and covariate:
+   - the cohort and population values;
+   - the standardized difference.
+
+   The formulas are unit-tested, including zero variance.
+5. **Flow and scenarios.**
+   - New recipes: characterization after `build_cohorts`, and the population after the import.
+   - "Build cohorts" also builds the characterization of the batch.
+   - "Import Datasets" also builds the population.
+   - "Refresh Dashboard" rebuilds everything.
+6. **Dashboard.**
+   - A new "Cohort Characterization" dashboard filtered by cohort name: prevalence of binary
+     covariates (cohort against population), distributions of continuous covariates, and a
+     standardized-difference chart (the covariates with the largest absolute values).
+   - Charts read the full result tables.
+   - It is built first, next to the old dashboard.
+7. **Retirement**, after a backup:
+   - the 29 recipes and 30 datasets, and the old dashboard and its 30 insights;
+   - Setup's dashboard section, `cohort_definition_id` and `section8_tile1.py`;
+   - `RETIRING_KEYS` empties.
+8. **Verification.**
+   - E4 on SOL (Snowflake) and TMP (Redshift, Databricks): identical results across the three.
+   - Independent SQL checks: share of women, mean age, one condition group in the long-term
+     window.
+   - Standardized differences against a hand calculation.
+   - The filter shows each E4 cohort.
+   - The schemas of the 9 `DEMO_SF_RWE` inputs are unchanged.
+   - Timing of one batch, with population size and cohort count recorded.
+9. **Write-up.** Results in this plan; wiki articles listed for step 5.
+
+Risks:
+
+- **Speed at 2.3M with 50 cohorts.** The population is characterized once per import, and cohorts
+  once per batch. Partition the result tables by cohort id if needed.
+- **The presets differ from today's figures** (Charlson variant, windows). Step 0's mapping
+  documents each difference rather than hiding it.
+- **The renderer is an offline dependency.** It is pinned, and its output is checked in, so DSS
+  never needs it.
+
 **Gate to exit phase 4:**
 
 - E4 rerun gives identical counts on SF, DB and RS and equals 611, 593 and 247;
 - the multi-submission test passes;
-- the dashboard shows every built cohort without a rebuild;
+- the dashboard shows every built cohort, against the population with standardized differences,
+  without a rebuild;
 - the project macro test passes;
 - Setup has no custom-mapping, metadata-CSV or dashboard section.
 
@@ -805,8 +959,22 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 
 ## Open questions
 
-- [ ] R3 design: per-cohort aggregates (recommended), or per-cohort copies of the population. See
-  [Step 4 findings](#r3-dashboard-for-all-cohorts-ticket-3)
+- [x] R3 design. Decided (owner, 2026-11-24): the population is the reference, FeatureExtraction's
+  format and presets only, standardized differences added. See
+  [R3 as decided](#r3-as-decided-owner-2026-11-24)
+- [ ] Population reference: who is in it, and its index date. Proposal: every person with at least
+  365 days of observation; index date one year after the start of their first observation period;
+  end at the end of that period. This gives every long-term window a full year.
+- [ ] Presets and windows. Proposal:
+  - DemographicsGender, Race, Age, AgeGroup, TimeInCohort, PriorObservationTime and
+    PostObservationTime;
+  - CharlsonIndex;
+  - ConditionGroupEra, DrugGroupEra and VisitConceptCount, in the long-term window (365 days) and
+    any time prior.
+- [ ] Quarterly prevalence by quarter and incidence by county are not covariates. Keep them as
+  cohort-level views, as the v2.0 proposal does, or drop them?
+- [ ] Standardized differences between two cohorts (not only against the population): in 1.2, or
+  left to the v2.0 webapp, which can compute them from the same tables?
 - [x] Keep the metadata CSV as a hidden bulk-import path, or drop it. Dropped (owner, 2026-11-23);
   `tools/register_cohorts.py` registers a library from a metadata CSV (R2)
 - [x] `condition_count_for_charlson_score`: wire into the Charlson logic or drop. Dropped (owner,
