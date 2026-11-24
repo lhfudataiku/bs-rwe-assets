@@ -1,6 +1,6 @@
 <div ng-controller="BuiltCohortsController" class="rwd-built-cohorts">
     <p ng-if="loading">Reading the registered cohorts&hellip;</p>
-    <p ng-if="!loading && rows.length === 0 && errors.length === 0">No cohort is registered yet.</p>
+    <p ng-if="!loading && rows.length === 0 && errors.length === 0">No cohort written yet.</p>
     <table class="table table-condensed" ng-if="rows.length">
         <thead>
             <tr><th>Id</th><th>Name</th><th>Description</th><th>Script</th><th>Subjects</th><th>Status</th><th>Last built</th></tr>

@@ -10,8 +10,8 @@ same checks as the "Register cohorts" tile. The CSV keeps its columns: `cohort_d
     python3 tools/register_cohorts.py <csv> --project KEY --apply [--replace]               # store it
 
 `--apply` writes the project's `local` variable `cohort_submission` (needs `dku` auth). It does not
-upload scripts or run anything: upload the scripts to "Original Scripts" and run "Ingest registered
-cohorts" as in Setup. `--replace` marks every row Replace, for ids already registered. Writing to a
+upload scripts or run anything: upload the scripts to "Original Scripts" and click "Write batch to
+cohort definition" in Setup. `--replace` marks every row Replace, for ids already registered. Writing to a
 DSS project is a change to that project: get the owner's approval first.
 """
 import argparse

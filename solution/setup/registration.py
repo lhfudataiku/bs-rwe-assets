@@ -115,7 +115,7 @@ def validate_batch(rows, registered_ids, files=None):
     """
     submitted = [r for r in rows if r.get("submit")]
     if not submitted:
-        return ["Tick Submit on at least one script."]
+        return ["Tick In batch on at least one script."]
     errors, seen = [], {}
     registered_ids = {_as_int(i) for i in registered_ids}
     for row in submitted:

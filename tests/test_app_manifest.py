@@ -26,7 +26,7 @@ def scenario(sid):
 
 # The live layout before step 3, reduced to what the tool looks at.
 MANIFEST = {"homepageSections": [
-    {"sectionTitle": "Pipeline Configuration"},
+    {"sectionTitle": "**Pipeline Configuration** (One-time)"},
     {"sectionTitle": "Connections", "tiles": [{"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "main_connection"}]}]},
     {"sectionTitle": "Connect OMOP", "tiles": [
         {"type": "PROJECT_VARIABLES_EDIT", "module": "input_data_source_project_selectbox", "python": "old"},
@@ -36,10 +36,10 @@ MANIFEST = {"homepageSections": [
     {"sectionTitle": "Custom mapping", "tiles": [
         {"type": "MANAGED_FOLDER_ADD_FILE"}, {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cdm_standard_tables_map"}]},
         scenario("CHECKOMOPTABLEVARIABLESMAPPING")]},
-    {"sectionTitle": "Cohort Ingestion"},
+    {"sectionTitle": "**Cohort Ingestion**"},
     {"sectionTitle": "Upload scripts and metadata", "tiles": [
         {"type": "MANAGED_FOLDER_ADD_FILE"}, {"type": "UPLOAD_DATASET_SET_FILE"}, scenario("CREATECOHORTSCRIPTS"),
-        {"type": "MANAGED_FOLDER_LINK"}]},
+        {"type": "MANAGED_FOLDER_LINK", "folderId": "lMM00YKr", "prompt": "View Mapped Scripts"}]},
     {"sectionTitle": "Write", "tiles": [scenario("WRITECOHORTTODATASETS")]},
     {"sectionTitle": "Dashboard", "tiles": [{"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cohort_definition_id"}], "python": "old"}]},
 ]}
@@ -57,15 +57,29 @@ class Apply(unittest.TestCase):
     def test_step3_layout(self):
         titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
         self.assertNotIn("Custom mapping", titles)  # R1: S3 is gone
+        # The naming tile has its own section, right after the Cohort Ingestion heading.
+        self.assertEqual(titles[titles.index("**Cohort Ingestion**") + 1], "Cohort Script Table Naming")
+        self.assertEqual([t["module"] for t in by_title(self.m, "Cohort Script Table Naming")["tiles"]], ["table_naming"])
         upload = by_title(self.m, "Upload and Register Cohort SQL Scripts")
         self.assertEqual([t.get("type") if not t.get("module") else t["module"] for t in upload["tiles"]],
                          ["MANAGED_FOLDER_ADD_FILE", "register_cohorts", "SCENARIO_RUN", "MANAGED_FOLDER_LINK"])
-        self.assertEqual(upload["tiles"][2]["prompt"], "Ingest registered cohorts")
-        self.assertEqual(by_title(self.m, "Write")["tiles"][-1]["module"], "built_cohorts")
+        self.assertEqual(upload["tiles"][2]["prompt"], "Write batch to cohort definition")
+        self.assertEqual(upload["tiles"][3]["prompt"], "View written scripts")
+        build = by_title(self.m, "Build Cohorts")
+        self.assertEqual((build["tiles"][0]["prompt"], build["tiles"][-1]["module"]), ("Build cohorts", "built_cohorts"))
         omop = by_title(self.m, "Connect OMOP")["tiles"]
-        self.assertEqual(omop[3]["params"][0]["name"], "cohort_script_table_naming")
-        self.assertEqual(omop[4]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")
+        self.assertEqual(omop[3]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")
+        self.assertNotIn("mapping file", by_title(self.m, "**Pipeline Configuration** (One-time)")["sectionText"])
         self.assertEqual(self.tool.unknown_variables(self.m), [])
+
+    def test_first_step3_layout_moves_the_naming_tile(self):
+        m = copy.deepcopy(self.m)
+        naming = m["homepageSections"].pop(m["homepageSections"].index(by_title(m, "Cohort Script Table Naming")))
+        by_title(m, "Connect OMOP")["tiles"].insert(3, {"type": "PROJECT_VARIABLES_EDIT", "params": [
+            {"name": "cohort_script_table_naming"}, {"name": "cohort_script_table_prefix"}]})
+        self.assertIn("removed the tile with parameter cohort_script_table_naming", self.tool.apply(m))
+        self.assertEqual(m, self.m)
+        self.assertTrue(naming)
 
     def test_idempotent(self):
         self.assertTrue(self.changes)
@@ -138,6 +152,21 @@ class InlineTiles(unittest.TestCase):
         with mock.patch.dict(sys.modules, {"dataiku": dk}):
             self.assertEqual(do({"action": "load"}, {}, {}, []),
                              {"ok": False, "errors": ["Could not read the scripts or registered cohorts: folder missing"]})
+
+    def test_naming_tile_loads_and_saves(self):
+        do = self.tile("table_naming")
+        dk, project = self.fake_dataiku()
+        with mock.patch.dict(sys.modules, {"dataiku": dk}):
+            loaded = do({"action": "load"}, {}, {}, [])
+            self.assertEqual((loaded["naming"], loaded["atlas"]["person"]), ("atlas", "@cdm_database_schema.person"))
+            self.assertEqual([c["value"] for c in loaded["choices"]], ["atlas", "plain", "prefix", "mapping"])
+            refused = do({"action": "save", "naming": "prefix", "prefix": " "}, {}, {}, [])
+            self.assertFalse(refused["ok"])
+            project.set_variables.assert_not_called()
+            mapping = {"person": "cdm.person", "concept": " vocab.concept ", "death": ""}
+            self.assertEqual(do({"action": "save", "naming": "mapping", "mapping": mapping}, {}, {}, []), {"ok": True})
+        local = project.set_variables.call_args.args[0]["local"]
+        self.assertEqual(local["cohort_script_table_map"], {"person": "cdm.person", "concept": "vocab.concept"})
 
     def test_built_tile_lists_cohorts(self):
         do = self.tile("built_cohorts")

@@ -181,7 +181,7 @@ def validate_cdm_tables(script_cdm_table_names, project, cohort_info=None):
     logger.info(f"Validating {len(script_cdm_table_names)} CDM tables for cohort {cohort_info['id'] if cohort_info else 'unknown'}")
     
     if not script_cdm_table_names:
-        error_msg = ("No OMOP table was found in the script. Check that 'Cohort script table naming' in "
+        error_msg = ("No OMOP table was found in the script. Check that 'Cohort Script Table Naming' in "
                      "Project Setup matches how the script names OMOP tables.")
         if cohort_info:
             error_msg = f"Cohort {cohort_info['id']} ({cohort_info['name']}): {error_msg}"

@@ -28,6 +28,21 @@ class KeyMap(unittest.TestCase):
         self.assertEqual(mapping["cohort"], "cdm.cohort")
         self.assertEqual(set(mapping), set(OMOP_CDM_KEYS) | {"cohort", "cohort_definition"})
 
+    def test_mapping_keeps_the_named_tables_only(self):
+        mapping = n.key_map("mapping", mapping={"person": " cdm.person ", "cohort": "res.cohort", "death": ""})
+        self.assertEqual(mapping, {"person": "cdm.person", "cohort": "res.cohort"})
+
+    def test_mapping_errors_are_sentences(self):
+        self.assertEqual(n.naming_errors("mapping", mapping={}),
+                         ["Give the name used in the scripts for at least one OMOP table."])
+        errors = n.naming_errors("mapping", mapping={"persons": "p", "person": "x.t", "concept": "X.T"})
+        self.assertEqual(errors, ["Not OMOP tables: persons.", "concept and person are both named x.t in the scripts."])
+        with self.assertRaises(ValueError):
+            n.key_map("mapping", mapping={})
+
+    def test_mapping_from_atlas_covers_atlas_scripts(self):
+        self.assertEqual(n.key_map("mapping", mapping=n.key_map("atlas")), n.key_map("atlas"))
+
     def test_bad_choices_raise(self):
         with self.assertRaises(ValueError):
             n.key_map("json")

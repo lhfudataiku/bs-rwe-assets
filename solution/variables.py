@@ -24,7 +24,7 @@ STANDARD_DEFAULTS = {
 LOCAL_KEYS = frozenset([
     "main_connection", "folder_connection", "data_preparation_project_key",
     "omop_cdm_standard_tables_import", "omop_standardised_vocabulary_tables_import",
-    "cohort_script_table_prefix",  # R1
+    "cohort_script_table_prefix", "cohort_script_table_map",  # R1
     "cohort_submission",  # R2
 ] + OMOP_CDM_KEYS)
 

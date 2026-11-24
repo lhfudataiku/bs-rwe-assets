@@ -82,6 +82,17 @@ class RegisterCohorts(unittest.TestCase):
         self.assertIn("Plain OMOP table names", str(e.exception))
         self.executor.query_to_df.assert_not_called()
 
+    def test_custom_mapping_from_a_json_variable(self):
+        self.settings["cohort_script_table_naming"] = "mapping"
+        self.settings["cohort_script_table_map"] = (
+            '{"person": "@cdm_database_schema.person", "cohort": "@target_database_schema.@target_cohort_table"}')
+        self.assertEqual(rc.register_cohorts(), [1])
+        self.settings["cohort_script_table_map"] = {"person": "@cdm_database_schema.person"}
+        with self.assertRaises(ValueError) as e:
+            rc.register_cohorts()
+        self.assertIn("@target_database_schema.@target_cohort_table", str(e.exception))
+        self.assertIn("Custom mapping table", str(e.exception))
+
     def test_submission_as_json_text_and_empty(self):
         self.settings["cohort_submission"] = '[{"id": 1, "name": "A", "description": "", "file": "a.sql"}]'
         self.assertEqual(rc.register_cohorts(), [1])

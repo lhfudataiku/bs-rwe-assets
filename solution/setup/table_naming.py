@@ -6,14 +6,17 @@ One Setup choice, `cohort_script_table_naming`, replaces the uploaded JSON key m
   `cohort_scripts/omop_cdm_atlas.json` exactly (tests/test_table_naming.py).
 - `plain`: bare OMOP table names (`person`).
 - `prefix`: `cohort_script_table_prefix` + the bare name (`cdm.person`), for every table.
+- `mapping`: `cohort_script_table_map`, {OMOP table: name in the scripts}, typed in a table in
+  Project Setup. For scripts whose tables sit under several prefixes, as Atlas exports do.
 
-Pure: no DSS module is imported.
+Pure: no DSS module is imported, so the Setup tile can inline it.
 """
 import re
 
-ATLAS, PLAIN, PREFIX = "atlas", "plain", "prefix"
-NAMINGS = (ATLAS, PLAIN, PREFIX)
-LABELS = {ATLAS: "OHDSI Atlas placeholders", PLAIN: "Plain OMOP table names", PREFIX: "Custom prefix"}
+ATLAS, PLAIN, PREFIX, MAPPING = "atlas", "plain", "prefix", "mapping"
+NAMINGS = (ATLAS, PLAIN, PREFIX, MAPPING)
+LABELS = {ATLAS: "OHDSI Atlas placeholders", PLAIN: "Plain OMOP table names",
+          PREFIX: "One prefix for every table", MAPPING: "Custom mapping table"}
 
 CDM_TABLES = [
     "person", "observation_period", "visit_occurrence", "visit_detail", "condition_occurrence",
@@ -38,18 +41,56 @@ IGNORED_SCHEMAS = ("@temp_database_schema",)
 ATLAS_REFERENCE = re.compile(r"@\w+\.@?\w+")
 
 
-def key_map(naming=ATLAS, prefix=""):
-    """{OMOP table key: name used in the scripts} for every OMOP CDM, vocabulary and results table."""
+def naming_errors(naming=ATLAS, prefix="", mapping=None):
+    """What is wrong with the naming settings, as sentences. Empty when key_map() can be built."""
     if naming not in NAMINGS:
-        raise ValueError("cohort_script_table_naming must be one of %s, not %r" % (", ".join(NAMINGS), naming))
+        return ["The table naming must be one of %s, not %r." % (", ".join(NAMINGS), naming)]
     if naming == PREFIX and not (prefix or "").strip():
-        raise ValueError("cohort_script_table_naming is 'prefix' but cohort_script_table_prefix is empty")
+        return ["Type the prefix the scripts write before every OMOP table name."]
+    if naming != MAPPING:
+        return []
+    mapping = mapping or {}
+    if not isinstance(mapping, dict):
+        return ["The custom mapping must be a table of OMOP table and name in the scripts."]
+    errors, seen = [], {}
+    known = set(CDM_TABLES + VOCABULARY_TABLES + RESULTS_TABLES)
+    unknown = sorted(k for k in mapping if k not in known)
+    if unknown:
+        errors.append("Not OMOP tables: %s." % ", ".join(unknown))
+    for table in sorted(mapping):
+        name = (mapping[table] or "").strip()
+        if not name:
+            continue
+        if name.lower() in seen:
+            errors.append("%s and %s are both named %s in the scripts." % (seen[name.lower()], table, name))
+        seen.setdefault(name.lower(), table)
+    if not seen:
+        errors.append("Give the name used in the scripts for at least one OMOP table.")
+    return errors
+
+
+def key_map(naming=ATLAS, prefix="", mapping=None):
+    """{OMOP table key: name used in the scripts}.
+
+    Every OMOP CDM, vocabulary and results table for `atlas`, `plain` and `prefix`; only the tables
+    given a name for `mapping` (a blank name means the scripts do not use that table).
+    """
+    errors = naming_errors(naming, prefix, mapping)
+    if errors:
+        raise ValueError(" ".join(errors))
     tables = CDM_TABLES + VOCABULARY_TABLES + RESULTS_TABLES
     if naming == PLAIN:
         return {t: t for t in tables}
     if naming == PREFIX:
         return {t: prefix.strip() + t for t in tables}
+    if naming == MAPPING:
+        return {t: mapping[t].strip() for t in tables if (mapping.get(t) or "").strip()}
     return {t: ATLAS_COHORT if t == "cohort" else "%s.%s" % (ATLAS_SCHEMA[t], t) for t in tables}
+
+
+def table_groups():
+    """The OMOP tables as Setup lists them: (group label, tables)."""
+    return [("Results", RESULTS_TABLES), ("Clinical data", CDM_TABLES), ("Vocabulary", VOCABULARY_TABLES)]
 
 
 def unmapped_references(script, mapping):

@@ -3,7 +3,7 @@
 
 Offline: reads a manifest fetched with `dku app-designer get -P <KEY> -o json` and applies the repo's
 layout to it. Applying the output to DSS is a separate, approved step:
-`dku app-designer set-definition -P <KEY> <out.json>`.
+`dku app-designer set-definition -P <KEY> -d @<out.json>`.
 
     python3 tools/app_manifest.py manifest.json --out patched.json   # write the patched manifest
     python3 tools/app_manifest.py manifest.json --check              # exit 1 if anything differs,
@@ -13,7 +13,7 @@ layout to it. Applying the output to DSS is a separate, approved step:
 What the repo owns (solution-revision-plan.md, R1 and R2):
 - the Python of the tiles in PYTHON_TILES, found by what they are, not by position;
 - the whole of the custom tiles in CUSTOM_TILES (Python, HTML and JS in app_manifest/tiles/);
-- the "Cohort script table naming" tile;
+- the "Cohort Script Table Naming" section and the section texts of the cohort ingestion;
 - what LAYOUT removes, renames and relabels.
 
 A tile's Python process does not see the project library (DSS 15.2, 2026-11-05: wrappers that
@@ -41,51 +41,80 @@ PYTHON_TILES = [
 ]
 
 # Tiles the repo defines entirely: module -> prompt, help, and where the tile goes.
+# "section_of" places it in the section holding that scenario's button ("before" it, or at the end);
+# "own_section" places it alone in that section, created after the section titled "after".
 CUSTOM_TILES = {
+    "table_naming": {
+        "prompt": "How do your cohort scripts name OMOP tables?",
+        "help": "Saved as you choose. Applies to every batch registered afterwards.",
+        "own_section": "naming"},
     "register_cohorts": {
         "prompt": "Register cohorts",
-        "help": "One row per uploaded script. Check the id, name and description of each script to "
-                "submit, tick Replace to rebuild an existing cohort, then save and run the ingestion.",
+        "help": "One row per uploaded script; scripts uploaded above appear here as you upload them. "
+                "Tick In batch for the scripts to register, then click Register batch. Refresh list "
+                "picks up scripts the automatic refresh missed.",
         "section_of": "CREATECOHORTSCRIPTS", "before": "CREATECOHORTSCRIPTS"},
     "built_cohorts": {
         "prompt": "Built cohorts",
-        "help": "Every registered cohort with its latest build.",
+        "help": "Every written cohort with its latest build.",
         "section_of": "WRITECOHORTTODATASETS", "before": None},
 }
 
-NAMING_TILE = {
-    "type": "PROJECT_VARIABLES_EDIT",
-    "behavior": "INLINE_AUTO_SAVE",
-    "prompt": "Cohort script table naming",
-    "help": "How your cohort SQL scripts name OMOP tables. Atlas exports use placeholders such as "
-            "@cdm_database_schema.person.",
-    "params": [
-        {"name": "cohort_script_table_naming", "type": "SELECT", "label": "Scripts name OMOP tables with",
-         "defaultValue": "atlas", "mandatory": True,
-         "selectChoices": [{"value": "atlas", "label": "OHDSI Atlas placeholders"},
-                           {"value": "plain", "label": "Plain OMOP table names"},
-                           {"value": "prefix", "label": "Custom prefix"}]},
-        {"name": "cohort_script_table_prefix", "type": "STRING", "label": "Prefix",
-         "description": "Written before every OMOP table name in the scripts, for example cdm.",
-         "mandatory": False, "visibilityCondition": "model.cohort_script_table_naming == 'prefix'"},
-    ],
+COHORT_INGESTION = "**Cohort Ingestion**"
+OWN_SECTIONS = {
+    "naming": {
+        "after": COHORT_INGESTION,
+        "sectionTitle": "Cohort Script Table Naming",
+        "sectionText": "Set this once, before registering cohort scripts. Each script names the OMOP "
+                       "tables it reads, and the solution replaces those names with this project's "
+                       "tables, so it needs to know how your scripts write them. Pick the option that "
+                       "matches your scripts below. If you change it later, register the affected "
+                       "scripts again with Replace.",
+    },
 }
-NAMING_PLACE = {"section_of": "IMPORTDATASETSFROMDATAPREPPROJECT", "before": "IMPORTDATASETSFROMDATAPREPPROJECT"}
 
 LAYOUT = {
     # R1: the custom table mapping goes (its section holds this scenario's button).
     "remove_sections_with_scenario": ["CHECKOMOPTABLEVARIABLESMAPPING"],
     # R2: the metadata CSV upload goes.
     "remove_tile_types": ["UPLOAD_DATASET_SET_FILE"],
-    "scenario_prompts": {"CREATECOHORTSCRIPTS": "Ingest registered cohorts"},
+    # R1, first layout: the naming parameters sat in the OMOP section. Now a custom tile.
+    "remove_tiles_with_first_param": ["cohort_script_table_naming"],
+    "scenario_prompts": {"CREATECOHORTSCRIPTS": "Write batch to cohort definition",
+                         "WRITECOHORTTODATASETS": "Build cohorts"},
+    "folder_link_prompts": {"lMM00YKr": "View written scripts"},
+    # Three verbs for the ingestion: upload scripts, register a batch, write it to cohort definition.
+    # The cohorts are then built.
     "sections": {
         "CREATECOHORTSCRIPTS": {
             "sectionTitle": "Upload and Register Cohort SQL Scripts",
-            "sectionText": "Upload one or more cohort SQL scripts, each defining one cohort. Register "
-                           "them below: every script gets a cohort id, a name and an optional "
-                           "description, prefilled from `-- name:` and `-- description:` comments at "
-                           "the top of the script. Then run the ingestion, which checks the batch "
-                           "again and writes the cohort definitions."},
+            "sectionText": "1. **Upload** your cohort SQL scripts, one cohort per script.\n"
+                           "2. **Register** a batch in the table below. Each uploaded script gets a "
+                           "cohort id, a name and a description, prefilled from its `-- name:` and "
+                           "`-- description:` comments. Tick *In batch* for the scripts to register, "
+                           "then click **Register batch**.\n"
+                           "3. Click **Write batch to cohort definition**. The batch is checked against "
+                           "the data, then written to the **cohort definition** dataset and its scripts "
+                           "to the **Written Scripts** folder. If any check fails, nothing is written "
+                           "and every problem is listed.\n\n"
+                           "Then build the cohorts in **Build Cohorts**."},
+        "WRITECOHORTTODATASETS": {
+            "sectionTitle": "Build Cohorts",
+            "sectionText": "Runs the scripts of the last written batch on the OMOP tables and fills "
+                           "the **cohort** table. **Built cohorts** lists every written cohort with its "
+                           "latest build."},
+    },
+    "sections_by_title": {
+        "**Pipeline Configuration** (One-time)": {
+            "sectionText": "A one-time configuration of the data pipeline: choose the project's "
+                           "connections, then import the OMOP CDM tables from the source project. Run "
+                           "**Connection Reconfiguration**, then **Connect OMOP Common Data Model "
+                           "Standard Tables**. [Instructions](article:8)"},
+        COHORT_INGESTION: {
+            "sectionText": "Once the pipeline is configured, ingest cohorts from SQL scripts. Set "
+                           "**Cohort Script Table Naming** once. Then, for each batch of scripts, run "
+                           "**Upload and Register Cohort SQL Scripts** and **Build Cohorts**, in that "
+                           "order. [Instructions](article:8)"},
     },
 }
 
@@ -198,16 +227,28 @@ def apply_layout(manifest, changes):
         for _, _, tile in all_tiles(manifest):
             if tile.get("scenarioId") == scenario_id:
                 update(tile, {"prompt": prompt}, changes, "button of %s" % scenario_id)
+    for section in sections(manifest):
+        tiles = section.get("tiles") or []
+        kept = [t for t in tiles if not any(matches(t, {"first_param": p})
+                                            for p in LAYOUT["remove_tiles_with_first_param"])]
+        if len(kept) != len(tiles):
+            changes.append("removed the tile with parameter %s" % "/".join(LAYOUT["remove_tiles_with_first_param"]))
+            section["tiles"] = kept
+    for folder_id, prompt in LAYOUT["folder_link_prompts"].items():
+        for _, _, tile in all_tiles(manifest):
+            if tile.get("type") == "MANAGED_FOLDER_LINK" and tile.get("folderId") == folder_id:
+                update(tile, {"prompt": prompt}, changes, "link to folder %s" % folder_id)
     for scenario_id, values in LAYOUT["sections"].items():
         update(section_of_scenario(manifest, scenario_id), values, changes, "section of %s" % scenario_id)
+    for title, values in LAYOUT["sections_by_title"].items():
+        update(section_titled(manifest, title), values, changes, "section %s" % title)
 
 
-def apply_naming_tile(manifest, changes):
-    found = [t for _, _, t in all_tiles(manifest) if matches(t, {"first_param": "cohort_script_table_naming"})]
-    if not found:
-        place(manifest, copy.deepcopy(NAMING_TILE), NAMING_PLACE, changes, "the table naming tile")
-    else:
-        update(found[0], copy.deepcopy(NAMING_TILE), changes, "table naming tile")
+def section_titled(manifest, title):
+    found = [s for s in sections(manifest) if s.get("sectionTitle") == title]
+    if len(found) != 1:
+        raise SystemExit("expected one Setup section titled %r, found %d" % (title, len(found)))
+    return found[0]
 
 
 def apply_custom_tiles(manifest, changes, inline_library):
@@ -216,12 +257,21 @@ def apply_custom_tiles(manifest, changes, inline_library):
                   "params": [], "prompt": spec["prompt"], "help": spec["help"],
                   "python": tile_code(module + ".py", inline_library),
                   "html": read_tile_file(module + ".html"), "js": read_tile_file(module + ".js")}
-        found = [t for _, _, t in all_tiles(manifest) if t.get("module") == module]
+        found = [(i, t) for i, _, t in all_tiles(manifest) if t.get("module") == module]
+        if spec.get("own_section"):
+            own = OWN_SECTIONS[spec["own_section"]]
+            header = {k: own[k] for k in ("sectionTitle", "sectionText")}
+            if not found:
+                index = sections(manifest).index(section_titled(manifest, own["after"])) + 1
+                sections(manifest).insert(index, dict(header, tiles=[values]))
+                changes.append("added section %s with tile %s" % (own["sectionTitle"], module))
+                continue
+            update(sections(manifest)[found[0][0]], header, changes, "section %s" % own["sectionTitle"])
         if not found:
             place(manifest, values, {"section_of": spec["section_of"], "before": spec["before"]}, changes,
                   "tile %s" % module)
         else:
-            update(found[0], values, changes, "tile %s" % module)
+            update(found[0][1], values, changes, "tile %s" % module)
 
 
 def apply_python_tiles(manifest, changes, inline_library):
@@ -234,7 +284,6 @@ def apply(manifest, inline_library=True):
     """Bring the manifest to the repo's Setup, in place. Returns what changed (empty when it matched)."""
     changes = []
     apply_layout(manifest, changes)
-    apply_naming_tile(manifest, changes)
     apply_custom_tiles(manifest, changes, inline_library)
     apply_python_tiles(manifest, changes, inline_library)
     return changes

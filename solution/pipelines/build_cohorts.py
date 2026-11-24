@@ -1,6 +1,6 @@
 """`build_cohorts`: the static Python recipe that writes the cohorts of the last batch (R5, R6).
 
-Inputs: the mapped scripts folder, `uploaded_cohort_definition` (the batch), and the imported OMOP
+Inputs: the "Written Scripts" folder (`lMM00YKr`), `uploaded_cohort_definition` (the batch), and the imported OMOP
 tables, declared for lineage. Outputs, both in append mode: `cohort`, written in-database by the
 scripts, and `cohort_building_log`, one row per cohort and run.
 

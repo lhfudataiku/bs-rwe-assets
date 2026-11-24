@@ -1,6 +1,6 @@
 """`register_cohorts`: the static Python recipe that ingests the submitted batch (R1, R2, R5).
 
-Input: the "Original Scripts" folder. Outputs: the mapped scripts folder, `cohort_definition` and
+Input: the "Original Scripts" folder. Outputs: the "Written Scripts" folder (`lMM00YKr`), `cohort_definition` and
 `uploaded_cohort_definition` (the batch `build_cohorts` reads). The batch is the project variable
 `cohort_submission`, written by the "Register cohorts" Setup tile or `tools/register_cohorts.py`.
 
@@ -43,7 +43,10 @@ def read_submission():
 
 def table_naming():
     naming = get_setting("cohort_script_table_naming", default=ATLAS)
-    return naming, key_map(naming, get_setting("cohort_script_table_prefix", default=""))
+    mapping = get_setting("cohort_script_table_map", default={})
+    if isinstance(mapping, str):
+        mapping = json.loads(mapping) if mapping.strip() else {}
+    return naming, key_map(naming, get_setting("cohort_script_table_prefix", default=""), mapping)
 
 
 def map_batch(batch, files, mapping, naming):
@@ -55,7 +58,7 @@ def map_batch(batch, files, mapping, naming):
         unmapped = unmapped_references(text, mapping)
         if unmapped:
             errors.append("%s: the script uses %s, which the '%s' table naming does not cover. Check "
-                          "'Cohort script table naming' in Project Setup."
+                          "'Cohort Script Table Naming' in Project Setup."
                           % (label, ", ".join(unmapped), LABELS.get(naming, naming)))
             continue
         tables = return_script_cdm_tables(text, mapping)

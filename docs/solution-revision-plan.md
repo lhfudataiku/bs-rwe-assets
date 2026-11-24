@@ -600,7 +600,7 @@ DSS part, approved by the owner on 2026-11-23, on `SOL_RWD_COHORT_DISCOVERY` and
    - TMP still has stale `sync_*` recipes reading `PREP_RWD_S3_1K`; they log graph errors in jobs.
      TMP is deleted in D3 step 6.
 
-**Step 3 status (2026-11-23): repo part written, not yet in DSS.**
+**Step 3 status (2026-11-23): repo part done (`e3ddcbf`); DSS part done on both projects, except the checks in a browser.**
 
 - **R1.** `solution/setup/table_naming.py:key_map(naming, prefix)` builds the key map from
   `cohort_script_table_naming` (`atlas`, `plain` or `prefix`) and `cohort_script_table_prefix`.
@@ -645,7 +645,76 @@ DSS part, approved by the owner on 2026-11-23, on `SOL_RWD_COHORT_DISCOVERY` and
   - the naming tile's `visibilityCondition` syntax;
   - folder and dataset access from a tile process.
 
-DSS part, to run after the owner's approval, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
+DSS results (2026-11-23, library `e3ddcbf` in both projects):
+
+- **Changes, as listed below, on SOL and TMP.**
+  - Backups of the manifest, scenarios, recipes and variables are kept outside the repo.
+  - `register_cohorts` is in the "Cohort SQL Scripts" zone. "Create Cohort Scripts" is one forced
+    build, "Ingest registered cohorts".
+  - The three scenarios, three recipes, two metadata datasets, folder `4ktqvA1F` and
+    `cdm_standard_tables_map` (both scopes) are gone.
+  - "Format Solution" no longer names `cohort_metadata_copy`, the mapping folder or
+    `compute_cohort_definition`. "Reconfigure Connections" no longer names `cohort_metadata` or the
+    mapping folder.
+  - TMP's "Create Cohort Scripts" also lost its "Update project variables" step.
+  - Setup was applied with `dku app-designer set-definition -P KEY -d @file`, and `--check` is clean.
+    DSS adds `allowDuplicates: true` to each parameter, so the tool now writes it.
+- **Snowflake (SOL).**
+  - The E4 batch without Replace was refused, with all three ids named and nothing written.
+  - With Replace it was accepted, and E4 gives 611 / 593 / 247 with the E4 checksums.
+  - A second batch, cohort 4 "Anemia (Crohn's test)" (a copy of the Anemia script), was ingested and
+    built alone; cohorts 1–3 kept their build.
+  - The tile functions, run on the live tables, list all four scripts as *registered* and all four
+    cohorts as built.
+  - Cohort 4 and `step3_quote_test.sql` are left in SOL for the browser check.
+- **Redshift (TMP):** E4 gives 611 / 593 / 247 with the checksums.
+- **Databricks (TMP, `PREP_RWD_DB_1K` / `bs-databricks-per-user`):**
+  - E4 gives 611 / 593 / 247 with the checksums.
+  - Cohort 4 "Anemia (Crohn's test)" was written with `\'` and built (611).
+  - TMP was then switched back to Redshift.
+- **Not done: the browser checks.** The built-in browser cannot open the design instance
+  (organisation policy). Still open for the owner, in SOL's Setup:
+  - the prefix field shows only for "Custom prefix";
+  - "Register cohorts" loads, saves and shows errors as sentences;
+  - "Built cohorts" lists cohorts 1–4.
+- **Finding:** "Reconfigure Connections" moves the "Original Scripts" folder with the other folders.
+  Scripts uploaded under one connection are not seen under the other, so each switch needs a
+  re-upload. TMP's folder was empty after the switch back to Redshift, and the E4 scripts were
+  uploaded again; E4 on Redshift still gives 611 / 593 / 247.
+- **Leftovers:** as in step 2, switching back left 33 TMP tables in `business_solutions.default` on
+  `bs-databricks-per-user`, and no `rwdtmp_` scratch table.
+
+**Setup revision after the owner's review (2026-11-24).** Applied to both projects' Setup;
+`--check` is clean. The library change, the `mapping` choice in `register_cohorts`, reaches DSS
+with the next resync.
+
+- **Table naming.**
+  - Four choices: Atlas placeholders, plain names, one prefix for every table, and a custom
+    mapping table. Atlas scripts use several prefixes, which one prefix cannot express.
+  - The mapping table lists every OMOP table and starts from the Atlas names. A blank row means
+    the scripts do not use that table. It is stored as `cohort_script_table_map`, which joins the
+    variable contract.
+  - The choice is now a custom tile, saved as it changes, in its own section "Cohort Script Table
+    Naming", right after **Cohort Ingestion**. The section text explains what to choose and when.
+- **Register cohorts.**
+  - The table refreshes itself when the pointer returns to the tile or the window regains focus
+    (at most every 3 seconds); edited rows keep their edits. The upload tile raises no event, so
+    a "Refresh list" button at the top of the tile, next to the upload, covers a missed refresh.
+    A refresh takes a few seconds: it starts the tile's Python, reads every script and
+    `cohort_definition`. The tile shows "Reading the uploaded scripts…" meanwhile.
+  - Columns have fixed widths inside the tile, and the name and description are text areas that
+    grow with their text.
+- **Wording: three verbs.** Scripts are *uploaded*, a batch is *registered*, and the batch is
+  *written* to cohort definition; then cohorts are *built*.
+  - Tile button: "Register batch". Ingestion button: "Write batch to cohort definition". Statuses: *New*,
+    *In batch, not written*, *Written*, *Changed since written*.
+  - The "Write Cohort to Datasets" section became "Build Cohorts" (button "Build cohorts"), and
+    the folder "Mapped Scripts" (`lMM00YKr`) was renamed "Written Scripts", with "Format Solution"'s
+    folder list, and its link became "View written scripts".
+  - The Pipeline Configuration text no longer mentions a mapping file. The Cohort Ingestion text
+    names the three sections in order.
+
+DSS part as run, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
 
 1. **Backups:** export the manifest, scenarios, recipes and variables.
 2. **Library:** resync both projects.

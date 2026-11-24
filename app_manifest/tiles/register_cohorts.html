@@ -1,24 +1,33 @@
-<div ng-controller="RegisterCohortsController" class="rwd-register-cohorts">
-    <p ng-if="loading">Reading the uploaded scripts&hellip;</p>
-    <p ng-if="!loading && rows.length === 0 && errors.length === 0">Upload cohort SQL scripts above, then reload this page.</p>
-    <table class="table table-condensed" ng-if="rows.length">
-        <thead>
-            <tr><th>Script</th><th>Status</th><th>Cohort id</th><th>Name</th><th>Description</th><th>Submit</th><th>Replace</th></tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in rows">
-                <td>{{row.file}}</td>
-                <td>{{statusLabel(row)}}</td>
-                <td><input type="number" min="0" step="1" ng-model="row.id" ng-disabled="!row.submit" style="width: 6em"></td>
-                <td><input type="text" ng-model="row.name" ng-disabled="!row.submit" maxlength="255"></td>
-                <td><input type="text" ng-model="row.description" ng-disabled="!row.submit"></td>
-                <td><input type="checkbox" ng-model="row.submit"></td>
-                <td><input type="checkbox" ng-model="row.replace" ng-if="row.submit && isRegistered(row.id)"></td>
-            </tr>
-        </tbody>
-    </table>
+<div ng-controller="RegisterCohortsController" class="rwd-register-cohorts" ng-mouseenter="refresh()">
+    <div style="margin-bottom: 8px">
+        <button class="btn btn--secondary" ng-click="load(true)" ng-disabled="busy">Refresh list</button>
+        <span style="color: #666; margin-left: 8px" ng-if="busy">Reading the uploaded scripts&hellip;</span>
+        <span style="color: #666; margin-left: 8px" ng-if="!busy">{{refreshNote || 'Just uploaded scripts? The list refreshes when you come back to it; click Refresh list if they are missing.'}}</span>
+    </div>
+    <p ng-if="!loading && rows.length === 0 && errors.length === 0">No script uploaded yet.</p>
+    <div style="width: 100%; overflow-x: auto" ng-if="rows.length">
+        <table class="table table-condensed" style="width: 100%; table-layout: fixed">
+            <colgroup>
+                <col style="width: 17%"><col style="width: 13%"><col style="width: 7em">
+                <col style="width: 22%"><col><col style="width: 5em"><col style="width: 5.5em">
+            </colgroup>
+            <thead>
+                <tr><th>Script</th><th>Status</th><th>Cohort id</th><th>Name</th><th>Description</th><th>In batch</th><th>Replace</th></tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in rows track by row.file">
+                    <td style="vertical-align: top; word-break: break-all">{{row.file}}</td>
+                    <td style="vertical-align: top">{{statusLabel(row)}}</td>
+                    <td style="vertical-align: top"><input type="number" min="0" step="1" ng-model="row.id" ng-change="row.dirty = true" ng-disabled="!row.submit" style="width: 100%; box-sizing: border-box"></td>
+                    <td style="vertical-align: top"><textarea ng-model="row.name" ng-change="row.dirty = true" ng-disabled="!row.submit" maxlength="255" rows="{{lines(row.name, 2)}}" style="width: 100%; box-sizing: border-box; resize: vertical"></textarea></td>
+                    <td style="vertical-align: top"><textarea ng-model="row.description" ng-change="row.dirty = true" ng-disabled="!row.submit" rows="{{lines(row.description, 2)}}" style="width: 100%; box-sizing: border-box; resize: vertical"></textarea></td>
+                    <td style="vertical-align: top; text-align: center"><input type="checkbox" ng-model="row.submit" ng-change="row.dirty = true"></td>
+                    <td style="vertical-align: top; text-align: center"><input type="checkbox" ng-model="row.replace" ng-change="row.dirty = true" ng-if="row.submit && isWritten(row.id)" title="Overwrite cohort {{row.id}} with this script"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <ul class="text-error" ng-if="errors.length"><li ng-repeat="e in errors">{{e}}</li></ul>
     <p class="text-success" ng-if="message">{{message}}</p>
-    <button class="btn btn--secondary" ng-click="load()" ng-disabled="busy">Reload</button>
-    <button class="btn btn--primary" ng-click="save()" ng-disabled="busy || !rows.length">Save submission</button>
+    <button class="btn btn--primary" ng-click="register()" ng-disabled="busy || !rows.length">Register batch</button>
 </div>
