@@ -28,7 +28,7 @@ supersede R2 and R3. This plan stays the scope of 1.2 until the owner decides ot
 | --- | --- | --- |
 | [R1](#r1-cohort-script-table-naming-ticket-1) | Cohort script table naming replaces the custom JSON mapping | Ticket 1 |
 | [R2](#r2-cohort-registration-ticket-2) | Cohort registration: repeated submissions, list of built cohorts, guard against id overwrite | Ticket 2 |
-| [R3](#r3-dashboard-for-all-cohorts-ticket-3) | Cohort characterization in FeatureExtraction's format, every cohort against the population, with standardized differences; dashboard filtered by cohort; dashboard section removed from Setup (revised 2026-11-24) | Ticket 3 |
+| [R3](#r3-dashboard-for-all-cohorts-ticket-3) | Cohort characterization in FeatureExtraction's format, each cohort precomputed against the population, two chosen cohorts compared on request, with standardized differences; dashboard filtered by cohort; dashboard section removed from Setup (revised 2026-11-24) | Ticket 3 |
 | [R4](#r4-resolved-table-paths) | `sql_script_function.py`: table paths resolved by DSS | Review |
 | [R5](#r5-cohort-build-as-one-static-recipe) | Cohort build as one static recipe instead of the `create_cohort` scenario chain | Review |
 | [R6](#r6-databricks-temporary-tables) | Databricks temporary tables left behind | Review |
@@ -256,6 +256,32 @@ every cohort and filter on the dashboard.
    - continuous: `(m1 − m2) / sqrt((s1² + s2²) / 2)`.
 4. **Covariates: FeatureExtraction presets only.** No hand-built covariates and no after-index views
    on the dashboard.
+5. **The population** is every person with at least 365 days of observation. Their index date is one
+   year after the start of their first observation period, and the end is the end of that period,
+   so every long-term window is a full year.
+6. **Presets and windows:**
+   - DemographicsGender, DemographicsRace, DemographicsAge, DemographicsAgeGroup,
+     DemographicsTimeInCohort, DemographicsPriorObservationTime and
+     DemographicsPostObservationTime;
+   - CharlsonIndex;
+   - ConditionGroupEra, DrugGroupEra and VisitConceptCount, in the long-term window (365 days
+     before index) and any time prior.
+7. **Prevalence by quarter and incidence by county stay** as cohort-level views. They are not
+   covariates, and the v2.0 proposal keeps them too.
+8. **Standardized differences between two cohorts are added**, as well as against the population.
+9. **What is precomputed, and what is computed on request** (owner, 2026-11-24). Results that every
+   comparison reuses are precomputed, incrementally. A comparison between two chosen cohorts is
+   computed on request. The earlier draft precomputed every pair, which grows with the square of
+   the number of cohorts.
+10. **A requested comparison runs as a scenario and is cached** (owner, 2026-11-24), in
+    `covariate_balance` next to the precomputed rows against the population. The table keeps every pair computed so far. A pair already in the cache is not
+    computed again.
+11. **Project Setup has no dashboard section** (owner, 2026-11-24; R3 as first proposed). Neither
+    the dashboard nor the comparison is driven from Setup.
+12. **A code webapp requests comparisons** (owner, 2026-11-24). It selects the cohorts, runs the
+    scenario, and is inserted into the dashboard as a webapp tile.
+13. **Cohort B defaults to the population** (owner, 2026-11-24). That pair is precomputed, so the
+    default never runs a scenario.
 
 **Design.**
 
@@ -270,10 +296,55 @@ every cohort and filter on the dashboard.
   - After "Build cohorts", for the cohorts of the batch only: delete and insert by cohort id, as
     the cohort build does.
   - The population, after "Import Datasets".
-  - Standardized differences are recomputed for the batch's cohorts.
+  - Standardized differences against the population, for the batch's cohorts.
+- **Precomputed (reused by every comparison), incrementally:**
+
+  | Result | Computed | Size |
+  | --- | --- | --- |
+  | Covariates of each cohort (`covariate`, `covariate_continuous`) | once per cohort, when its batch is built | cohorts × covariates |
+  | Covariates of the population | once per import | covariates |
+  | Balance of each cohort against the population (`covariate_balance`, comparator −1) | with the cohort's covariates | cohorts × covariates |
+  | `covariate_ref`, `analysis_ref` | added to as new covariates appear | covariates |
+
+  - A cohort is never recomputed unless it is rebuilt, and the population only when the data is
+    re-imported.
+  - Everything grows linearly with the number of cohorts. As an estimate, 50 cohorts at about
+    2,000 covariates each give about 100,000 rows per table.
+- **On request: a comparison between two chosen cohorts.**
+  - The standardized differences of a pair are arithmetic on the two cohorts' stored aggregates:
+    one SQL statement that joins about 2 × 2,000 rows. It never reads person-level data.
+  - One library function builds that statement, `pair_balance_sql(cohort_a, cohort_b)`. The 1.2
+    mechanism calls it now, and the v2.0 webapp later calls the same function at query time.
+  - In 1.2 it runs as a scenario, "Compare cohorts", whose results are cached in
+    `covariate_balance` (decision 10). The request does not come from Setup (decision 11).
+  - **One balance table.** `covariate_balance` has one row per cohort, comparator and covariate:
+    the two values and the standardized difference. The comparator is −1 for the population
+    (precomputed) or a cohort id (computed on request). Every comparison, the default one
+    included, is read the same way.
+  - **Request: the "Compare cohorts" webapp** (decision 12). It is a standard DSS code webapp: HTML
+    and JS, with a Python backend. It is inserted into dashboard page 2.
+    - It lists the built cohorts from `cohort_definition` and `cohort_building_log`. The user
+      picks cohort A, and cohort B, which defaults to "Population" (decision 13).
+    - If the pair is already in `covariate_balance`, as the population always is, the webapp says
+      so, and no scenario runs.
+    - Otherwise the backend appends the pair to `comparison_requests` (who asked, and when), runs
+      "Compare cohorts", and polls the run. It shows "computing", then "done: select the pair in
+      the page filter", or the run's error as a sentence.
+    - The logic lives in the project library (`solution/compare/`). Webapp backends, unlike Setup
+      tiles, can import it.
+    - The backend stays thin, so the v2.0 Cohort Workbench (FastAPI) can reuse the same services.
+  - **Cache.**
+    - "Compare cohorts" computes only the requested pairs that are missing from
+      `covariate_balance`, and writes them by delete and insert per pair.
+    - When a cohort is rebuilt (Replace), its rows against the population are recomputed with it,
+      and its rows against other cohorts are deleted, to be recomputed on the next request. When
+      the data is re-imported, everything is recomputed and the rows against other cohorts are
+      cleared.
 - **Dashboard.**
-  - One single-select filter on cohort name, on both pages.
-  - Every chart reads a small result table in full, so the filter is exact.
+  - One single-select filter on the cohort. Its page shows the cohort against the population
+    (precomputed), plus the quarterly prevalence and county incidence views.
+  - A second page shows the requested comparison of two cohorts.
+  - Every chart reads a small table in full, so no chart samples.
   - The 5 statistics cards become charts or dataset tables.
   - "Build Cohort Dashboard" becomes "Refresh Dashboard", for manual use.
 - **Removed.**
@@ -561,7 +632,7 @@ tiles for the frequency tables. Open question 4 is closed.
 | 1. Foundation | R4, R7, R8 | Offline tests; E4 counts unchanged |
 | 2. Cohort build | R5, R6 | Offline tests (statement splitter on every script in `cohort_scripts/`, literal escaping); E4 rerun; a forced failure on Databricks leaves no `rwdtmp_` table |
 | 3. Setup | R1, R2; regenerate tiles with `tools/app_manifest.py` | Two submissions in a row; a reused id is refused without **Replace** and accepted with it; "Built cohorts" lists both batches |
-| 4. Characterization and dashboard | R3 as decided | Same results on SF, DB and RS for the E4 cohorts; independent SQL checks of a binary, a continuous and a concept covariate; standardized differences equal a hand calculation; all cohorts selectable by filter; the 9 `DEMO_SF_RWE` inputs unchanged. See the [step 4 work session](#step-4-work-session-draft-2026-11-24) |
+| 4. Characterization and dashboard | R3 as decided | Same results on SF, DB and RS for the E4 cohorts; independent SQL checks of a binary, a continuous and a concept covariate; standardized differences (precomputed against the population, on request between two cohorts) equal a hand calculation; a batch computes only its own cohorts; all cohorts selectable by filter; the 9 `DEMO_SF_RWE` inputs unchanged. See the [step 4 work session](#step-4-work-session-draft-2026-11-24) |
 | 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 03, 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
 
 **Step 1 status (2026-11-23): repo part done (`d0a11e9`, fix `e41c6d3`); DSS part done; E4 passed on SF, DB and RS. Step 1 is done.**
@@ -883,13 +954,9 @@ DSS part as run, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
 
 The repo part comes first, with offline tests. The DSS part follows, with the owner's approval.
 
-0. **Decide the open items** (see Open questions):
-   - the population's definition and index date;
-   - the presets and windows;
-   - the quarterly prevalence and county incidence views.
-
-   Output: a mapping table in this plan, from today's figures to presets, noting where figures will
-   differ and why.
+0. **Map today's figures to the decided presets.** Decisions 5–8 settle the open items. Output: a
+   mapping table in this plan, from each of today's figures to its preset and window (or to the
+   quarterly and county views), noting where figures will differ and why.
 1. **Rendering toolchain.**
    - `tools/render_feature_extraction.py` pins a FeatureExtraction release (templates and
      `PrespecAnalyses.csv`) and the SqlRender jar.
@@ -907,21 +974,36 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - write `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`;
    - delete and insert by cohort id, in one session; a failed cohort is logged and does not stop
      the others, as in R5.
-4. **Standardized differences.** `covariate_balance`, with one row per cohort and covariate:
-   - the cohort and population values;
-   - the standardized difference.
-
-   The formulas are unit-tested, including zero variance.
-5. **Flow and scenarios.**
+4. **Standardized differences.**
+   - Precomputed: `covariate_balance`, each cohort of the batch against the population.
+   - On request: `pair_balance_sql(cohort_a, cohort_b)`, which builds one statement over the stored
+     aggregates, and `compare_cohorts()`, the scenario's recipe body. The latter reads
+     `comparison_requests`, computes only the pairs missing from `covariate_balance`, and skips
+     with a sentence any pair naming an unknown or unbuilt cohort.
+   - `solution/compare/` also holds the webapp's services: the list of built cohorts, the cache
+     lookup, appending a request, and starting and polling the run. Each is unit-tested with DSS
+     stubbed.
+   - Unit tests cover the formulas, zero variance, the antisymmetry of A–B against B–A, and a
+     covariate present in only one of the two cohorts.
+5. **Flow and scenarios.** No Setup tile is added, and Setup's dashboard section goes (part 7).
+   - New:
+     - the `comparison_requests` table (appended by the webapp);
+     - the "Compare cohorts" recipe and scenario, run by the webapp, with no trigger;
+     - `covariate_balance`, holding both the population rows and the cached pairs;
+     - the "Compare cohorts" code webapp, with its backend started automatically.
+   - Rebuilding a cohort deletes its cached pairs; "Import Datasets" clears the cache.
    - New recipes: characterization after `build_cohorts`, and the population after the import.
    - "Build cohorts" also builds the characterization of the batch.
    - "Import Datasets" also builds the population.
    - "Refresh Dashboard" rebuilds everything.
 6. **Dashboard.**
-   - A new "Cohort Characterization" dashboard filtered by cohort name: prevalence of binary
-     covariates (cohort against population), distributions of continuous covariates, and a
-     standardized-difference chart (the covariates with the largest absolute values).
-   - Charts read the full result tables.
+   - A new "Cohort Characterization" dashboard.
+   - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary
+     covariates, distributions of continuous covariates, the covariates with the largest absolute
+     standardized differences, and the quarterly prevalence and county incidence views.
+   - Page 2: the "Compare cohorts" webapp tile at the top, with cohort B set to "Population" by
+     default. Below it, the charts of `covariate_balance`, filtered by cohort and comparator.
+   - Every chart reads a small table in full.
    - It is built first, next to the old dashboard.
 7. **Retirement**, after a backup:
    - the 29 recipes and 30 datasets, and the old dashboard and its 30 insights;
@@ -931,7 +1013,14 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - E4 on SOL (Snowflake) and TMP (Redshift, Databricks): identical results across the three.
    - Independent SQL checks: share of women, mean age, one condition group in the long-term
      window.
-   - Standardized differences against a hand calculation.
+   - Standardized differences against a hand calculation, for the population and for one pair of
+     E4 cohorts requested on demand.
+   - A new batch computes only its own cohorts, which is checked in the job log.
+   - The cache: a second request for the same pair computes nothing, and rebuilding one of its
+     cohorts makes the next run recompute it.
+   - The webapp, from the dashboard: request a pair, see it computed, then select it in the filter.
+     An unbuilt cohort is not offered. With cohort B left at "Population", nothing runs and the
+     result shows at once.
    - The filter shows each E4 cohort.
    - The schemas of the 9 `DEMO_SF_RWE` inputs are unchanged.
    - Timing of one batch, with population size and cohort count recorded.
@@ -941,6 +1030,14 @@ Risks:
 
 - **Speed at 2.3M with 50 cohorts.** The population is characterized once per import, and cohorts
   once per batch. Partition the result tables by cohort id if needed.
+- **Waiting for a comparison.** The arithmetic takes seconds, but a scenario adds about a minute of
+  DSS job overhead. The time from request to chart is measured in part 8.
+- **The webapp backend acts for the viewer.** It runs as one configured identity. A dashboard reader
+  without the right to run scenarios could still start one through it, so the backend checks the
+  caller's rights on the project before it runs anything. The webapp's "run as" user must be able
+  to run "Compare cohorts".
+- **The backend must be running.** It is set to start automatically. If it is down, the tile says so
+  in a sentence, and the dashboard's precomputed page 1 is unaffected.
 - **The presets differ from today's figures** (Charlson variant, windows). Step 0's mapping
   documents each difference rather than hiding it.
 - **The renderer is an offline dependency.** It is pinned, and its output is checked in, so DSS
@@ -950,8 +1047,8 @@ Risks:
 
 - E4 rerun gives identical counts on SF, DB and RS and equals 611, 593 and 247;
 - the multi-submission test passes;
-- the dashboard shows every built cohort, against the population with standardized differences,
-  without a rebuild;
+- the dashboard shows every built cohort against the population without a rebuild, and a requested
+  comparison of two cohorts;
 - the project macro test passes;
 - Setup has no custom-mapping, metadata-CSV or dashboard section.
 
@@ -962,19 +1059,17 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 - [x] R3 design. Decided (owner, 2026-11-24): the population is the reference, FeatureExtraction's
   format and presets only, standardized differences added. See
   [R3 as decided](#r3-as-decided-owner-2026-11-24)
-- [ ] Population reference: who is in it, and its index date. Proposal: every person with at least
-  365 days of observation; index date one year after the start of their first observation period;
-  end at the end of that period. This gives every long-term window a full year.
-- [ ] Presets and windows. Proposal:
-  - DemographicsGender, Race, Age, AgeGroup, TimeInCohort, PriorObservationTime and
-    PostObservationTime;
-  - CharlsonIndex;
-  - ConditionGroupEra, DrugGroupEra and VisitConceptCount, in the long-term window (365 days) and
-    any time prior.
-- [ ] Quarterly prevalence by quarter and incidence by county are not covariates. Keep them as
-  cohort-level views, as the v2.0 proposal does, or drop them?
-- [ ] Standardized differences between two cohorts (not only against the population): in 1.2, or
-  left to the v2.0 webapp, which can compute them from the same tables?
+- [x] Population reference. Decided (owner, 2026-11-24): every person with at least 365 days of
+  observation, indexed one year after the start of their first observation period (R3 decision 5)
+- [x] Presets and windows. Decided (owner, 2026-11-24): the proposal as written (R3 decision 6)
+- [x] Prevalence by quarter and incidence by county. Kept as cohort-level views (owner, 2026-11-24;
+  R3 decision 7)
+- [x] Standardized differences between two cohorts. Added in 1.2 (owner, 2026-11-24; R3 decision 8).
+  Computed on request, not precomputed (owner, 2026-11-24; R3 decision 9)
+- [x] How 1.2 runs a requested comparison of two cohorts. A scenario with a cache (owner,
+  2026-11-24; R3 decision 10), with no Setup section (R3 decision 11)
+- [x] Where the user asks for a comparison. A "Compare cohorts" code webapp, inserted into the
+  dashboard (owner, 2026-11-24; R3 decision 12)
 - [x] Keep the metadata CSV as a hidden bulk-import path, or drop it. Dropped (owner, 2026-11-23);
   `tools/register_cohorts.py` registers a library from a metadata CSV (R2)
 - [x] `condition_count_for_charlson_score`: wire into the Charlson logic or drop. Dropped (owner,
