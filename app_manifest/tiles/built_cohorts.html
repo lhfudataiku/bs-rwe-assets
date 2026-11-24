@@ -1,9 +1,11 @@
 <div ng-controller="BuiltCohortsController" class="rwd-built-cohorts">
     <p ng-if="loading">Reading the registered cohorts&hellip;</p>
     <p ng-if="!loading && rows.length === 0 && errors.length === 0">No cohort written yet.</p>
-    <table class="table table-condensed" ng-if="rows.length">
+    <p ng-if="rows.length" style="color: #666; margin: 0 0 4px">{{rows.length}} cohort(s).</p>
+    <div style="width: 100%; max-height: 480px; overflow: auto; border: 1px solid #ddd" ng-if="rows.length">
+    <table class="table table-condensed" style="width: 100%; margin-bottom: 0">
         <thead>
-            <tr><th>Id</th><th>Name</th><th>Description</th><th>Script</th><th>Subjects</th><th>Status</th><th>Last built</th></tr>
+            <tr><th style="position: sticky; top: 0; background: #fff; z-index: 1">Id</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Name</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Description</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Script</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Subjects</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Status</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Last built</th></tr>
         </thead>
         <tbody>
             <tr ng-repeat="row in rows">
@@ -12,6 +14,7 @@
             </tr>
         </tbody>
     </table>
+    </div>
     <ul class="text-error" ng-if="errors.length"><li ng-repeat="e in errors">{{e}}</li></ul>
     <button class="btn btn--secondary" ng-click="load()">Refresh</button>
 </div>

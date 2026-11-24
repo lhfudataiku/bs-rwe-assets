@@ -18,6 +18,9 @@ app.controller('RegisterCohortsController', function($scope) {
         var label = labels[row.status] || row.status;
         return (row.status === 'registered' || row.status === 'changed') ? label + ' as cohort ' + row.id : label;
     };
+    $scope.batchCount = function() {
+        return $scope.rows.filter(function(row) { return row.submit; }).length;
+    };
     $scope.isWritten = function(id) {
         return $scope.writtenIds.indexOf(parseInt(id, 10)) >= 0;
     };

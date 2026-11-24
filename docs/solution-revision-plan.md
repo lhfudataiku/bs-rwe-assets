@@ -682,7 +682,8 @@ DSS results (2026-11-23, library `e3ddcbf` in both projects):
   re-upload. TMP's folder was empty after the switch back to Redshift, and the E4 scripts were
   uploaded again; E4 on Redshift still gives 611 / 593 / 247.
 - **Leftovers:** as in step 2, switching back left 33 TMP tables in `business_solutions.default` on
-  `bs-databricks-per-user`, and no `rwdtmp_` scratch table.
+  `bs-databricks-per-user`, and no `rwdtmp_` scratch table. Dropped with the owner's approval on
+  2026-11-24; each was then confirmed gone by name.
 
 **Setup revision after the owner's review (2026-11-24).** Applied to both projects' Setup;
 `--check` is clean. The library change, the `mapping` choice in `register_cohorts`, reaches DSS
