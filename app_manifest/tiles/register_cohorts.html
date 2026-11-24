@@ -18,7 +18,7 @@
             <tbody>
                 <tr ng-repeat="row in rows track by row.file">
                     <td style="vertical-align: top; word-break: break-all">{{row.file}}</td>
-                    <td style="vertical-align: top">{{statusLabel(row)}}</td>
+                    <td style="vertical-align: top">{{statusLabel(row)}}<div class="text-error" ng-if="row.dialect_issue" style="font-size: 90%">{{row.dialect_issue}}</div></td>
                     <td style="vertical-align: top"><input type="number" min="0" step="1" ng-model="row.id" ng-change="row.dirty = true" ng-disabled="!row.submit" style="width: 100%; box-sizing: border-box"></td>
                     <td style="vertical-align: top"><textarea ng-model="row.name" ng-change="row.dirty = true" ng-disabled="!row.submit" maxlength="255" rows="{{lines(row.name, 2)}}" style="width: 100%; box-sizing: border-box; resize: vertical"></textarea></td>
                     <td style="vertical-align: top"><textarea ng-model="row.description" ng-change="row.dirty = true" ng-disabled="!row.submit" rows="{{lines(row.description, 2)}}" style="width: 100%; box-sizing: border-box; resize: vertical"></textarea></td>

@@ -33,10 +33,18 @@ class Rows(unittest.TestCase):
         last = [{"id": 9, "name": "Typed", "description": "", "file": "d.sql", "replace": False}]
         rows = {row["file"]: row for row in r.registration_rows(files, reg, last)}
         self.assertEqual(rows["a.sql"], {"file": "a.sql", "status": "new", "id": 10, "name": "Crohn's disease",
-                                         "description": "first diagnosis", "submit": True, "replace": False})
+                                         "description": "first diagnosis", "submit": True, "replace": False,
+                                         "dialect_issue": None})
         self.assertEqual((rows["b.sql"]["status"], rows["b.sql"]["id"], rows["b.sql"]["submit"]), ("registered", 5, False))
         self.assertEqual(rows["c.sql"]["status"], "changed")
         self.assertEqual((rows["d.sql"]["status"], rows["d.sql"]["name"]), ("pending", "Typed"))
+
+    def test_script_for_another_dialect_is_flagged_and_unticked(self):
+        files = {"db.sql": "CREATE TABLE @temp_database_schema.x USING DELTA AS SELECT 1;", "sf.sql": "SELECT 1;"}
+        rows = {row["file"]: row for row in r.registration_rows(files, [], None, "Snowflake")}
+        self.assertFalse(rows["db.sql"]["submit"])
+        self.assertIn("exported for Databricks", rows["db.sql"]["dialect_issue"])
+        self.assertEqual((rows["sf.sql"]["submit"], rows["sf.sql"]["dialect_issue"]), (True, None))
 
     def test_first_registration_starts_at_one(self):
         self.assertEqual([x["id"] for x in r.registration_rows({"a.sql": "", "b.sql": ""}, [])], [1, 2])
@@ -62,6 +70,14 @@ class Validate(unittest.TestCase):
                 self.row(file="gone.sql", id=4), self.row(file="e.sql", id=5, name="n" * 256)]
         errors = r.validate_batch(rows, [], {"a.sql", "b.sql", "c.sql", "e.sql"})
         self.assertEqual(len(errors), 5, errors)
+
+    def test_dialect_is_checked_when_texts_and_connection_are_known(self):
+        files = {"a.sql": "CREATE TABLE #t (i int) DISTSTYLE ALL; ANALYZE #t;"}
+        errors = r.validate_batch([self.row()], [], files, "Databricks")
+        self.assertEqual(len(errors), 1)
+        self.assertIn("exported for Redshift, but this project runs on Databricks", errors[0])
+        self.assertEqual(r.validate_batch([self.row()], [], files, "Redshift"), [])
+        self.assertEqual(r.validate_batch([self.row()], [], set(files), "Databricks"), [])
 
     def test_nothing_ticked(self):
         self.assertEqual(len(r.validate_batch([self.row(submit=False)], [])), 1)

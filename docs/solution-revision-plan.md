@@ -167,6 +167,39 @@ force-rebuilding about 20 datasets.
 - Prevalence and covariate figures must equal today's single-cohort results for the same cohort; compare
   the three E4 cohorts before and after.
 
+**Step 4 findings (2026-11-24, read from SOL's flow, dashboard and 30 insights; nothing changed).**
+
+- **Cohort against control needs the whole population per cohort.**
+  - Five dashboard figures compare the cohort with everyone else in the population:
+    - sex and race (`population_cohort_demographic_prepared`);
+    - Charlson score (`popoulation_cohort_charlson_score`);
+    - age (`population_w_cohort_first_occurrence`);
+    - incidence by county (`cohort_location_prepared`).
+  - Each is a left join of the population on the one filtered cohort, then `COHORT_FLAG`.
+  - With every cohort precomputed, "control" differs per cohort. Carrying the cohort id through
+    these joins means one copy of the population per cohort.
+  - At 2.3M persons and 50 cohorts, that is over 100M rows per person-level dataset, several
+    times that for the covariate rows. The cost estimate above ("grows with total cohort
+    membership") holds only for the cohort-side datasets.
+- **The charts sample.**
+  - All 22 charts run on the DSS engine, 14 of them on a head sample of the dataset (the first
+    10,000 rows by default) and 8 on the full dataset.
+  - With all cohorts in one dataset, a head sample holds the first cohorts only, so a filtered
+    chart would be wrong or empty for later cohorts.
+  - On the 2.3M population the person-level charts already read only the first rows today.
+- **Recommended design: per-cohort aggregates.** Each dashboard dataset becomes a small table
+  keyed by cohort, for example (cohort id, cohort name, group, category, persons).
+  - The population totals are computed once, the cohort counts per cohort, and control = total
+    − cohort.
+  - Rows grow with cohorts × categories, not with the population. The charts read the full
+    dataset, so the filter is exact. The 5 statistics cards become charts or dataset tables on
+    these aggregates.
+  - Cohort-only figures (prevalence by quarter, condition, drug and visit covariates) keep
+    person- or event-level rows with the cohort id added, as planned.
+- **Alternative: per-cohort copies of the population (as R3 reads now).**
+  - Fewer recipe changes, but the dataset size above applies.
+  - The charts would have to move to the full dataset or to in-database aggregation.
+
 ## R4. Resolved table paths
 
 **Today.** `get_sql_path()` and `set_table_variables()` in `solution/recipes/sql_script_function.py`
@@ -715,6 +748,24 @@ with the next resync.
   - The Pipeline Configuration text no longer mentions a mapping file. The Cohort Ingestion text
     names the three sections in order.
 
+**Dialect check (2026-11-24).** `solution/setup/sql_dialect.py` tells which SQL dialect an Atlas
+script was exported for, from markers Atlas always writes.
+
+- **Markers.** They were sampled from five atlas-demo cohorts (1791177, 1662241, 1770910, 99278,
+  2978) rendered by WebAPI 2.14 for each dialect:
+  - Snowflake: `CREATE TEMP TABLE` with `DATEADD(day, ...)`;
+  - Databricks: `USING DELTA` or `date_add(...)`;
+  - Redshift: `#` tables with `DISTKEY`, `DISTSTYLE` or `ANALYZE`;
+  - not supported: the untranslated template (`SELECT ... INTO #t`), and PostgreSQL (`INTERVAL`
+    without `DATEADD`).
+- **Accuracy.** It classifies all 111 shipped scripts and all 20 sampled renderings correctly.
+- **Where it applies.**
+  - The tile marks such a script in its status column and leaves it unticked.
+  - The batch check and the ingestion refuse it, naming the dialect it was exported for.
+  - Hand-written SQL without markers is not judged.
+- **Shared structure.** The three dialects share one statement skeleton and the same Atlas
+  placeholders. The sampled scripts render with no placeholder left in our build code.
+
 DSS part as run, on `SOL_RWD_COHORT_DISCOVERY` and `TMP_RWD_SOL_V112_TEST`:
 
 1. **Backups:** export the manifest, scenarios, recipes and variables.
@@ -754,6 +805,8 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 
 ## Open questions
 
+- [ ] R3 design: per-cohort aggregates (recommended), or per-cohort copies of the population. See
+  [Step 4 findings](#r3-dashboard-for-all-cohorts-ticket-3)
 - [x] Keep the metadata CSV as a hidden bulk-import path, or drop it. Dropped (owner, 2026-11-23);
   `tools/register_cohorts.py` registers a library from a metadata CSV (R2)
 - [x] `condition_count_for_charlson_score`: wire into the Charlson logic or drop. Dropped (owner,

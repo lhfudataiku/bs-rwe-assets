@@ -69,6 +69,14 @@ class RegisterCohorts(unittest.TestCase):
         self.output.upload_data.assert_not_called()
         self.executor.query_to_df.assert_not_called()
 
+    def test_script_for_another_dialect_writes_nothing(self):
+        self.files = {"a.sql": ATLAS_SCRIPT + "\nCREATE TABLE x USING DELTA AS SELECT date_add(d, 1);"}
+        with self.assertRaises(ValueError) as e:
+            rc.register_cohorts()
+        self.assertIn("exported for Databricks, but this project runs on Snowflake", str(e.exception))
+        self.output.upload_data.assert_not_called()
+        self.executor.query_to_df.assert_not_called()
+
     def test_replace_is_accepted(self):
         self.registered = [{"id": 1, "name": "Old", "description": "", "syntax": ""}]
         self.settings["cohort_submission"][0]["replace"] = True

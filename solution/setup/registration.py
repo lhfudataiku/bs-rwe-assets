@@ -4,10 +4,12 @@ the checks on a submitted batch, and the "Built cohorts" listing.
 The tile is a convenience; the `register_cohorts` recipe repeats every check against the data and is
 the authority. Both call the functions here.
 
-Import-free on purpose (hashlib and json are imported inside the functions that need them):
-`tools/app_manifest.py` inlines this module into the Setup tiles, which cannot import the project
-library.
+Imports only the pure `sql_dialect` module (hashlib and json are imported inside the functions that
+need them): `tools/app_manifest.py` inlines both into the Setup tiles, which cannot import the
+project library.
 """
+
+from solution.setup.sql_dialect import dialect_error
 
 NEW, REGISTERED, CHANGED, PENDING = "new", "registered", "changed", "pending"
 MAX_NAME_LENGTH = 255
@@ -64,7 +66,7 @@ def _as_int(value):
     return number if str(number) == str(value).strip() else None
 
 
-def registration_rows(files, registered, submission=None):
+def registration_rows(files, registered, submission=None, connection_type=None):
     """One row per uploaded script, for the "Register cohorts" tile.
 
     files: {filename: script text}; registered: [{"id", "name", "description", "syntax"}] from
@@ -72,7 +74,8 @@ def registration_rows(files, registered, submission=None):
     A file already registered keeps its id, name and description, is unticked, and is marked
     `changed` when its text differs from the registered script. A file in the last submission but
     not registered (the ingestion failed) keeps what was typed. A new file gets the next free id and
-    the header's name and description, and is ticked.
+    the header's name and description, and is ticked unless it was exported for another SQL dialect
+    than `connection_type`. Every row carries `dialect_issue`: that sentence, or None.
     """
     by_file = {}
     for cohort in registered:
@@ -88,30 +91,34 @@ def registration_rows(files, registered, submission=None):
     for filename in sorted(files):
         text = files[filename]
         header = script_header(text)
+        issue = dialect_error(text, connection_type, filename)
         if filename in by_file:
             cohort, meta = by_file[filename]
             changed = meta.get("sha256") != script_digest(text)
             rows.append({"file": filename, "status": CHANGED if changed else REGISTERED,
                          "id": _as_int(cohort.get("id")), "name": cohort.get("name") or "",
-                         "description": cohort.get("description") or "", "submit": False, "replace": False})
+                         "description": cohort.get("description") or "", "submit": False, "replace": False,
+                         "dialect_issue": issue})
         elif filename in pending:
             row = pending[filename]
             rows.append({"file": filename, "status": PENDING, "id": _as_int(row.get("id")),
                          "name": row.get("name") or "", "description": row.get("description") or "",
-                         "submit": True, "replace": bool(row.get("replace"))})
+                         "submit": True, "replace": bool(row.get("replace")), "dialect_issue": issue})
         else:
             rows.append({"file": filename, "status": NEW, "id": next_id,
                          "name": header.get("name") or default_name(filename),
-                         "description": header.get("description", ""), "submit": True, "replace": False})
+                         "description": header.get("description", ""), "submit": issue is None,
+                         "replace": False, "dialect_issue": issue})
             next_id += 1
     return rows
 
 
-def validate_batch(rows, registered_ids, files=None):
+def validate_batch(rows, registered_ids, files=None, connection_type=None):
     """Errors in the submitted rows, as sentences. Empty when the batch can be ingested.
 
     rows: tile rows (only those with `submit` count); registered_ids: ids in `cohort_definition`;
-    files: names in "Original Scripts", when known.
+    files: names in "Original Scripts", or {name: script text}, when known. With the texts and the
+    project's connection type, a script exported for another SQL dialect is refused.
     """
     submitted = [r for r in rows if r.get("submit")]
     if not submitted:
@@ -137,6 +144,10 @@ def validate_batch(rows, registered_ids, files=None):
                           "or choose another id." % (label, cohort_id))
         if files is not None and row.get("file") not in files:
             errors.append("%s: the script is not in Original Scripts." % label)
+        elif isinstance(files, dict) and connection_type:
+            issue = dialect_error(files[row["file"]], connection_type, label)
+            if issue:
+                errors.append(issue)
     return errors
 
 

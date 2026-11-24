@@ -5,7 +5,8 @@ Input: the "Original Scripts" folder. Outputs: the "Written Scripts" folder (`lM
 `cohort_submission`, written by the "Register cohorts" Setup tile or `tools/register_cohorts.py`.
 
 Every check runs before anything is written, and every problem in the batch is reported at once:
-the tile's checks again, against the data (an id already in `cohort_definition` needs Replace);
+the tile's checks again, against the data (an id already in `cohort_definition` needs Replace; a
+script exported for another SQL dialect than the project's connection is refused);
 Atlas references the table naming does not cover (R1); OMOP tables missing from the project.
 Names, descriptions and filenames are written through `sql_literal`.
 """
@@ -92,7 +93,9 @@ def register_cohorts():
     files = folder_texts(dataiku.Folder(ORIGINAL_SCRIPTS_FOLDER, ignore_flow=True))
     registered = read_rows(dataiku.Dataset("cohort_definition", ignore_flow=True), DEFINITION_COLUMNS)
 
-    errors = validate_batch([dict(r, submit=True) for r in batch], [c["id"] for c in registered], set(files))
+    connection_type = cohort_connection_type()
+    errors = validate_batch([dict(r, submit=True) for r in batch], [c["id"] for c in registered], files,
+                            connection_type)
     if not errors:
         batch = [dict(r, id=int(r["id"]), name=r["name"].strip()) for r in batch]
         naming, mapping = table_naming()
@@ -103,7 +106,6 @@ def register_cohorts():
     output = dataiku.Folder(MAPPED_SCRIPTS_FOLDER, ignore_flow=True)
     for cohort_id, (script, _) in mapped.items():
         output.upload_data("cohort_%d" % cohort_id, script.encode("utf-8"))
-    connection_type = cohort_connection_type()
     SQLExecutor2(connection=get_setting("main_connection")).query_to_df(
         "SELECT 1", pre_queries=definition_statements(batch, files, mapped, connection_type),
         post_queries=SESSION_COMMIT[connection_type])
