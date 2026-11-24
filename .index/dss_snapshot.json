@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1302,
+ "dss_project_count": 1304,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -21959,7 +21959,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T14:52Z",
+   "fetched_at": "2026-11-24T10:23Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -21979,7 +21979,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD RS 1K",
-   "probed_at": "2026-11-23T14:52Z",
+   "probed_at": "2026-11-24T10:24Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T14:52Z",
+   "fetched_at": "2026-11-24T10:23Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-23T14:52Z",
+   "probed_at": "2026-11-24T10:24Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T14:52Z",
+   "fetched_at": "2026-11-24T10:23Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-23T14:52Z",
+   "probed_at": "2026-11-24T10:24Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -36899,52 +36899,6 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "cohort_metadata": {
-     "columns": [
-      [
-       "cohort_definition_id",
-       "string"
-      ],
-      [
-       "cohort_definition_name",
-       "string"
-      ],
-      [
-       "cohort_definition_description",
-       "string"
-      ],
-      [
-       "cohort_sql_script_filename",
-       "string"
-      ]
-     ],
-     "connection": "filesystem_managed",
-     "managed": false,
-     "type": "UploadedFiles"
-    },
-    "cohort_metadata_copy": {
-     "columns": [
-      [
-       "cohort_definition_id",
-       "string"
-      ],
-      [
-       "cohort_definition_name",
-       "string"
-      ],
-      [
-       "cohort_definition_description",
-       "string"
-      ],
-      [
-       "cohort_sql_script_filename",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
     "cohort_observation": {
      "columns": [
       [
@@ -38667,7 +38621,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T14:52Z",
+   "fetched_at": "2026-11-24T10:23Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38684,8 +38638,7 @@
     "PREP_RWD_SF_1K.person_sf",
     "PREP_RWD_SF_1K.procedure_occurrence_sf",
     "PREP_RWD_SF_1K.visit_occurrence_sf",
-    "charlson_scoring",
-    "cohort_metadata"
+    "charlson_scoring"
    ],
    "git_references": {
     "preview": {
@@ -38700,31 +38653,91 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "a764faa382970d087d6a33da7533bd1af3e06e16",
+     "hash": "37007e9ef313c1534e3fa01da7409de85e0e4c6f",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-23T14:52Z",
+   "probed_at": "2026-11-24T10:24Z",
    "variables": {
     "local": {
-     "cdm_standard_tables_map": "omop_cdm_atlas",
-     "concept": "concept_sf",
-     "concept_ancestor": "concept_ancestor_sf",
-     "condition_era": "condition_era_sf",
-     "condition_occurrence": "condition_occurrence_sf",
+     "cohort_script_table_map": {
+      "care_site": "@cdm_database_schema.care_site",
+      "cdm_source": "@cdm_database_schema.cdm_source",
+      "cohort": "@target_database_schema.@target_cohort_table",
+      "cohort_definition": "@target_database_schema.cohort_definition",
+      "concept": "@vocabulary_database_schema.concept",
+      "concept_ancestor": "@vocabulary_database_schema.concept_ancestor",
+      "concept_class": "@vocabulary_database_schema.concept_class",
+      "concept_relationship": "@vocabulary_database_schema.concept_relationship",
+      "concept_synonym": "@vocabulary_database_schema.concept_synonym",
+      "condition_era": "@cdm_database_schema.condition_era",
+      "condition_occurrence": "@cdm_database_schema.condition_occurrence",
+      "cost": "@cdm_database_schema.cost",
+      "death": "@cdm_database_schema.death",
+      "device_exposure": "@cdm_database_schema.device_exposure",
+      "domain": "@vocabulary_database_schema.domain",
+      "dose_era": "@cdm_database_schema.dose_era",
+      "drug_era": "@cdm_database_schema.drug_era",
+      "drug_exposure": "@cdm_database_schema.drug_exposure",
+      "drug_strength": "@vocabulary_database_schema.drug_strength",
+      "episode": "@cdm_database_schema.episode",
+      "episode_event": "@cdm_database_schema.episode_event",
+      "fact_relationship": "@cdm_database_schema.fact_relationship",
+      "location": "@cdm_database_schema.location",
+      "measurement": "@cdm_database_schema.measurement",
+      "metadata": "@cdm_database_schema.metadata",
+      "note": "@cdm_database_schema.note",
+      "note_nlp": "@cdm_database_schema.note_nlp",
+      "observation": "@cdm_database_schema.observation",
+      "observation_period": "@cdm_database_schema.observation_period",
+      "payer_plan_period": "@cdm_database_schema.payer_plan_period",
+      "person": "@cdm_database_schema.person",
+      "procedure_occurrence": "@cdm_database_schema.procedure_occurrence",
+      "provider": "@cdm_database_schema.provider",
+      "relationship": "@vocabulary_database_schema.relationship",
+      "source_to_concept_map": "@vocabulary_database_schema.source_to_concept_map",
+      "specimen": "@cdm_database_schema.specimen",
+      "visit_detail": "@cdm_database_schema.visit_detail",
+      "visit_occurrence": "@cdm_database_schema.visit_occurrence",
+      "vocabulary": "@vocabulary_database_schema.vocabulary"
+     },
+     "cohort_script_table_naming": "mapping",
+     "cohort_script_table_prefix": "",
+     "cohort_submission": [
+      {
+       "description": "first diagnosis of anemia",
+       "file": "feature_condition_anemia.sql",
+       "id": 1,
+       "name": "Anemia",
+       "replace": true
+      },
+      {
+       "description": "first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",
+       "file": "feature_condition_depression.sql",
+       "id": 3,
+       "name": "Depression",
+       "replace": true
+      },
+      {
+       "description": "The first condition record of Type 2 Diabetes Mellitus, which is followed by another Type 2 Diabetes Mellitus condition record, at least 2 drugs used to treat Type 2 diabetes, or at least 2 HbA1c measurements with value > 6.5%",
+       "file": "feature_condition_dm2.sql",
+       "id": 2,
+       "name": "Diabetes mellitus type 2",
+       "replace": true
+      },
+      {
+       "description": "step 3 second-batch test (copy of cohort 1)",
+       "file": "step3_quote_test.sql",
+       "id": 4,
+       "name": "Anemia (Crohn's test)",
+       "replace": true
+      }
+     ],
      "data_preparation_project_key": "PREP_RWD_SF_1K",
-     "death": "death_sf",
-     "device_exposure": "device_exposure_sf",
-     "drug_era": "drug_era_sf",
-     "drug_exposure": "drug_exposure_sf",
      "enable_pipeline": false,
      "folder_connection": "filesystem_folders",
-     "location": "location_sf",
      "main_connection": "bs-snowflake",
-     "measurement": "measurement_sf",
-     "observation": "observation_sf",
-     "observation_period": "observation_period_sf",
      "omop_cdm_standard_tables_import": [
       "person",
       "observation_period",
@@ -38743,13 +38756,9 @@
      "omop_standardised_vocabulary_tables_import": [
       "concept",
       "concept_ancestor"
-     ],
-     "person": "person_sf",
-     "procedure_occurrence": "procedure_occurrence_sf",
-     "visit_occurrence": "visit_occurrence_sf"
+     ]
     },
     "standard": {
-     "cdm_standard_tables_map": "omop_cdm_atlas",
      "cohort_definition_id": 1,
      "cohort_script_table_naming": "atlas",
      "days_prior_to_cohort_startdate": 365,
@@ -57137,52 +57146,6 @@
      "managed": true,
      "type": "Redshift"
     },
-    "cohort_metadata": {
-     "columns": [
-      [
-       "cohort_definition_id",
-       "string"
-      ],
-      [
-       "cohort_definition_name",
-       "string"
-      ],
-      [
-       "cohort_definition_description",
-       "string"
-      ],
-      [
-       "cohort_sql_script_filename",
-       "string"
-      ]
-     ],
-     "connection": "filesystem_managed",
-     "managed": false,
-     "type": "UploadedFiles"
-    },
-    "cohort_metadata_copy": {
-     "columns": [
-      [
-       "cohort_definition_id",
-       "string"
-      ],
-      [
-       "cohort_definition_name",
-       "string"
-      ],
-      [
-       "cohort_definition_description",
-       "string"
-      ],
-      [
-       "cohort_sql_script_filename",
-       "string"
-      ]
-     ],
-     "connection": "redshift-solutions",
-     "managed": true,
-     "type": "Redshift"
-    },
     "cohort_observation": {
      "columns": [
       [
@@ -58905,7 +58868,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-23T14:52Z",
+   "fetched_at": "2026-11-24T10:23Z",
    "flow_sources": [
     "PREP_RWD_RS_1K.concept_ancestor_rs",
     "PREP_RWD_RS_1K.concept_rs",
@@ -58922,8 +58885,7 @@
     "PREP_RWD_RS_1K.person_rs",
     "PREP_RWD_RS_1K.procedure_occurrence_rs",
     "PREP_RWD_RS_1K.visit_occurrence_rs",
-    "charlson_scoring",
-    "cohort_metadata"
+    "charlson_scoring"
    ],
    "git_references": {
     "preview": {
@@ -58938,16 +58900,38 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "a764faa382970d087d6a33da7533bd1af3e06e16",
+     "hash": "37007e9ef313c1534e3fa01da7409de85e0e4c6f",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "TMP RWD solution v1.1.2 test",
-   "probed_at": "2026-11-23T14:52Z",
+   "probed_at": "2026-11-24T10:24Z",
    "variables": {
     "local": {
-     "cdm_standard_tables_map": "omop_cdm_atlas",
      "cohort_build_error": 0,
+     "cohort_submission": [
+      {
+       "description": "first diagnosis of anemia",
+       "file": "c_anemia.sql",
+       "id": 1,
+       "name": "Anemia",
+       "replace": true
+      },
+      {
+       "description": "The first condition record of Type 2 Diabetes Mellitus, which is followed by another Type 2 Diabetes Mellitus condition record, at least 2 drugs used to treat Type 2 diabetes, or at least 2 HbA1c measurements with value > 6.5%",
+       "file": "c_dmt2.sql",
+       "id": 2,
+       "name": "Diabetes mellitus type 2",
+       "replace": true
+      },
+      {
+       "description": "first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",
+       "file": "c_depression.sql",
+       "id": 3,
+       "name": "Depression",
+       "replace": true
+      }
+     ],
      "concept": "concept_rs",
      "concept_ancestor": "concept_ancestor_rs",
      "condition_era": "condition_era_rs",
@@ -58990,9 +58974,31 @@
     "standard": {
      "advanced_file_format": false,
      "care_site": "care_site",
-     "cdm_standard_tables_map": "omop_cdm_atlas",
      "cohort_build_error": 0,
      "cohort_definition_id": 1,
+     "cohort_submission": [
+      {
+       "description": "first diagnosis of anemia",
+       "file": "c_anemia.sql",
+       "id": 1,
+       "name": "Anemia",
+       "replace": true
+      },
+      {
+       "description": "The first condition record of Type 2 Diabetes Mellitus, which is followed by another Type 2 Diabetes Mellitus condition record, at least 2 drugs used to treat Type 2 diabetes, or at least 2 HbA1c measurements with value > 6.5%",
+       "file": "c_dmt2.sql",
+       "id": 2,
+       "name": "Diabetes mellitus type 2",
+       "replace": true
+      },
+      {
+       "description": "first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",
+       "file": "c_depression.sql",
+       "id": 3,
+       "name": "Depression",
+       "replace": true
+      }
+     ],
      "concept": "concept_rs",
      "concept_ancestor": "concept_ancestor_rs",
      "concept_class": "concept_class",

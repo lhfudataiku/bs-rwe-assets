@@ -478,8 +478,6 @@ SOL_RWD_COHORT_DISCOVERY	cohort_filtered	Snowflake	bs-snowflake	yes	4			-
 SOL_RWD_COHORT_DISCOVERY	cohort_filtered_exploded_by_quarter	Snowflake	bs-snowflake	yes	6			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_location	Snowflake	bs-snowflake	yes	6			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_location_prepared	Snowflake	bs-snowflake	yes	6			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_metadata_copy	Snowflake	bs-snowflake	yes	4			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_observation	Snowflake	bs-snowflake	yes	9			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_prevalence	Snowflake	bs-snowflake	yes	8			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_visit_events	Snowflake	bs-snowflake	yes	9			-			
@@ -727,8 +725,6 @@ TMP_RWD_SOL_V112_TEST	cohort_filtered	Redshift	redshift-solutions	yes	4			-
 TMP_RWD_SOL_V112_TEST	cohort_filtered_exploded_by_quarter	Redshift	redshift-solutions	yes	6			-			
 TMP_RWD_SOL_V112_TEST	cohort_location	Redshift	redshift-solutions	yes	6			-			
 TMP_RWD_SOL_V112_TEST	cohort_location_prepared	Redshift	redshift-solutions	yes	6			-			
-TMP_RWD_SOL_V112_TEST	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_metadata_copy	Redshift	redshift-solutions	yes	4			-			
 TMP_RWD_SOL_V112_TEST	cohort_observation	Redshift	redshift-solutions	yes	9			-			
 TMP_RWD_SOL_V112_TEST	cohort_prevalence	Redshift	redshift-solutions	yes	8			-			
 TMP_RWD_SOL_V112_TEST	cohort_visit_events	Redshift	redshift-solutions	yes	9			-			
