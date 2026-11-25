@@ -1052,6 +1052,53 @@ Risks:
 - the project macro test passes;
 - Setup has no custom-mapping, metadata-CSV or dashboard section.
 
+**Execution sequence (draft, 2026-11-25).** Each stage ends at a gate. The next stage starts only
+after the gate passes and the owner approves it.
+
+- **Tools.**
+  - The repo and `dku` carry parts 1–5 and 7. The library, the rendered SQL, the recipes, the
+    scenarios and the webapp code live in the repo with offline tests. They reach DSS as in step 3
+    and E4: library resync, recipe code, scenario steps.
+  - Dataiku Headless (the `dataiku-headless@dataiku` plugin, through Cobuild) carries part 6: the
+    charts and dataset tables, the two dashboard pages, their filters and the webapp tile. Its read
+    tools (`list_dashboards`, `get_dashboard_settings`, `list_insights`, `get_insight_settings`)
+    change nothing. Every change goes through a Cobuild conversation.
+  - Neither tool renders the dashboard, and the organisation's browser policy blocks
+    `design.solutions.dataiku-dss.io` in both Claude browsers (built-in and Claude in Chrome,
+    2026-11-25). The owner checks every page visually. `dku dashboard validate` pre-checks a layout.
+  - Cobuild is not used for the flow: it prefers visual recipes, and Headless forbids falling back
+    to raw API calls.
+- **Stages.**
+  1. **Repo only (parts 0–4).** Nothing changes on DSS.
+     Gate: the owner accepts the mapping table, the tests pass, and the rendering reproduces byte
+     for byte. Commit with the owner's approval.
+  2. **Backup.**
+     Gate: a bundle export of SOL, and saved copies of its Setup and its old dashboard definition.
+  3. **Flow on SOL only (part 5).** Each new object is named before it is created, and sits next to
+     the old ones; nothing is deleted. "Build cohorts" and "Compare cohorts" run once on the E4
+     batch.
+     Gate: the independent SQL checks and the hand-calculated standardized differences (population
+     and one pair) match, and a second request for the same pair computes nothing.
+  4. **Dashboard with Cobuild, on SOL (part 6).** One unit of work per Cobuild turn, in this order:
+     page 1 insights; page 1 layout and cohort filter; the webapp insight; page 2 and its filters.
+     - Each turn names the datasets and insights read beforehand.
+     - Inspection turns use `allow_edit_project=false`, building turns `true`.
+     - A deletion confirmation from Cobuild is never answered: it goes to the owner, since this
+       stage deletes nothing.
+     - After each turn the dashboard definition is read again, and the owner looks at the page.
+     - Cobuild conversations live only in the Headless server process, so the stage runs in one
+       session. Nobody builds in the UI on SOL meanwhile.
+     Gate: the owner accepts both pages visually, and the webapp works from the dashboard: request a
+     pair, see it computed, filter to it; with cohort B left at "Population", nothing runs.
+  5. **TMP: Redshift, then Databricks.** The E4 round trip, without the dashboard.
+     Gate: the same results as Snowflake, and the 9 `DEMO_SF_RWE` input schemas unchanged.
+  6. **Retirement (part 7).** With `dku`, from an explicit list the owner approves, not through
+     Cobuild.
+     Gate: the gate to exit phase 4 above.
+- **Before stage 4.** The owner enables the plugin (it is registered as the `dataiku` marketplace but
+  not enabled) and starts a new session, whose setup skill connects it to the design instance.
+  Stages 1–3 do not need it.
+
 Then D1 copies the solution on the head of `solution-revision-v1-2`.
 
 ## Open questions
