@@ -1140,6 +1140,45 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      submission. That logic moves to one module used by both tiles, so the two batches follow the
      same rules and sentences; each keeps only what is its own (scripts and dialect for
      registration, build and characterization logs here).
+
+   *Done offline (2026-11-25):*
+   - **Shared batch rules: `solution/setup/batch.py`.** It holds the whole-number id, the duplicate
+     id, "Tick In batch on at least one …" and "already done: tick Replace". Registration now uses it;
+     its messages and behaviour are unchanged, and the inlined Setup tiles still pass.
+   - **What to characterize: `solution/setup/characterization.py`.** It is pure, so the tile will
+     inline it.
+     - Rows: the population first, then every registered cohort whose latest build succeeded, with
+       its status. A cohort whose latest characterization attempt failed shows "Characterization
+       failed", even after an earlier success, since a failed redo on Databricks may already have
+       deleted its rows.
+     - Defaults: a cohort not characterized yet is ticked; a characterized one is not.
+     - The batch check (characterized needs *Replace*, no successful build is refused) and the
+       saved value, `characterization_submission` (added to the variable contract).
+     - The population is needed when it was never characterized or "Import Datasets" succeeded
+       since; that time comes from the scenario's last successful run.
+   - **The SQL of one run: `solution/characterization/statements.py`.** Pure; about 240 statements on
+     Snowflake.
+     - `CREATE TABLE IF NOT EXISTS` for the five result tables, with types per dialect. Part 5 still
+       creates the DSS datasets over them.
+     - The run's cohort table: the chosen cohorts from `cohort`, plus the population (first
+       observation period of 365 days or more, index one year after its start).
+     - The construction script, with every `@cdm_database_schema.<table>` replaced by its resolved
+       name. A table it cannot resolve raises before anything runs.
+     - Then delete and insert per cohort id for `covariate` and `covariate_continuous`, inserts of
+       new ids only for `covariate_ref` and `analysis_ref`, and the cleanup. Everything that reads
+       the data runs before the first delete, so a run that fails there changes no result.
+   - **The recipe body: `solution/pipelines/characterize_cohorts.py`.**
+     - Checks the saved batch again, as the authority.
+     - Runs everything in one session, then reads the entries per cohort from the run's cohort
+       table, and appends to `characterization_log`. The log gets SUCCESS with counts, or FAILED
+       with the error for every cohort of a failed run.
+     - Clears the saved batch after a success, and does nothing, without failing, when there is
+       nothing to do.
+   - **Databricks scratch tables** are `rwdtmp_<key>__ch_<name>`. The characterization sweeps only
+     its own leftovers and the build only its own, so the two can run at the same time.
+   - **Tests: `tests/test_characterize_cohorts.py`** (20 tests; 125 in all).
+   - **Left for part 5:** the five DSS datasets, the recipe and scenario, the Setup section and tile,
+     and the first run on SOL.
 4. **Standardized differences.**
    - Precomputed: `covariate_balance`, each cohort of the batch against the population.
    - On request: `pair_balance_sql(cohort_a, cohort_b)`, which builds one statement over the stored

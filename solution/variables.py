@@ -26,6 +26,7 @@ LOCAL_KEYS = frozenset([
     "omop_cdm_standard_tables_import", "omop_standardised_vocabulary_tables_import",
     "cohort_script_table_prefix", "cohort_script_table_map",  # R1
     "cohort_submission",  # R2
+    "characterization_submission",  # R3, decisions 14-15
 ] + OMOP_CDM_KEYS)
 
 # Still in use until the named item removes them.

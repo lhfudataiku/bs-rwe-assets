@@ -1,0 +1,135 @@
+"""`characterize_cohorts`: the static Python recipe behind "Characterize cohorts" (R3, step 4 part 3).
+
+Run from the "Characterize Cohorts" section of Project Setup (decision 14), on the batch saved by
+the "Characterization batch" tile in `characterization_submission`:
+
+- the batch is checked again here, as the authority: every cohort must have a successful latest
+  build, and a characterized cohort needs *Replace* (decision 15);
+- the population (id -1) is added when it was never characterized or the data was imported since;
+- one FeatureExtraction run covers all of them, in one session (`statements.run_statements`);
+- `characterization_log` gets one row per cohort, SUCCESS with its entry count, or FAILED with the
+  error for every cohort of a failed run; the saved batch is cleared after a success.
+
+Inputs, declared for lineage: `cohort`, `cohort_definition`, `cohort_building_log` and the OMOP tables
+the SQL reads. Outputs: `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`,
+`characterization_log`, written in-database. On Databricks the scratch tables are
+`rwdtmp_<project key>__ch_<name>`; any left by an earlier crash are dropped first, and the cohort
+build's are never touched.
+"""
+import datetime
+import logging
+
+import dataiku
+from dataiku import SQLExecutor2
+
+from solution.characterization.statements import RESULT_TABLES, count_query, log_statement, run_statements
+from solution.pipelines.build_cohorts import clean_error, drop_tables, run, scratch_schema
+from solution.recipes.sql_script_function import cohort_connection_type, get_sql_path
+from solution.recipes.sql_text import characterization_scratch_prefix, is_characterization_scratch_table
+from solution.setup.batch import latest_by_id
+from solution.setup.characterization import POPULATION_ID, SUCCESS, population_needed, selected_ids
+from solution.setup.registration import DEFINITION_COLUMNS, LOG_COLUMNS, read_rows
+from solution.utils.variables import get_setting, set_local
+
+logger = logging.getLogger(__name__)
+
+OMOP_TABLES = ["person", "observation_period", "visit_occurrence", "condition_era", "drug_era", "concept",
+               "concept_ancestor"]
+CHARACTERIZATION_LOG_COLUMNS = {"run_timestamp": "RUN_TIMESTAMP", "id": "COHORT_DEFINITION_ID",
+                                "build_timestamp": "BUILD_TIMESTAMP", "count": "COHORT_COUNT",
+                                "status": "STATUS"}
+IMPORT_SCENARIO = "IMPORTDATASETSFROMDATAPREPPROJECT"
+SUBMISSION = "characterization_submission"
+
+
+def utc_timestamp(moment=None):
+    return (moment or datetime.datetime.utcnow()).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def imported_at(project):
+    """When "Import Datasets" last succeeded, as a UTC ISO string, or None if unknown."""
+    try:
+        last = project.get_scenario(IMPORT_SCENARIO).get_last_successful_run()
+        end = getattr(last, "end_time", None) if last else None
+        if end is None:
+            return None
+        if end.tzinfo is not None:
+            end = end.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+        return utc_timestamp(end)
+    except Exception as e:  # unknown: then only never-characterized decides for the population
+        logger.warning("Could not read the last run of %s: %s", IMPORT_SCENARIO, e)
+        return None
+
+
+def sweep_scratch_tables(executor, schema, project_key):
+    """Drop the characterization's scratch tables left by an earlier crash. Never fails the run."""
+    prefix = characterization_scratch_prefix(project_key)
+    try:
+        listed = executor.query_to_df("SHOW TABLES IN %s LIKE '%s*'" % (schema, prefix))
+        names = [n for n in listed["tableName"] if is_characterization_scratch_table(n, project_key)]
+        drop_tables(executor, ["%s.`%s`" % (schema, n) for n in names], "Databricks")
+        if names:
+            logger.warning("Dropped %d scratch tables left by an earlier run: %s", len(names), ", ".join(names))
+    except Exception as e:
+        logger.warning("Could not sweep scratch tables in %s: %s", schema, e)
+
+
+def characterize(executor, connection_type, project_key, schema, cohort_ids, population, build_times):
+    """Run one characterization. Returns the log rows (SUCCESS per cohort, or FAILED for all)."""
+    tables = {t: get_sql_path(t) for t in OMOP_TABLES}
+    paths = {t: get_sql_path(t) for t in list(RESULT_TABLES) + ["cohort"]}
+    prefix = characterization_scratch_prefix(project_key) if schema else None
+    statements, scratch, cohort_name = run_statements(connection_type, tables, paths, cohort_ids, population,
+                                                      prefix, schema)
+    run_timestamp = utc_timestamp()
+    ids = sorted(cohort_ids) + ([POPULATION_ID] if population else [])
+    try:
+        df = run(executor, ["DROP TABLE IF EXISTS %s" % t for t in scratch] + statements, connection_type,
+                 count_query(cohort_name))
+        counts = {int(r[0]): int(r[1]) for r in df.itertuples(index=False)}
+        rows = [[run_timestamp, i, build_times.get(i, ""), counts.get(i, 0), SUCCESS, ""] for i in ids]
+    except Exception as e:
+        logger.error("Characterization of %s failed: %s", ids, e)
+        error = clean_error(e)
+        rows = [[run_timestamp, i, build_times.get(i, ""), 0, "FAILED", error] for i in ids]
+    finally:
+        try:
+            drop_tables(executor, scratch, connection_type)
+        except Exception as e:
+            logger.warning("Could not drop the characterization's scratch tables: %s", e)
+    run(executor, log_statement(paths["characterization_log"], rows, connection_type), connection_type)
+    return rows
+
+
+def characterize_cohorts():
+    project = dataiku.api_client().get_default_project()
+    connection_type = cohort_connection_type()
+    project_key = dataiku.default_project_key()
+    executor = SQLExecutor2(connection=get_setting("main_connection"))
+    schema = scratch_schema(connection_type)
+
+    definitions = read_rows(dataiku.Dataset("cohort_definition", ignore_flow=True), DEFINITION_COLUMNS)
+    build_logs = read_rows(dataiku.Dataset("cohort_building_log", ignore_flow=True), LOG_COLUMNS)
+    char_logs = read_rows(dataiku.Dataset("characterization_log", ignore_flow=True), CHARACTERIZATION_LOG_COLUMNS)
+    built = {i: log for i, log in latest_by_id(build_logs).items() if str(log.get("status") or "").upper() == SUCCESS}
+    registered = {int(d["id"]) for d in definitions if d.get("id") is not None}
+    built_ids = sorted(i for i in built if i in registered)
+    characterized = sorted(latest_by_id(char_logs, keep=lambda l: str(l.get("status") or "").upper() == SUCCESS))
+
+    cohort_ids = selected_ids(get_setting(SUBMISSION, default=[]), built_ids, characterized)
+    population = population_needed(char_logs, imported_at(project))
+    if not cohort_ids and not population:
+        logger.info("Nothing to characterize: no cohort in the batch, and the population is up to date.")
+        return []
+
+    if schema:
+        sweep_scratch_tables(executor, schema, project_key)
+    build_times = {i: str(built[i].get("run_timestamp") or "") for i in cohort_ids}
+    rows = characterize(executor, connection_type, project_key, schema, cohort_ids, population, build_times)
+    failed = [r for r in rows if r[4] != SUCCESS]
+    if failed:
+        raise ValueError("Characterization failed for %s (see characterization_log): %s"
+                         % (", ".join(str(r[1]) for r in failed), failed[0][5]))
+    if cohort_ids:
+        set_local(project, SUBMISSION, [])
+    return rows

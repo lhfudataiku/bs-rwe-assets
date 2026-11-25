@@ -92,7 +92,22 @@ def project_scratch_prefix(project_key):
 
 
 def is_project_scratch_table(name, project_key):
+    """A scratch table of this project's cohort build (never one of the characterization's)."""
     return re.match(re.escape(project_scratch_prefix(project_key)) + r"\d+_", name.lower()) is not None
+
+
+def characterization_scratch_prefix(project_key):
+    """`rwdtmp_<project key>__ch_`: the characterization's scratch tables (R3, step 4 part 3).
+
+    One run covers many cohorts, so the prefix carries no cohort id. `ch` is not a number, so the
+    cohort build's sweep never drops these, and the characterization's sweep (below) never drops the
+    build's: a build and a characterization can run at the same time.
+    """
+    return "%s%s__ch_" % (SCRATCH_PREFIX, project_key.lower())
+
+
+def is_characterization_scratch_table(name, project_key):
+    return name.lower().startswith(characterization_scratch_prefix(project_key))
 
 
 def render_temp_tables(sql, connection_type, prefix=None, qualifier=None):

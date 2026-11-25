@@ -4,11 +4,12 @@ the checks on a submitted batch, and the "Built cohorts" listing.
 The tile is a convenience; the `register_cohorts` recipe repeats every check against the data and is
 the authority. Both call the functions here.
 
-Imports only the pure `sql_dialect` module (hashlib and json are imported inside the functions that
-need them): `tools/app_manifest.py` inlines both into the Setup tiles, which cannot import the
-project library.
+Imports only the pure `batch` and `sql_dialect` modules (hashlib and json are imported inside the
+functions that need them): `tools/app_manifest.py` inlines them into the Setup tiles, which cannot
+import the project library. The batch rules shared with the characterization tile are in `batch`.
 """
 
+from solution.setup.batch import as_int, batch_errors, latest_by_id
 from solution.setup.sql_dialect import dialect_error
 
 NEW, REGISTERED, CHANGED, PENDING = "new", "registered", "changed", "pending"
@@ -58,14 +59,6 @@ def default_name(filename):
     return " ".join(words)[:1].upper() + " ".join(words)[1:] if words else stem
 
 
-def _as_int(value):
-    try:
-        number = int(str(value).strip())
-    except (TypeError, ValueError):
-        return None
-    return number if str(number) == str(value).strip() else None
-
-
 def registration_rows(files, registered, submission=None, connection_type=None):
     """One row per uploaded script, for the "Register cohorts" tile.
 
@@ -83,7 +76,7 @@ def registration_rows(files, registered, submission=None, connection_type=None):
         if meta.get("script"):
             by_file[meta["script"]] = (cohort, meta)
     pending = {row.get("file"): row for row in (submission or []) if row.get("file")}
-    used = {_as_int(c.get("id")) for c in registered} | {_as_int(r.get("id")) for r in pending.values()}
+    used = {as_int(c.get("id")) for c in registered} | {as_int(r.get("id")) for r in pending.values()}
     used.discard(None)
     next_id = max(used | {0}) + 1
 
@@ -96,12 +89,12 @@ def registration_rows(files, registered, submission=None, connection_type=None):
             cohort, meta = by_file[filename]
             changed = meta.get("sha256") != script_digest(text)
             rows.append({"file": filename, "status": CHANGED if changed else REGISTERED,
-                         "id": _as_int(cohort.get("id")), "name": cohort.get("name") or "",
+                         "id": as_int(cohort.get("id")), "name": cohort.get("name") or "",
                          "description": cohort.get("description") or "", "submit": False, "replace": False,
                          "dialect_issue": issue})
         elif filename in pending:
             row = pending[filename]
-            rows.append({"file": filename, "status": PENDING, "id": _as_int(row.get("id")),
+            rows.append({"file": filename, "status": PENDING, "id": as_int(row.get("id")),
                          "name": row.get("name") or "", "description": row.get("description") or "",
                          "submit": True, "replace": bool(row.get("replace")), "dialect_issue": issue})
         else:
@@ -120,28 +113,15 @@ def validate_batch(rows, registered_ids, files=None, connection_type=None):
     files: names in "Original Scripts", or {name: script text}, when known. With the texts and the
     project's connection type, a script exported for another SQL dialect is refused.
     """
-    submitted = [r for r in rows if r.get("submit")]
-    if not submitted:
-        return ["Tick In batch on at least one script."]
-    errors, seen = [], {}
-    registered_ids = {_as_int(i) for i in registered_ids}
-    for row in submitted:
+    errors, valid = batch_errors(rows, registered_ids, lambda r: r.get("file") or "a row", "script",
+                                 "already exists", "rebuild it from this script, or choose another id")
+    for row, _ in valid:
         label = row.get("file") or "a row"
-        cohort_id = _as_int(row.get("id"))
-        if cohort_id is None or cohort_id < 0:  # 0 is valid: the demo library uses it
-            errors.append("%s: the cohort id must be a whole number, 0 or more, not %r." % (label, row.get("id")))
-            continue
-        if cohort_id in seen:
-            errors.append("%s: cohort id %d is also given to %s." % (label, cohort_id, seen[cohort_id]))
-        seen[cohort_id] = label
         name = (row.get("name") or "").strip()
         if not name:
             errors.append("%s: the cohort needs a name." % label)
         elif len(name) > MAX_NAME_LENGTH:
             errors.append("%s: the name is longer than %d characters." % (label, MAX_NAME_LENGTH))
-        if cohort_id in registered_ids and not row.get("replace"):
-            errors.append("%s: cohort %d already exists. Tick Replace to rebuild it from this script, "
-                          "or choose another id." % (label, cohort_id))
         if files is not None and row.get("file") not in files:
             errors.append("%s: the script is not in Original Scripts." % label)
         elif isinstance(files, dict) and connection_type:
@@ -153,7 +133,7 @@ def validate_batch(rows, registered_ids, files=None, connection_type=None):
 
 def submission(rows):
     """The `cohort_submission` value for the ticked rows."""
-    return [{"id": _as_int(r.get("id")), "name": (r.get("name") or "").strip(),
+    return [{"id": as_int(r.get("id")), "name": (r.get("name") or "").strip(),
              "description": (r.get("description") or "").strip(), "file": r.get("file"),
              "replace": bool(r.get("replace"))}
             for r in rows if r.get("submit")]
@@ -165,14 +145,10 @@ def built_cohort_rows(definitions, logs):
     definitions: [{"id", "name", "description", "syntax"}]; logs: [{"run_timestamp", "id", "count",
     "status"}] from `cohort_building_log`, in any order.
     """
-    latest = {}
-    for log in logs:
-        cohort_id = _as_int(log.get("id"))
-        if cohort_id is not None and str(log.get("run_timestamp")) >= str(latest.get(cohort_id, {}).get("run_timestamp", "")):
-            latest[cohort_id] = log
+    latest = latest_by_id(logs)
     rows = []
     for cohort in definitions:
-        cohort_id = _as_int(cohort.get("id"))
+        cohort_id = as_int(cohort.get("id"))
         log = latest.get(cohort_id, {})
         rows.append({"id": cohort_id, "name": cohort.get("name") or "",
                      "description": cohort.get("description") or "",
