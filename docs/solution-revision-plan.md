@@ -264,8 +264,10 @@ every cohort and filter on the dashboard.
      DemographicsTimeInCohort, DemographicsPriorObservationTime and
      DemographicsPostObservationTime;
    - CharlsonIndex;
-   - ConditionGroupEra, DrugGroupEra and VisitConceptCount, in the long-term window (365 days
-     before index) and any time prior.
+   - ConditionGroupEra and DrugGroupEra, in the long-term window (365 days before index) and any
+     time prior;
+   - VisitConceptCount in the long-term window only (owner, 2026-11-25): FeatureExtraction has no
+     any-time-prior visit preset.
 7. **Prevalence by quarter and incidence by county stay** as cohort-level views. They are not
    covariates, and the v2.0 proposal keeps them too.
 8. **Standardized differences between two cohorts are added**, as well as against the population.
@@ -356,6 +358,53 @@ every cohort and filter on the dashboard.
 - **For the decision register** (meets its admission rule; to add when the owner agrees): the
   FeatureExtraction result format as the contract between 1.2, the demo copy and v2.0, and the 5
   person-level tables as the contract with `DEMO_SF_RWE`.
+
+### Step 4 part 0: today's figures mapped to the presets (2026-11-25)
+
+Read from SOL's dashboard "Cohort Discovery Insights", its 30 insights and the recipes behind them,
+and compared with FeatureExtraction's `PrespecAnalyses.csv`, `DomainConceptGroup.sql`,
+`CharlsonIndex.sql`, `DemographicsTime.sql` and `DemographicsAgeGroup.sql` from its `main` branch.
+Part 1 pins a release, and part 2 checks these findings again against it. Nothing was changed.
+`${days_prior_to_cohort_startdate}` is 365 on SOL.
+
+**Page 1, "Cohort Descriptive Statistics".**
+
+| Today's figure (dataset) | How it is computed today | Becomes | Differs because |
+| --- | --- | --- | --- |
+| Sex, chart and frequency card (`population_cohort_demographic_prepared`, `population_cohort_sex`) | distinct persons per gender concept, cohort against control (everyone else) | DemographicsGender (1): share per gender concept | the reference is the population (decision 5), not "everyone else"; FeatureExtraction counts cohort entries, today persons |
+| Race, chart and frequency card (same datasets, `population_cohort_race`) | as sex, per race concept | DemographicsRace (4) | as sex. Ethnicity is computed today but shown nowhere; no preset is chosen for it |
+| Age, chart and summary card (`population_w_cohort_first_occurrence`) | years from birth to the start of the person's observation period, first cohort entry per person | DemographicsAge (2), continuous; DemographicsAgeGroup (3), 5-year groups | FeatureExtraction takes the age at cohort start (year of index minus year of birth). Today's figure is the age at the start of observation, which is not the cohort's age |
+| Cohort duration, prior observation, follow-up: one 3-variable summary card (`cohort_observation`) | cohort start to end; cohort start minus observation start; observation end minus cohort start, each floored at 0 | DemographicsTimeInCohort (10), DemographicsPriorObservationTime (8), DemographicsPostObservationTime (9) | same definitions, but FeatureExtraction uses the observation period that contains the index date. Today joins every period of the person, so a person with two periods counts twice |
+| Charlson Comorbidity Index, chart and summary card (`popoulation_cohort_charlson_score`) | 17 categories, weights 1–6; a category counts only with at least 2 condition occurrences; all eras, with no time limit | CharlsonIndex (901, Romano adaptation), eras up to index | same 17 concept sets (identical ancestor lists) and weights. FeatureExtraction counts a category from one era and ignores eras after index; today's "at least 2" rule and post-index eras go |
+| Dataset Population, card (`population_w_cohort_prepared`) | distinct persons with an observation period | population size: the count of the population pseudo-cohort (−1) | the population needs 365 days of observation (decision 5), so it is smaller |
+| Population Prevalence, card | cohort persons over all persons | cohort-level view: cohort persons over the population | the denominator is the population (decision 5) |
+| Cohort ID, Created Date, Name, Total Occurrence, Distinct Patient Count: 5 statistics cards | from `cohort_definition_filtered` and `cohort_observation`, on a head sample | a per-cohort summary table (id, name, created, entries, persons), shown as a dataset table | not covariates. Cards are not filtered by the dashboard filter (spike, 2026-11-20), so they become a table |
+| Cohort Prevalence by Quarter and Ave Quarterly Occurrence (`cohort_prevalence`) | per quarter, distinct cohort persons spanning it over persons observed in it | kept (decision 7), keyed by cohort | the same figures per cohort |
+| Incidence by County, chart and table (`cohort_location_prepared`) | per county, cohort persons over observed person-years, × 1,000 | kept (decision 7), keyed by cohort; person-years per county computed once | the same figures per cohort. It counts cohort members, not new cases, so it is closer to a rate of membership than an incidence; the name stays |
+| One tile whose insight `t0koor2` no longer exists | — | dropped | broken today |
+
+**Page 2, "Cohort Covariates".**
+
+| Today's figure (dataset) | How it is computed today | Becomes | Differs because |
+| --- | --- | --- | --- |
+| Condition Group Prevalence, chart and table (`cohort_condition_group_prevalence_prepared`) | from `condition_occurrence`, grouped under SNOMED clinical finding (441840); the condition starts before cohort start and ends at most 365 days before it; share of cohort entries | ConditionGroupEraLongTerm (210) and ConditionGroupEraAnyTimePrior (209) | FeatureExtraction reads `condition_era`, includes the index day, and has an any-time-prior window too. Its groups take levels of separation `> 2` (today `>= 2`) and 3 fewer name exclusions (`%at anatomical site`, `%of specific body system%`, `%of specific body organ%`), so its group list differs slightly |
+| Drug Group Prevalence, chart and table (`cohort_drug_group_prevalence_prepared`) | from `drug_exposure`, grouped under ATC classes (code length 1, 3, 4, 5) and ingredients; the same 365-day window | DrugGroupEraLongTerm (410) and DrugGroupEraAnyTimePrior (409) | the same group rule (FeatureExtraction's `drug_era` variant). FeatureExtraction reads `drug_era`, whose eras merge exposures, and includes the index day |
+| Visit Occurrence in Relation to Cohort, pivot table (`cohort_visit_joined`) | visits per visit type, before cohort start, during the cohort and after it ends | VisitConceptCountLongTerm (923): visits per visit concept in the 365 days up to index, as a continuous covariate | only the before-index part has a preset; "during" and "after" go (decision 4). See the open point below |
+| Cohort ID, Created Date, Name, Total Occurrence, Distinct Patient Count: 5 cards | as on page 1 | the per-cohort summary table | as on page 1 |
+
+**New, with no figure today.** Each covariate gets its standardized difference against the
+population (decision 3) and, on request, against another cohort (decision 8).
+
+**Decided (owner, 2026-11-25).**
+
+- **Visits: long-term window only.** Decision 6 named VisitConceptCount "in the long-term window and
+  any time prior", but FeatureExtraction has no any-time-prior visit preset (the visit presets are
+  VisitCount and VisitConceptCount in the long, medium and short-term windows, 920–925). Only
+  VisitConceptCountLongTerm (923) is used, which matches the other long-term presets. Decision 6 is
+  updated.
+- **Charlson: the preset's rules.** Today's "at least 2 occurrences" rule and post-index eras go,
+  as decision 4 rules out hand-built covariates. Scores fall for cohorts with single-era diagnoses
+  and rise for none.
 
 ## R4. Resolved table paths
 
@@ -957,6 +1006,9 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
 0. **Map today's figures to the decided presets.** Decisions 5–8 settle the open items. Output: a
    mapping table in this plan, from each of today's figures to its preset and window (or to the
    quarterly and county views), noting where figures will differ and why.
+   *Drafted 2026-11-25:* [part 0 mapping](#step-4-part-0-todays-figures-mapped-to-the-presets-2026-11-25),
+   accepted by the owner on 2026-11-25 with its two points (visits long-term only, the preset's
+   Charlson rules).
 1. **Rendering toolchain.**
    - `tools/render_feature_extraction.py` pins a FeatureExtraction release (templates and
      `PrespecAnalyses.csv`) and the SqlRender jar.
