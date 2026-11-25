@@ -284,6 +284,19 @@ every cohort and filter on the dashboard.
     scenario, and is inserted into the dashboard as a webapp tile.
 13. **Cohort B defaults to the population** (owner, 2026-11-24). That pair is precomputed, so the
     default never runs a scenario.
+14. **Characterization has its own Setup section** (owner, 2026-11-25), "Characterize Cohorts",
+    after "Build Cohorts", with its own button.
+    - "Build cohorts" no longer characterizes. Building stays one cohort at a time; characterizing
+      is one set-based run over many cohorts.
+    - Its tile reuses the "Register cohorts" pattern (owner, 2026-11-25): a table of built
+      cohorts with their status, an *In batch* tick to include a cohort and a *Replace* tick to
+      redo one, checked and saved as a batch, then run by the section's button.
+    - Cohorts not yet characterized are ticked *In batch* by default, so one click still
+      characterizes everything new, across several build batches.
+15. **A characterized cohort is never recomputed without an explicit request** (owner,
+    2026-11-25). As with registering an existing id, a characterized cohort ticked *In batch* is
+    refused unless *Replace* is ticked too. Rebuilding a cohort or re-importing the data marks its
+    characterization out of date in the tile but leaves it as it is.
 
 **Design.**
 
@@ -296,22 +309,32 @@ every cohort and filter on the dashboard.
     session with its commit.
   - No SQL renderer runs inside DSS; the renderer port stays in v2.0 (its M3).
   - Rendering needs Java (available locally, OpenJDK 21) and the SqlRender jar.
-- **When.**
-  - After "Build cohorts", for the cohorts of the batch only: delete and insert by cohort id, as
-    the cohort build does.
-  - The population, after "Import Datasets".
-  - Standardized differences against the population, for the batch's cohorts.
+- **When** (decisions 14 and 15). Everything is computed by "Characterize cohorts", in the
+  "Characterize Cohorts" section of Setup. It runs one FeatureExtraction pass (about 200 statements)
+  over:
+  - the saved batch (`characterization_submission`): the cohorts ticked *In batch*, by default
+    every built cohort with no characterization yet, and characterized ones only with *Replace*
+    (delete and insert by cohort id);
+  - the population, when it has none yet or the data was re-imported since. The population is not a
+    user cohort and follows the data. When it changes, every cohort's balance against it is
+    recomputed from the stored aggregates (arithmetic only, no FeatureExtraction run), so balances
+    always use the current population.
+
+  Standardized differences against the population come with each cohort characterized.
 - **Precomputed (reused by every comparison), incrementally:**
 
   | Result | Computed | Size |
   | --- | --- | --- |
-  | Covariates of each cohort (`covariate`, `covariate_continuous`) | once per cohort, when its batch is built | cohorts × covariates |
-  | Covariates of the population | once per import | covariates |
+  | Covariates of each cohort (`covariate`, `covariate_continuous`) | once per cohort, by "Characterize cohorts"; again only when ticked | cohorts × covariates |
+  | Covariates of the population | by "Characterize cohorts", first time and after each import | covariates |
   | Balance of each cohort against the population (`covariate_balance`, comparator −1) | with the cohort's covariates | cohorts × covariates |
   | `covariate_ref`, `analysis_ref` | added to as new covariates appear | covariates |
 
-  - A cohort is never recomputed unless it is rebuilt, and the population only when the data is
-    re-imported.
+  - A cohort is never recomputed unless the user ticks *In batch* and *Replace* (decision 15). The
+    population is recomputed only when the data was re-imported.
+  - `characterization_log` records each run: run time, cohort id, the build time of the cohort
+    characterized, entries counted, status and error. Setup compares it with
+    `cohort_building_log` to show what is out of date.
   - Everything grows linearly with the number of cohorts. As an estimate, 50 cohorts at about
     2,000 covariates each give about 100,000 rows per table.
 - **On request: a comparison between two chosen cohorts.**
@@ -340,10 +363,12 @@ every cohort and filter on the dashboard.
   - **Cache.**
     - "Compare cohorts" computes only the requested pairs that are missing from
       `covariate_balance`, and writes them by delete and insert per pair.
-    - When a cohort is rebuilt (Replace), its rows against the population are recomputed with it,
-      and its rows against other cohorts are deleted, to be recomputed on the next request. When
-      the data is re-imported, everything is recomputed and the rows against other cohorts are
-      cleared.
+    - When a cohort is re-characterized, its rows against the population are recomputed with it,
+      and its rows against other cohorts are deleted, to be recomputed on the next request.
+      Rebuilding a cohort alone changes nothing here: its stored figures, and the pairs computed
+      from them, stay consistent until it is re-characterized.
+    - When the population is recomputed, all population rows are recomputed and the pairs are
+      kept, since pairs do not involve the population.
 - **Dashboard.**
   - One single-select filter on the cohort. Its page shows the cohort against the population
     (precomputed), plus the quarterly prevalence and county incidence views.
@@ -1093,13 +1118,28 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      (`rwdtmp_<key>__c<id>_`). The characterization is not per cohort, so it needs its own prefix
      that the sweep also matches.
 3. **Engine.** `solution/pipelines/characterize_cohorts.py`, the body of one static recipe:
-   - characterize the batch's cohorts and the population pseudo-cohort (reserved id −1, never
-     written to `cohort`);
+   - choose what to characterize (decisions 14, 15): the saved batch, `characterization_submission`
+     (cleared after a successful run), checked again against the data as the cohort ingestion
+     does, and the population pseudo-cohort (reserved id −1, never written to `cohort`) when it
+     has none or the data was re-imported since;
+   - copy their rows into one scratch cohort table, the `@characterization_cohort`, and run the
+     rendered SQL once for all of them;
    - replace each `@cdm_database_schema.<table>` with the resolved name of that table's dataset
      (`get_sql_path`), through a fixed map, never the user's `cohort_script_table_naming`;
    - write `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`;
-   - delete and insert by cohort id, in one session; a failed cohort is logged and does not stop
-     the others, as in R5.
+   - delete and insert by cohort id, in one session, and append to `characterization_log`. One
+     set-based run cannot fail per cohort as the build does, so a failed run writes nothing,
+     logs every cohort it held as failed, and leaves them to the next click;
+   - give the Databricks scratch tables their own prefix, which the crash sweep also matches
+     (part 2);
+   - the status of each built cohort for Setup: Not characterized, In batch (saved, not run yet),
+     Characterized (when), Rebuilt since characterized, Data re-imported since characterized,
+     Characterization failed. A cohort whose latest build failed is not offered.
+   - **Shared with registration.** `solution/setup/registration.py` already builds rows with a
+     status and the two ticks, checks a batch ("already exists: tick Replace") and turns it into a
+     submission. That logic moves to one module used by both tiles, so the two batches follow the
+     same rules and sentences; each keeps only what is its own (scripts and dialect for
+     registration, build and characterization logs here).
 4. **Standardized differences.**
    - Precomputed: `covariate_balance`, each cohort of the batch against the population.
    - On request: `pair_balance_sql(cohort_a, cohort_b)`, which builds one statement over the stored
@@ -1111,17 +1151,33 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      stubbed.
    - Unit tests cover the formulas, zero variance, the antisymmetry of A–B against B–A, and a
      covariate present in only one of the two cohorts.
-5. **Flow and scenarios.** No Setup tile is added, and Setup's dashboard section goes (part 7).
+5. **Flow and scenarios.** Setup's dashboard section goes (part 7). A "Characterize Cohorts"
+   section comes after "Build Cohorts" (decision 14):
+   - a short text: what is characterized, that existing results are kept, how to redo one;
+   - a "Characterization batch" custom tile, built on the "Register cohorts" tile (decision 14):
+     - the same table: fixed height with a scrollbar and a sticky header, a count line
+       ("N cohort(s), M in batch"), a "Refresh list" button, and refresh on hover and focus that
+       keeps the user's edits;
+     - one row per built cohort: id, name, subjects, built on, status (part 3), *In batch* and
+       *Replace*. The population is a fixed first row, ticked automatically when it needs
+       computing;
+     - a "Save batch" button that checks the batch (a characterized cohort needs *Replace*; a
+       cohort whose latest build failed cannot be included) and saves it to the local variable
+       `characterization_submission` (added to the variable contract), or lists every problem;
+   - the "Characterize cohorts" button, which runs the new scenario on the saved batch.
+   - The HTML and JS start from `register_cohorts.{html,js}`. If the two tiles stay alike, the
+     shared parts move to one template that `tools/app_manifest.py` fills for each.
    - New:
      - the `comparison_requests` table (appended by the webapp);
      - the "Compare cohorts" recipe and scenario, run by the webapp, with no trigger;
      - `covariate_balance`, holding both the population rows and the cached pairs;
      - the "Compare cohorts" code webapp, with its backend started automatically.
-   - Rebuilding a cohort deletes its cached pairs; "Import Datasets" clears the cache.
-   - New recipes: characterization after `build_cohorts`, and the population after the import.
-   - "Build cohorts" also builds the characterization of the batch.
-   - "Import Datasets" also builds the population.
-   - "Refresh Dashboard" rebuilds everything.
+   - Re-characterizing a cohort deletes its cached pairs (part 4).
+   - New recipe and scenario: "Characterize cohorts" (reads `cohort`, `cohort_building_log` and the
+     OMOP tables; writes the four FeatureExtraction tables, the population rows of
+     `covariate_balance` and `characterization_log`), run from Setup only.
+   - "Build cohorts" and "Import Datasets" are unchanged: neither characterizes.
+   - "Refresh Dashboard" refreshes the dashboard's datasets only; it never characterizes.
 6. **Dashboard.**
    - A new "Cohort Characterization" dashboard.
    - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary
@@ -1141,9 +1197,17 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      window.
    - Standardized differences against a hand calculation, for the population and for one pair of
      E4 cohorts requested on demand.
-   - A new batch computes only its own cohorts, which is checked in the job log.
-   - The cache: a second request for the same pair computes nothing, and rebuilding one of its
-     cohorts makes the next run recompute it.
+   - After two build batches, the tile ticks every new cohort *In batch*, and one run
+     characterizes both batches, which is checked in `characterization_log` and the job log. Run
+     again with nothing ticked, it characterizes nothing.
+   - A characterized cohort ticked *In batch* without *Replace* is refused with a sentence, and
+     nothing is saved.
+   - Rebuilding a characterized cohort with Replace shows it as "Rebuilt since characterized" and
+     leaves its figures. Ticked *In batch* and *Replace*, it is re-characterized alone, and its
+     cached pairs are deleted.
+   - A cohort whose build failed is not offered.
+   - The cache: a second request for the same pair computes nothing, and re-characterizing one of
+     its cohorts makes the next request recompute it.
    - The webapp, from the dashboard: request a pair, see it computed, then select it in the filter.
      An unbuilt cohort is not offered. With cohort B left at "Population", nothing runs and the
      result shows at once.
@@ -1176,7 +1240,9 @@ Risks:
 - the dashboard shows every built cohort against the population without a rebuild, and a requested
   comparison of two cohorts;
 - the project macro test passes;
-- Setup has no custom-mapping, metadata-CSV or dashboard section.
+- Setup has no custom-mapping, metadata-CSV or dashboard section, and has a "Characterize Cohorts"
+  section whose batch tile includes new cohorts by default and redoes a characterized one only
+  with *Replace*.
 
 **Execution sequence (draft, 2026-11-25).** Each stage ends at a gate. The next stage starts only
 after the gate passes and the owner approves it.
