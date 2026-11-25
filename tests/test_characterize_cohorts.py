@@ -102,7 +102,7 @@ class Selection(unittest.TestCase):
 
     def test_submission_and_authority(self):
         rows = ch.characterization_rows(DEFINITIONS, BUILDS, [])
-        self.assertEqual(ch.submission(rows), [{"id": 1, "replace": False}, {"id": 2, "replace": False},
+        self.assertEqual(ch.batch_submission(rows), [{"id": 1, "replace": False}, {"id": 2, "replace": False},
                                                {"id": 3, "replace": False}])
         self.assertEqual(ch.selected_ids([{"id": 2}, {"id": 1}], [1, 2], []), [1, 2])
         self.assertEqual(ch.selected_ids([], [1], []), [])

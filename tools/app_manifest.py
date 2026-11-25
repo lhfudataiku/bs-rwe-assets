@@ -22,6 +22,7 @@ import ...` line in a wrapper, and in the modules it pulls in, is replaced by th
 once. --import writes the bare wrappers instead, for re-testing that on a later DSS version.
 """
 import argparse
+import ast
 import copy
 import json
 import os
@@ -58,6 +59,12 @@ CUSTOM_TILES = {
         "prompt": "Built cohorts",
         "help": "Every written cohort with its latest build.",
         "section_of": "WRITECOHORTTODATASETS", "before": None},
+    "characterization_batch": {
+        "prompt": "Characterization batch",
+        "help": "One row per cohort whose latest build succeeded. New cohorts are ticked In batch. "
+                "A characterized cohort is redone only with In batch and Replace. Click Save batch, "
+                "then Characterize cohorts.",
+        "own_section": "characterization"},
 }
 
 COHORT_INGESTION = "**Cohort Ingestion**"
@@ -78,6 +85,7 @@ def link_tile(prompt, path, text):
     """A Setup tile holding one link that opens `path` of this project in a new tab."""
     return {"type": "PROJECT_VARIABLES_EDIT", "behavior": "INLINE_AUTO_SAVE", "params": [],
             "prompt": prompt, "html": LINK_TILE_HTML % (path, text)}
+CHARACTERIZE_SCENARIO = "CHARACTERIZECOHORTS"
 OWN_SECTIONS = {
     "naming": {
         "after": COHORT_INGESTION,
@@ -87,6 +95,26 @@ OWN_SECTIONS = {
                        "tables, so it needs to know how your scripts write them. Pick the option that "
                        "matches your scripts below. If you change it later, register the affected "
                        "scripts again with Replace.",
+    },
+    # R3, decision 14: after "Build Cohorts", with its own button.
+    "characterization": {
+        "after": "Build Cohorts",
+        "sectionTitle": "Characterize Cohorts",
+        "sectionText": "Describes each built cohort with the FeatureExtraction covariates (demographics, "
+                       "Charlson index, condition and drug groups, visits) and compares it with the "
+                       "population: every person with at least 365 days of observation.\n\n"
+                       "1. In **Characterization batch**, new cohorts are ticked *In batch*. Click "
+                       "**Save batch**.\n"
+                       "2. Click **Characterize cohorts**. One run covers the whole batch, and the "
+                       "population when it has none yet or the data was imported again.\n\n"
+                       "Existing results are kept: a characterized cohort is redone only when you tick "
+                       "*In batch* and *Replace*. A rebuilt cohort shows as *Rebuilt since "
+                       "characterized* until you do.",
+        "extra_tiles": [
+            {"type": "SCENARIO_RUN", "scenarioId": CHARACTERIZE_SCENARIO, "prompt": "Characterize cohorts"},
+            link_tile("Review Characterization Log", "datasets/characterization_log/explore/",
+                      "Explore the characterization log dataset"),
+        ],
     },
 }
 
@@ -141,7 +169,8 @@ LAYOUT = {
             "sectionText": "Once the pipeline is configured, ingest cohorts from SQL scripts. Set "
                            "**Cohort Script Table Naming** once. Then, for each batch of scripts, run "
                            "**Upload and Register Cohort SQL Scripts** and **Build Cohorts**, in that "
-                           "order. [Instructions](article:8)"},
+                           "order. Then characterize the built cohorts, across one or several batches, "
+                           "in **Characterize Cohorts**. [Instructions](article:8)"},
     },
 }
 
@@ -165,6 +194,29 @@ def inline(code, seen):
     return SOLUTION_IMPORT.sub(substitute, code)
 
 
+def top_level_names(source):
+    names = set()
+    for node in ast.parse(source).body:
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+            names.add(node.name)
+        elif isinstance(node, ast.Assign):
+            for target in node.targets:
+                for leaf in (target.elts if isinstance(target, ast.Tuple) else [target]):
+                    if isinstance(leaf, ast.Name):
+                        names.add(leaf.id)
+    return names
+
+
+def name_clashes(modules):
+    """Top-level names defined by more than one of the inlined modules, as "name (a, b)"."""
+    owners = {}
+    for module in modules:
+        with open(module_path(module)) as fh:
+            for name in top_level_names(fh.read()):
+                owners.setdefault(name, []).append(module)
+    return ["%s (%s)" % (n, ", ".join(m)) for n, m in sorted(owners.items()) if len(m) > 1]
+
+
 def tile_code(fname, inline_library=True):
     with open(os.path.join(TILES_DIR, fname)) as fh:
         code = fh.read()
@@ -176,6 +228,10 @@ def tile_code(fname, inline_library=True):
         raise SystemExit("%s must start with its `from solution... import` lines" % fname)
     seen = set()
     library = "\n\n".join(inline(line, seen) for line in head)
+    clashes = name_clashes(sorted(seen))
+    if clashes:
+        raise SystemExit("%s: inlined modules define the same top-level name, so one would silently replace "
+                         "the other: %s" % (fname, "; ".join(clashes)))
     library = library.replace("# Inlined from ", "# Inlined from ", 1).replace(
         "\n", " by tools/app_manifest.py --inline\n", 1)
     return library + "\n\n# Tile wrapper (" + fname + ")\n" + "\n".join(lines[len(head):]).lstrip("\n")
@@ -296,15 +352,40 @@ def apply_custom_tiles(manifest, changes, inline_library):
             header = {k: own[k] for k in ("sectionTitle", "sectionText")}
             if not found:
                 index = sections(manifest).index(section_titled(manifest, own["after"])) + 1
-                sections(manifest).insert(index, dict(header, tiles=[values]))
+                tiles = [values] + [dict(t) for t in own.get("extra_tiles", [])]
+                sections(manifest).insert(index, dict(header, tiles=tiles))
                 changes.append("added section %s with tile %s" % (own["sectionTitle"], module))
                 continue
-            update(sections(manifest)[found[0][0]], header, changes, "section %s" % own["sectionTitle"])
+            section = sections(manifest)[found[0][0]]
+            update(section, header, changes, "section %s" % own["sectionTitle"])
+            apply_extra_tiles(section, own.get("extra_tiles", []), changes)
         if not found:
             place(manifest, values, {"section_of": spec["section_of"], "before": spec["before"]}, changes,
                   "tile %s" % module)
         else:
             update(found[0][1], values, changes, "tile %s" % module)
+
+
+def same_tile(tile, expect):
+    if tile.get("type") != expect["type"]:
+        return False
+    if expect["type"] == "SCENARIO_RUN":
+        return tile.get("scenarioId") == expect["scenarioId"]
+    return tile.get("prompt") == expect.get("prompt")
+
+
+def apply_extra_tiles(section, extra_tiles, changes):
+    """Make the section hold each of `extra_tiles` (a button, a link), added at the end if missing."""
+    tiles = section.setdefault("tiles", [])
+    for expect in extra_tiles:
+        found = [t for t in tiles if same_tile(t, expect)]
+        if not found:
+            tiles.append(dict(expect))
+            changes.append("section %s: added %s" % (section.get("sectionTitle"),
+                                                     expect.get("prompt") or expect.get("scenarioId")))
+        else:
+            update(found[0], expect, changes, "section %s tile %s" % (section.get("sectionTitle"),
+                                                                       expect.get("prompt")))
 
 
 def apply_python_tiles(manifest, changes, inline_library):

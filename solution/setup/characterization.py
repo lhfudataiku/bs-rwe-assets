@@ -10,8 +10,11 @@ the recipe repeats every check and is the authority, as for registration.
   when the data was imported after its last characterization.
 
 Timestamps are ISO strings (`%Y-%m-%dT%H:%M:%SZ`, UTC), as `cohort_building_log` writes them.
-Pure, importing only the pure `batch` module: `tools/app_manifest.py` inlines it into the tile.
+Pure apart from `imported_at`, which reads a scenario run from the project handle it is given, and
+importing only the pure `batch` module: `tools/app_manifest.py` inlines it into the tile.
 """
+import datetime
+
 from solution.setup.batch import as_int, batch_errors, latest_by_id
 
 POPULATION_ID = -1
@@ -24,6 +27,39 @@ REBUILT, REIMPORTED, CHAR_FAILED = "rebuilt since characterized", "data re-impor
 STATUS_LABELS = {NOT_CHARACTERIZED: "Not characterized", IN_BATCH: "In batch, not run yet",
                  CHARACTERIZED: "Characterized", REBUILT: "Rebuilt since characterized",
                  REIMPORTED: "Data re-imported since characterized", CHAR_FAILED: "Characterization failed"}
+
+CHARACTERIZATION_LOG_COLUMNS = {"run_timestamp": "RUN_TIMESTAMP", "id": "COHORT_DEFINITION_ID",
+                                "build_timestamp": "BUILD_TIMESTAMP", "count": "COHORT_COUNT",
+                                "status": "STATUS"}
+IMPORT_SCENARIO = "IMPORTDATASETSFROMDATAPREPPROJECT"
+SUBMISSION = "characterization_submission"
+
+
+def utc_timestamp(moment=None):
+    return (moment or datetime.datetime.utcnow()).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def imported_at(project):
+    """When "Import Datasets" last succeeded, as a UTC ISO string, or None if unknown."""
+    try:
+        last = project.get_scenario(IMPORT_SCENARIO).get_last_successful_run()
+        end = getattr(last, "end_time", None) if last else None
+        if end is None:
+            return None
+        if end.tzinfo is not None:
+            end = end.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+        return utc_timestamp(end)
+    except Exception:  # unknown: then only never-characterized decides for the population
+        return None
+
+
+def batch_ids(definitions, build_logs, characterization_logs):
+    """(built ids, characterized ids): registered cohorts whose latest build succeeded, and cohorts
+    with a successful characterization. What `validate_selection` and `selected_ids` check against."""
+    registered = {as_int(d.get("id")) for d in definitions}
+    built = sorted(i for i, log in latest_by_id(build_logs).items() if _succeeded(log) and i in registered)
+    characterized = sorted(latest_by_id(characterization_logs, keep=_succeeded))
+    return built, characterized
 
 
 def _succeeded(log):
@@ -106,7 +142,7 @@ def _label(row):
     return (row.get("name") or "").strip() or "Cohort %s" % row.get("id")
 
 
-def submission(rows):
+def batch_submission(rows):
     """The `characterization_submission` value for the ticked cohort rows (the population excluded)."""
     return [{"id": as_int(r.get("id")), "replace": bool(r.get("replace"))}
             for r in rows if r.get("submit") and not r.get("population") and as_int(r.get("id")) != POPULATION_ID]

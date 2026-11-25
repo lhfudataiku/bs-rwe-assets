@@ -1264,6 +1264,31 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      `covariate_balance` and `characterization_log`), run from Setup only.
    - "Build cohorts" and "Import Datasets" are unchanged: neither characterizes.
    - "Refresh Dashboard" refreshes the dashboard's datasets only; it never characterizes.
+
+   **Part 5, repo side done (2026-11-25).**
+   - **Setup: the "Characterize Cohorts" section** (`tools/app_manifest.py`), placed after "Build
+     Cohorts": a short text, the "Characterization batch" tile, the "Characterize cohorts" button
+     (scenario `CHARACTERIZECOHORTS`) and a link to `characterization_log`. The Cohort Ingestion
+     text now points to it.
+   - **The tile:** `app_manifest/tiles/characterization_batch.{py,html,js}`, built on "Register
+     cohorts": the same fixed-height table, count line, refresh and kept edits. The population is a
+     fixed, greyed first row, ticked automatically when it needs computing. "Save batch" checks and
+     saves `characterization_submission`.
+   - **Inlining fix.** The tile inlines `characterization` and `registration` into one namespace,
+     and both defined `submission()`, so registration's silently replaced the characterization's.
+     The characterization's is now `batch_submission()`, and `tools/app_manifest.py` refuses any
+     two inlined modules that share a top-level name.
+   - **Shared helpers** moved into `solution/setup/characterization.py` (the log columns,
+     `imported_at`, `batch_ids`), so the tile and the recipe check against the same ids.
+   - **DSS code kept in the repo:** `dss/recipes/characterize_cohorts.py` (the recipe body) and
+     `dss/webapps/compare_cohorts/` (HTML, JS, CSS and the Flask backend over
+     `solution/compare/services.py`).
+   - **Tests:** 149 in all; the tile is run inlined, and the backend's routes with Flask stubbed.
+   - **Applying it to SOL needs, in order:** the backup (stage 2); the library resync; the six
+     result datasets and `comparison_requests`; the `characterize_cohorts` recipe; the scenario;
+     the Setup manifest; the webapp. The column names of the new Snowflake tables are upper case,
+     like `cohort_building_log`'s, so each dataset's schema is reloaded from its table after the
+     first run.
 6. **Dashboard.**
    - A new "Cohort Characterization" dashboard.
    - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary
@@ -1355,8 +1380,8 @@ after the gate passes and the owner approves it.
   2. **Backup.**
      Gate: a bundle export of SOL, and saved copies of its Setup and its old dashboard definition.
   3. **Flow on SOL only (part 5).** Each new object is named before it is created, and sits next to
-     the old ones; nothing is deleted. "Build cohorts" and "Compare cohorts" run once on the E4
-     batch.
+     the old ones; nothing is deleted. "Characterize cohorts" runs once on the E4 batch, and one
+     pair is requested through the webapp.
      Gate: the independent SQL checks and the hand-calculated standardized differences (population
      and one pair) match, and a second request for the same pair computes nothing.
   4. **Dashboard with Cobuild, on SOL (part 6).** One unit of work per Cobuild turn, in this order:

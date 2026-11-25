@@ -16,7 +16,6 @@ the SQL reads. Outputs: `covariate`, `covariate_continuous`, `covariate_ref`, `a
 in-database. On Databricks the scratch tables are `rwdtmp_<project key>__ch_<name>`; any left by an
 earlier crash are dropped first, and the cohort build's are never touched.
 """
-import datetime
 import logging
 
 import dataiku
@@ -27,7 +26,10 @@ from solution.pipelines.build_cohorts import clean_error, drop_tables, run, scra
 from solution.recipes.sql_script_function import cohort_connection_type, get_sql_path
 from solution.recipes.sql_text import characterization_scratch_prefix, is_characterization_scratch_table
 from solution.setup.batch import latest_by_id
-from solution.setup.characterization import POPULATION_ID, SUCCESS, population_needed, selected_ids
+from solution.setup.characterization import (  # noqa: F401 (re-exported for the recipe and tests)
+    CHARACTERIZATION_LOG_COLUMNS, IMPORT_SCENARIO, POPULATION_ID, SUBMISSION, SUCCESS, batch_ids, imported_at,
+    population_needed, selected_ids, utc_timestamp,
+)
 from solution.setup.registration import DEFINITION_COLUMNS, LOG_COLUMNS, read_rows
 from solution.utils.variables import get_setting, set_local
 
@@ -35,30 +37,6 @@ logger = logging.getLogger(__name__)
 
 OMOP_TABLES = ["person", "observation_period", "visit_occurrence", "condition_era", "drug_era", "concept",
                "concept_ancestor"]
-CHARACTERIZATION_LOG_COLUMNS = {"run_timestamp": "RUN_TIMESTAMP", "id": "COHORT_DEFINITION_ID",
-                                "build_timestamp": "BUILD_TIMESTAMP", "count": "COHORT_COUNT",
-                                "status": "STATUS"}
-IMPORT_SCENARIO = "IMPORTDATASETSFROMDATAPREPPROJECT"
-SUBMISSION = "characterization_submission"
-
-
-def utc_timestamp(moment=None):
-    return (moment or datetime.datetime.utcnow()).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def imported_at(project):
-    """When "Import Datasets" last succeeded, as a UTC ISO string, or None if unknown."""
-    try:
-        last = project.get_scenario(IMPORT_SCENARIO).get_last_successful_run()
-        end = getattr(last, "end_time", None) if last else None
-        if end is None:
-            return None
-        if end.tzinfo is not None:
-            end = end.astimezone(datetime.timezone.utc).replace(tzinfo=None)
-        return utc_timestamp(end)
-    except Exception as e:  # unknown: then only never-characterized decides for the population
-        logger.warning("Could not read the last run of %s: %s", IMPORT_SCENARIO, e)
-        return None
 
 
 def sweep_scratch_tables(executor, schema, project_key):
@@ -129,10 +107,8 @@ def characterize_cohorts():
     definitions = read_rows(dataiku.Dataset("cohort_definition", ignore_flow=True), DEFINITION_COLUMNS)
     build_logs = read_rows(dataiku.Dataset("cohort_building_log", ignore_flow=True), LOG_COLUMNS)
     char_logs = read_rows(dataiku.Dataset("characterization_log", ignore_flow=True), CHARACTERIZATION_LOG_COLUMNS)
-    built = {i: log for i, log in latest_by_id(build_logs).items() if str(log.get("status") or "").upper() == SUCCESS}
-    registered = {int(d["id"]) for d in definitions if d.get("id") is not None}
-    built_ids = sorted(i for i in built if i in registered)
-    characterized = sorted(latest_by_id(char_logs, keep=lambda l: str(l.get("status") or "").upper() == SUCCESS))
+    built = latest_by_id(build_logs)
+    built_ids, characterized = batch_ids(definitions, build_logs, char_logs)
 
     cohort_ids = selected_ids(get_setting(SUBMISSION, default=[]), built_ids, characterized)
     population = population_needed(char_logs, imported_at(project))

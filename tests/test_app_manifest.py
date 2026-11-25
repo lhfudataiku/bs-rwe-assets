@@ -78,6 +78,13 @@ class Apply(unittest.TestCase):
             self.assertIn("/datasets/%s/explore/" % name, tile["html"])
             self.assertIn('target="_blank"', tile["html"])
             self.assertNotIn("SOL_", tile["html"])  # the key comes from the page URL
+        # R3, decision 14: characterization has its own section after Build Cohorts, with its button.
+        titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
+        self.assertEqual(titles[titles.index("Build Cohorts") + 1], "Characterize Cohorts")
+        char = by_title(self.m, "Characterize Cohorts")["tiles"]
+        self.assertEqual([t.get("module") or t.get("scenarioId") or t.get("prompt") for t in char],
+                         ["characterization_batch", "CHARACTERIZECOHORTS", "Review Characterization Log"])
+        self.assertIn("/datasets/characterization_log/explore/", char[2]["html"])
         omop = by_title(self.m, "Connect OMOP")["tiles"]
         self.assertEqual(omop[3]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")
         self.assertNotIn("mapping file", by_title(self.m, "**Pipeline Configuration** (One-time)")["sectionText"])
@@ -186,6 +193,52 @@ class InlineTiles(unittest.TestCase):
             result = do({}, {}, {}, [])
         self.assertTrue(result["ok"])
         self.assertEqual([(r["id"], r["name"]) for r in result["rows"]], [(1, "A")])
+
+    def test_characterization_tile_loads_and_saves(self):
+        do = self.tile("characterization_batch")
+        tables = {
+            "cohort_definition": (["COHORT_DEFINITION_ID", "COHORT_DEFINITION_NAME"], [(1, "Anemia"), (2, "Crohn's")]),
+            "cohort_building_log": (["RUN_TIMESTAMP", "COHORT_DEFINITION_ID", "COHORT_COUNT", "STATUS"],
+                                    [("2026-11-20T10:00:00Z", 1, 611, "SUCCESS"), ("2026-11-20T10:00:00Z", 2, 593, "SUCCESS")]),
+            "characterization_log": (["RUN_TIMESTAMP", "COHORT_DEFINITION_ID", "BUILD_TIMESTAMP", "COHORT_COUNT", "STATUS"],
+                                     [("2026-11-21T10:00:00Z", 1, "2026-11-20T10:00:00Z", 611, "SUCCESS"),
+                                      ("2026-11-21T10:00:00Z", -1, "", 900, "SUCCESS")]),
+        }
+        dk, project = self.fake_dataiku()
+
+        def dataset(name, **kwargs):
+            ds = mock.MagicMock()
+            columns, rows = tables[name]
+            ds.read_schema.return_value = [{"name": c} for c in columns]
+            ds.iter_tuples.side_effect = lambda: iter(rows)
+            return ds
+        dk.Dataset.side_effect = dataset
+        project.get_scenario.return_value.get_last_successful_run.return_value = None
+        with mock.patch.dict(sys.modules, {"dataiku": dk}):
+            loaded = do({"action": "load"}, {}, {}, [])
+            self.assertTrue(loaded["ok"], loaded)
+            self.assertEqual(loaded["characterized_ids"], [-1, 1])
+            self.assertEqual([(r["id"], r["status"], r["submit"]) for r in loaded["rows"]],
+                             [(-1, "characterized", False), (1, "characterized", False), (2, "not characterized", True)])
+            rows = loaded["rows"]
+            rows[1]["submit"] = True  # characterized, without Replace
+            refused = do({"action": "save", "rows": rows}, {}, {}, [])
+            self.assertEqual(refused["errors"],
+                             ["Anemia: cohort 1 is already characterized. Tick Replace to characterize it again."])
+            project.set_variables.assert_not_called()
+            rows[1]["replace"] = True
+            self.assertEqual(do({"action": "save", "rows": rows}, {}, {}, []), {"ok": True, "saved": 2})
+        saved = project.set_variables.call_args.args[0]["local"]["characterization_submission"]
+        self.assertEqual(saved, [{"id": 1, "replace": True}, {"id": 2, "replace": False}])
+
+    def test_inlined_modules_never_share_a_top_level_name(self):
+        # One namespace: a second `submission` would silently replace the first (found in part 5).
+        self.assertEqual(self.tool.name_clashes(["solution.setup.characterization", "solution.setup.registration",
+                                                 "solution.setup.batch", "solution.utils.variables",
+                                                 "solution.setup.sql_dialect"]), [])
+        with mock.patch.object(self.tool, "top_level_names", return_value={"submission"}):
+            self.assertEqual(self.tool.name_clashes(["solution.setup.batch", "solution.setup.registration"]),
+                             ["submission (solution.setup.batch, solution.setup.registration)"])
 
     def test_wrappers_compile_and_define_do(self):
         tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")
