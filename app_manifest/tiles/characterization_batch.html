@@ -8,9 +8,11 @@
     <p ng-if="rows.length" style="color: #666; margin: 0 0 4px">{{cohortCount()}} cohort(s), {{batchCount()}} in batch.{{populationNote()}}</p>
     <div style="width: 100%; max-height: 480px; overflow: auto; border: 1px solid #ddd" ng-if="rows.length">
         <table class="table table-condensed" style="width: 100%; table-layout: fixed; margin-bottom: 0">
+            <!-- Percentages only: with fixed widths in em, the name column had no room left and its
+                 text ran under the next column. -->
             <colgroup>
-                <col style="width: 6em"><col><col style="width: 7em"><col style="width: 11em">
-                <col style="width: 17%"><col style="width: 11em"><col style="width: 5em"><col style="width: 5.5em">
+                <col style="width: 8%"><col style="width: 21%"><col style="width: 10%"><col style="width: 13%">
+                <col style="width: 14%"><col style="width: 15%"><col style="width: 9%"><col style="width: 10%">
             </colgroup>
             <thead>
                 <tr><th style="position: sticky; top: 0; background: #fff; z-index: 1">Cohort id</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Name</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Subjects</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Built</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Status</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Characterized</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">In batch</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Replace</th></tr>
@@ -18,7 +20,7 @@
             <tbody>
                 <tr ng-repeat="row in rows track by row.id" ng-style="row.population ? {'background': '#f7f7f7'} : {}">
                     <td style="vertical-align: top">{{row.population ? '' : row.id}}</td>
-                    <td style="vertical-align: top">{{row.name}}</td>
+                    <td style="vertical-align: top; overflow-wrap: anywhere">{{row.name}}</td>
                     <td style="vertical-align: top">{{row.subjects === null || row.subjects === undefined ? '' : row.subjects}}</td>
                     <td style="vertical-align: top">{{when(row.built)}}</td>
                     <td style="vertical-align: top">{{labels[row.status] || row.status}}</td>

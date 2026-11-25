@@ -80,7 +80,11 @@ class Apply(unittest.TestCase):
             self.assertNotIn("SOL_", tile["html"])  # the key comes from the page URL
         # R3, decision 14: characterization has its own section after Build Cohorts, with its button.
         titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
-        self.assertEqual(titles[titles.index("Build Cohorts") + 1], "Characterize Cohorts")
+        # A part heading of its own, like **Cohort Ingestion**: a stand-alone operation.
+        self.assertEqual(titles[titles.index("Build Cohorts") + 1:titles.index("Build Cohorts") + 3],
+                         ["**Cohort Characterization**", "Characterize Cohorts"])
+        self.assertEqual(by_title(self.m, "**Cohort Characterization**")["tiles"], [])
+        self.assertIn("**Cohort Characterization**", by_title(self.m, "**Cohort Ingestion**")["sectionText"])
         char = by_title(self.m, "Characterize Cohorts")["tiles"]
         self.assertEqual([t.get("module") or t.get("scenarioId") or t.get("prompt") for t in char],
                          ["characterization_batch", "Characterize_Cohorts", "Review Characterization Log"])

@@ -118,6 +118,18 @@ OWN_SECTIONS = {
     },
 }
 
+# Part headings: a section with a bold title, a text and no tiles, like **Cohort Ingestion**. Each is
+# created right before the section titled "before", or its text kept up to date.
+COHORT_CHARACTERIZATION = "**Cohort Characterization**"
+HEADINGS = [
+    {"sectionTitle": COHORT_CHARACTERIZATION, "before": "Characterize Cohorts",
+     "sectionText": "A stand-alone part, run whenever cohorts have been built: describe each built cohort "
+                    "with FeatureExtraction covariates and compare it with the population. It reads the "
+                    "**cohort** table and never changes it, and existing results are kept unless you ask "
+                    "for a cohort to be redone. Run **Characterize Cohorts** after one or several "
+                    "batches of **Cohort Ingestion**."},
+]
+
 LAYOUT = {
     # R1: the custom table mapping goes (its section holds this scenario's button).
     "remove_sections_with_scenario": ["CHECKOMOPTABLEVARIABLESMAPPING"],
@@ -169,8 +181,8 @@ LAYOUT = {
             "sectionText": "Once the pipeline is configured, ingest cohorts from SQL scripts. Set "
                            "**Cohort Script Table Naming** once. Then, for each batch of scripts, run "
                            "**Upload and Register Cohort SQL Scripts** and **Build Cohorts**, in that "
-                           "order. Then characterize the built cohorts, across one or several batches, "
-                           "in **Characterize Cohorts**. [Instructions](article:8)"},
+                           "order. Then characterize the built cohorts in **Cohort Characterization**. "
+                           "[Instructions](article:8)"},
     },
 }
 
@@ -388,6 +400,18 @@ def apply_extra_tiles(section, extra_tiles, changes):
                                                                        expect.get("prompt")))
 
 
+def apply_headings(manifest, changes):
+    for heading in HEADINGS:
+        values = {k: heading[k] for k in ("sectionTitle", "sectionText")}
+        found = [s for s in sections(manifest) if s.get("sectionTitle") == heading["sectionTitle"]]
+        if found:
+            update(found[0], values, changes, "section %s" % heading["sectionTitle"])
+            continue
+        index = sections(manifest).index(section_titled(manifest, heading["before"]))
+        sections(manifest).insert(index, dict(values, tiles=[]))
+        changes.append("added heading %s" % heading["sectionTitle"])
+
+
 def apply_python_tiles(manifest, changes, inline_library):
     for fname, expect in PYTHON_TILES:
         i, j, tile = find_tile(manifest, expect)
@@ -399,6 +423,7 @@ def apply(manifest, inline_library=True):
     changes = []
     apply_layout(manifest, changes)
     apply_custom_tiles(manifest, changes, inline_library)
+    apply_headings(manifest, changes)
     apply_python_tiles(manifest, changes, inline_library)
     return changes
 

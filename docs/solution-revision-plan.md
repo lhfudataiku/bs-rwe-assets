@@ -1349,9 +1349,14 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      automatically, running. Its backend cannot be called with an API key (API access is off, and
      stays off), so the request, the cache and "a second request computes nothing" are the owner's
      browser check.
-   - **Superseded by decisions 6 (revised) and 16.** The results above still hold the any-time-prior
-     covariates and the small cells. The population is redone only after a re-import, so SOL's six
-     result tables have to be emptied before the next run, with the owner's approval.
+   - **Rerun after decisions 6 (revised) and 16** (owner-approved, 2026-11-25). Library at
+     `b4b1400`; the six result tables emptied (rows only); cohorts 1–3 and the population
+     characterized again in about 3 minutes.
+     - Entries 611 / 593 / 247 and 935 again; the saved batch cleared.
+     - 11 analyses; no any-time-prior row; the smallest stored count is 5, and no balance row shows
+       a side held by 1 to 4 people.
+     - Binary covariates stored: 4,872 for the population, 3,595 / 2,839 / 2,725 for the cohorts,
+       down from about 15,000–19,000. Balance rows against the population: 3,611 / 2,987 / 2,923.
 6. **Dashboard.**
    - A new "Cohort Characterization" dashboard.
    - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary
