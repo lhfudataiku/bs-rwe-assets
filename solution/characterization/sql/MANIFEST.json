@@ -1,0 +1,72 @@
+{
+ "feature_extraction": "3.14.0",
+ "sql_render": "1.19.7",
+ "jars": {
+  "featureExtraction-3.14.0.jar": "148c135b5461287933e45215d633318bd0a81778989061930bcde3604096ccd5",
+  "json-20231013.jar": "0f18192df289114e17aa1a0d0a7f8372cc9f5c7e4f7e39adcf8906fe714fa7d3",
+  "SqlRender-1.19.7.jar": "dc152542636e6f48d689a17b71cce31ce2d77160b76ce599b76f1e06a7e4d211"
+ },
+ "presets": [
+  "DemographicsGender",
+  "DemographicsRace",
+  "DemographicsAge",
+  "DemographicsAgeGroup",
+  "DemographicsTimeInCohort",
+  "DemographicsPriorObservationTime",
+  "DemographicsPostObservationTime",
+  "CharlsonIndex",
+  "ConditionGroupEraLongTerm",
+  "ConditionGroupEraAnyTimePrior",
+  "DrugGroupEraLongTerm",
+  "DrugGroupEraAnyTimePrior",
+  "VisitConceptCountLongTerm"
+ ],
+ "settings": {
+  "temporal": false,
+  "temporalSequence": false,
+  "DemographicsGender": true,
+  "DemographicsRace": true,
+  "DemographicsAge": true,
+  "DemographicsAgeGroup": true,
+  "DemographicsTimeInCohort": true,
+  "DemographicsPriorObservationTime": true,
+  "DemographicsPostObservationTime": true,
+  "CharlsonIndex": true,
+  "ConditionGroupEraLongTerm": true,
+  "ConditionGroupEraAnyTimePrior": true,
+  "DrugGroupEraLongTerm": true,
+  "DrugGroupEraAnyTimePrior": true,
+  "VisitConceptCountLongTerm": true,
+  "longTermStartDays": -365,
+  "mediumTermStartDays": -180,
+  "shortTermStartDays": -30,
+  "endDays": 0,
+  "includedCovariateConceptIds": [],
+  "addDescendantsToInclude": false,
+  "excludedCovariateConceptIds": [],
+  "addDescendantsToExclude": false,
+  "includedCovariateIds": []
+ },
+ "aggregated": true,
+ "min_characterization_mean": 0,
+ "min_characterization_count": 0,
+ "placeholders": {
+  "cdm_database_schema": "@cdm_database_schema (every OMOP table; fixed, not the user's naming)",
+  "cohort_table": "@characterization_cohort",
+  "temp_database_schema": "@temp_database_schema (databricks only)",
+  "session_id": "rwdfeatx"
+ },
+ "dialects": {
+  "snowflake": "snowflake",
+  "databricks": "spark=@temp_database_schema",
+  "redshift": "redshift"
+ },
+ "files": {
+  "sqlConstruction": "construction.sql",
+  "sqlQueryFeatures": "query_covariates.sql",
+  "sqlQueryContinuousFeatures": "query_covariates_continuous.sql",
+  "sqlQueryFeatureRef": "query_covariate_ref.sql",
+  "sqlQueryAnalysisRef": "query_analysis_ref.sql",
+  "sqlCleanup": "cleanup.sql"
+ }
+}

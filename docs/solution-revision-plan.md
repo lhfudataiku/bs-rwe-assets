@@ -289,7 +289,9 @@ every cohort and filter on the dashboard.
 
 - **Engine.** FeatureExtraction's SQL templates (Apache-2.0) for the chosen presets are rendered
   offline, once per dialect, and checked into the repo like `cohort_scripts/`.
-  - The table names stay as placeholders, mapped as in R1.
+  - The table names stay as one fixed token, `@cdm_database_schema.<table>`, resolved to the project's
+    datasets. The R1 naming setting does not apply: it describes only the uploaded cohort scripts
+    (owner, 2026-11-25).
   - They run with the R5 build machinery: statement splitter, Databricks scratch tables, one
     session with its commit.
   - No SQL renderer runs inside DSS; the renderer port stays in v2.0 (its M3).
@@ -1016,13 +1018,62 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      and Redshift.
    - It writes `solution/characterization/sql/<dialect>/` with a NOTICE. A rerun reproduces the
      files byte for byte.
+
+   *Done (2026-11-25):*
+   - **How it renders.** FeatureExtraction's own assembler, `FeatureExtraction.createSql`, does the
+     rendering. It is the same Java call the FeatureExtraction R package makes, in aggregated mode
+     with no minimum mean or count. SqlRender then translates the result.
+     - A 50-line launcher, `tools/feature_extraction/Render.java`, makes both calls.
+     - `tools/render_feature_extraction.py` runs it.
+   - **Pins.**
+     - FeatureExtraction 3.14.0, with its templates inside its jar, and SqlRender 1.19.7.
+     - The three jars (FeatureExtraction, its `json` dependency and SqlRender, 240 KB in all) come from
+       OHDSI's GitHub tags. They are pinned by SHA-256 and kept in `~/.cache/bs-rwe-assets/jars/`,
+       never committed. `--fetch` downloads them, with the owner's approval of 2026-11-25.
+   - **Output.**
+     - `solution/characterization/sql/{snowflake,databricks,redshift}/`, six files each: construction,
+       the four result queries (binary and continuous covariates, `covariate_ref`, `analysis_ref`),
+       and cleanup.
+     - `MANIFEST.json` (versions, jar hashes, presets, settings, placeholders) and `NOTICE`
+       (Apache-2.0).
+     - `--check` reruns the tool and compares bytes. Five reruns gave identical files.
+   - **Dialects.** Each `construction.sql` fingerprints as its folder's dialect (the step 3 check).
+     The scratch tables take the forms of Atlas's exports:
+     - Snowflake: `CREATE TEMP TABLE`;
+     - Redshift: `#` tables with `DISTKEY`;
+     - Databricks: Delta tables named `@temp_database_schema.rwdfeatx<name>`.
+
+     The session id is fixed (`rwdfeatx`), so the names are reproducible.
+   - **Placeholders left:**
+     - `@cdm_database_schema.<table>` for all seven OMOP tables read: `person`,
+       `observation_period`, `visit_occurrence`, `condition_era`, `drug_era`, `concept` and
+       `concept_ancestor`. This is FeatureExtraction's own form, kept as a fixed token of the
+       solution's SQL (owner, 2026-11-25).
+       - Customised schemas never reach the SQL. The project imports the OMOP tables as datasets
+         with standard names, and each token becomes that dataset's resolved SQL name, which
+         carries the user's catalog, schema, prefix or suffix.
+       - The R1 setting `cohort_script_table_naming` describes only how uploaded cohort scripts
+         spell table names, so it does not apply here. Tying this SQL to it would break it for any
+         user who picks plain names or a prefix.
+       - The token is kept rather than bare names, because the SQL also uses table names as
+         aliases (`person.person_id`, `cohort.subject_id`) that a bare-name replacement would
+         corrupt;
+     - `@characterization_cohort`, the cohorts to characterize. All of its cohorts are characterized,
+       and its rows per cohort are the denominator, so cohort entries, not persons, are counted
+       (part 0);
+     - `@temp_database_schema`, on Databricks only.
+   - **Tests.** `tests/test_characterization_sql.py` checks the folders, the manifest, that nothing
+     is left unrendered, the placeholders, the dialects and the tables read. Reproduction needs Java,
+     so it is `--check`, not a unit test.
 2. **Offline checks of the rendered SQL.**
-   - Every file splits into statements, its placeholders are covered by the R1 mapping, and its
-     scratch tables render.
+   - Every file splits into statements, every `@cdm_database_schema.<table>` names an OMOP table the
+     project imports as a dataset, and its scratch tables render.
    - The dialect fingerprint matches its folder.
 3. **Engine.** `solution/pipelines/characterize_cohorts.py`, the body of one static recipe:
    - characterize the batch's cohorts and the population pseudo-cohort (reserved id −1, never
      written to `cohort`);
+   - replace each `@cdm_database_schema.<table>` with the resolved name of that table's dataset
+     (`get_sql_path`), through a fixed map, never the user's `cohort_script_table_naming`;
    - write `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`;
    - delete and insert by cohort id, in one session; a failed cohort is logged and does not stop
      the others, as in R5.
