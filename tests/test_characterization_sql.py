@@ -1,7 +1,11 @@
-"""The checked-in FeatureExtraction SQL (step 4 part 1): complete, rendered, in its folder's dialect.
+"""The checked-in FeatureExtraction SQL (step 4 parts 1 and 2).
+
+Part 1: complete, rendered, in its folder's dialect. Part 2: it fits the build machinery (R5, R6):
+it splits into statements, its scratch tables are created before use and dropped, Databricks scratch
+tables render, and every OMOP table it reads is one the project always imports.
 
 Reproducing it needs Java and the pinned jars, so that is `tools/render_feature_extraction.py --check`,
-not a unit test. Part 2 adds the statement and placeholder checks against the build machinery.
+not a unit test.
 """
 import importlib.util
 import json
@@ -13,11 +17,18 @@ import stubs
 
 stubs.install()
 
+from solution.recipes.sql_text import render_temp_tables, split_statements  # noqa: E402
 from solution.setup.sql_dialect import DATABRICKS, REDSHIFT, SNOWFLAKE, detect_dialect  # noqa: E402
+from solution.variables import MANDATORY_TABLES, MANDATORY_VOCABULARY  # noqa: E402
 
 SQL_DIR = os.path.join(stubs.ROOT, "solution", "characterization", "sql")
 FOLDER_DIALECT = {"snowflake": SNOWFLAKE, "databricks": DATABRICKS, "redshift": REDSHIFT}
 TEMPLATE_SYNTAX = re.compile(r"\{\s*@|\}\s*\?\s*\{")  # SqlRender's {@x} ? {...} : {...}
+# How each dialect names a scratch table: session temp tables (Snowflake, Redshift), Delta tables (R6).
+SCRATCH = {"snowflake": r"\b(rwdfeatx\w+)", "redshift": r"#(\w+)", "databricks": r"@temp_database_schema\.(\w+)"}
+CREATE = {"snowflake": r"CREATE\s+TEMP\s+TABLE\s+", "redshift": r"CREATE\s+TABLE\s+", "databricks": r"CREATE\s+TABLE\s+"}
+DROP = r"DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?"
+COMMENTS = re.compile(r"--[^\n]*|/\*.*?\*/", re.S)
 
 
 def load_tool():
@@ -71,6 +82,53 @@ class RenderedSql(unittest.TestCase):
             self.assertEqual(set(re.findall(r"@cdm_database_schema\.(\w+)", sql)),
                              {"person", "observation_period", "visit_occurrence", "condition_era", "drug_era",
                               "concept", "concept_ancestor"})
+
+
+class FitsTheBuildMachinery(unittest.TestCase):
+    """Part 2: what the characterization recipe (part 3) relies on."""
+
+    def scratch(self, folder, pattern_prefix, sql):
+        return {name.lower() for name in re.findall(pattern_prefix + SCRATCH[folder].lstrip("\\b"), sql, re.I)}
+
+    def test_statements_split(self):
+        for folder in FOLDER_DIALECT:
+            self.assertGreater(len(split_statements(read(folder, "construction.sql"))), 100, folder)
+            self.assertGreater(len(split_statements(read(folder, "cleanup.sql"))), 10, folder)
+
+    def test_each_result_query_is_one_select(self):
+        """The recipe wraps each in `INSERT INTO <result table> (...)`."""
+        for folder in FOLDER_DIALECT:
+            for name in ("query_covariates.sql", "query_covariates_continuous.sql", "query_covariate_ref.sql",
+                         "query_analysis_ref.sql"):
+                statements = split_statements(read(folder, name))
+                self.assertEqual(len(statements), 1, "%s/%s" % (folder, name))
+                self.assertEqual(COMMENTS.sub(" ", statements[0]).split()[0].upper(), "SELECT", "%s/%s" % (folder, name))
+
+    def test_scratch_tables_are_created_before_use_and_all_dropped(self):
+        for folder in FOLDER_DIALECT:
+            construction, cleanup = read(folder, "construction.sql"), read(folder, "cleanup.sql")
+            created = self.scratch(folder, CREATE[folder], construction)
+            self.assertGreater(len(created), 20, folder)
+            used = set()
+            for name in os.listdir(os.path.join(SQL_DIR, folder)):
+                used |= {n.lower() for n in re.findall(SCRATCH[folder], read(folder, name), re.I)}
+            self.assertEqual(used - created, set(), folder)
+            dropped = self.scratch(folder, DROP, construction) | self.scratch(folder, DROP, cleanup)
+            self.assertEqual(created - dropped, set(), "%s leaves scratch tables behind" % folder)
+
+    def test_databricks_scratch_tables_render(self):
+        rendered, tables = render_temp_tables(read("databricks", "construction.sql"), "Databricks",
+                                              "rwdtmp_sol__x_", "`catalog`.`scratch`")
+        self.assertEqual(len(tables), len(set(tables)))
+        self.assertTrue(all(t.startswith("`catalog`.`scratch`.`rwdtmp_sol__x_rwdfeatx") for t in tables))
+        self.assertEqual(set(re.findall(r"@\w+", rendered)), {"@cdm_database_schema", "@characterization_cohort"})
+
+    def test_every_omop_table_read_is_always_imported(self):
+        always = set(MANDATORY_TABLES + MANDATORY_VOCABULARY)
+        for folder in FOLDER_DIALECT:
+            for name in os.listdir(os.path.join(SQL_DIR, folder)):
+                read_tables = set(re.findall(r"@cdm_database_schema\.(\w+)", read(folder, name)))
+                self.assertEqual(read_tables - always, set(), "%s/%s" % (folder, name))
 
 
 if __name__ == "__main__":

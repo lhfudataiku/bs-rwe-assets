@@ -1069,6 +1069,29 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - Every file splits into statements, every `@cdm_database_schema.<table>` names an OMOP table the
      project imports as a dataset, and its scratch tables render.
    - The dialect fingerprint matches its folder.
+
+   *Done (2026-11-25), in `tests/test_characterization_sql.py`:*
+   - **Statements.** Each construction script splits with the R5 splitter: 197 statements on
+     Snowflake and Redshift, 221 on Databricks. Each of the four result queries is one `SELECT`,
+     which the recipe wraps in `INSERT INTO <result table>`.
+   - **Scratch tables.** All 34 per dialect are created before any file reads them. Each is dropped
+     in the construction script or in `cleanup.sql`, so a run leaves none behind. A test with a
+     leaked table confirmed the check fails.
+   - **Databricks.** The scratch tables render through `render_temp_tables` (R6). They become
+     `<scratch schema>.rwdtmp_<prefix>rwdfeatx<name>`, leaving only `@cdm_database_schema` and
+     `@characterization_cohort`.
+   - **Dialects.** Each construction script fingerprints as its folder's dialect (part 1).
+   - **Tables read.** `person`, `observation_period`, `visit_occurrence`, `condition_era`, `drug_era`,
+     `concept` and `concept_ancestor`.
+     - `drug_era` was optional, imported only when chosen in Setup. It is now in
+       `MANDATORY_TABLES` (`solution/variables.py`), so "Import Datasets" always brings it, and
+       the schema check covers it.
+     - Every active prep project has a v1.1-compliant `drug_era` (index), and SOL, TMP and
+       `DEMO_SF_RWD` import it already.
+     - The wiki's list of imported tables needs it (step 5).
+   - **For part 3.** The Databricks scratch prefix must be swept like the cohort build's
+     (`rwdtmp_<key>__c<id>_`). The characterization is not per cohort, so it needs its own prefix
+     that the sweep also matches.
 3. **Engine.** `solution/pipelines/characterize_cohorts.py`, the body of one static recipe:
    - characterize the batch's cohorts and the population pseudo-cohort (reserved id −1, never
      written to `cohort`);

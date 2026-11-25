@@ -33,9 +33,10 @@ RETIRING_KEYS = {"cohort_definition_id": "R3"}
 
 VARIABLE_CONTRACT = frozenset(STANDARD_DEFAULTS) | LOCAL_KEYS | frozenset(RETIRING_KEYS)
 
+# Always imported. `drug_era` joined in 1.2: the characterization (R3, DrugGroupEra presets) reads it.
 MANDATORY_TABLES = [
     "person", "observation_period", "visit_occurrence", "condition_occurrence", "drug_exposure",
-    "death", "location", "condition_era"]
+    "death", "location", "condition_era", "drug_era"]
 
 MANDATORY_VOCABULARY = ["concept_ancestor", "concept"]
 
