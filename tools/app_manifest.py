@@ -61,6 +61,23 @@ CUSTOM_TILES = {
 }
 
 COHORT_INGESTION = "**Cohort Ingestion**"
+
+# A tile's HTML runs in the Setup page, whose URL names the project (/projects/KEY/...), so the
+# link is built there: the manifest stays free of the project key and works in any copy.
+LINK_TILE_HTML = """<div class="control-group">
+    <label class="control-label"></label>
+    <div class="controls">
+        <a href="#" target="_blank" rel="noopener"
+           onclick="var m = window.location.pathname.match(/\\/projects\\/([^\\/]+)/); if (m) { this.href = '/projects/' + m[1] + '/%s'; }">%s</a>
+        <span class="muted">(opens in a new tab)</span>
+    </div>
+</div>"""
+
+
+def link_tile(prompt, path, text):
+    """A Setup tile holding one link that opens `path` of this project in a new tab."""
+    return {"type": "PROJECT_VARIABLES_EDIT", "behavior": "INLINE_AUTO_SAVE", "params": [],
+            "prompt": prompt, "html": LINK_TILE_HTML % (path, text)}
 OWN_SECTIONS = {
     "naming": {
         "after": COHORT_INGESTION,
@@ -82,7 +99,17 @@ LAYOUT = {
     "remove_tiles_with_first_param": ["cohort_script_table_naming"],
     "scenario_prompts": {"CREATECOHORTSCRIPTS": "Write batch to cohort definition",
                          "WRITECOHORTTODATASETS": "Build cohorts"},
-    "folder_link_prompts": {"lMM00YKr": "View written scripts"},
+    # Links that open in a new tab, each in the tile it was in. The folder tile was a
+    # MANAGED_FOLDER_LINK, which opens in the same tab. Found by prompt, or by folder for that one.
+    "link_tiles": [
+        ({"type": "MANAGED_FOLDER_LINK", "folderId": "lMM00YKr"},
+         link_tile("View written scripts", "managedfolder/lMM00YKr/view/", "Written Scripts folder")),
+        ({}, link_tile("Review Cohort", "datasets/cohort/explore/", "Explore the cohort dataset")),
+        ({}, link_tile("Review Cohort Definition", "datasets/cohort_definition/explore/",
+                       "Explore the cohort definition dataset")),
+        ({}, link_tile("Review Cohort Log", "datasets/cohort_building_log/explore/",
+                       "Explore the cohort building log dataset")),
+    ],
     # Three verbs for the ingestion: upload scripts, register a batch, write it to cohort definition.
     # The cohorts are then built.
     "sections": {
@@ -234,10 +261,16 @@ def apply_layout(manifest, changes):
         if len(kept) != len(tiles):
             changes.append("removed the tile with parameter %s" % "/".join(LAYOUT["remove_tiles_with_first_param"]))
             section["tiles"] = kept
-    for folder_id, prompt in LAYOUT["folder_link_prompts"].items():
-        for _, _, tile in all_tiles(manifest):
-            if tile.get("type") == "MANAGED_FOLDER_LINK" and tile.get("folderId") == folder_id:
-                update(tile, {"prompt": prompt}, changes, "link to folder %s" % folder_id)
+    for old_tile, values in LAYOUT["link_tiles"]:
+        found = [t for _, _, t in all_tiles(manifest)
+                 if (old_tile and all(t.get(k) == v for k, v in old_tile.items()))
+                 or (t.get("type") == values["type"] and t.get("prompt") == values["prompt"])]
+        if len(found) != 1:
+            raise SystemExit("expected one Setup tile %r, found %d" % (values["prompt"], len(found)))
+        if found[0] != values:
+            found[0].clear()
+            found[0].update(values)
+            changes.append("tile %r: a link that opens in a new tab" % values["prompt"])
     for scenario_id, values in LAYOUT["sections"].items():
         update(section_of_scenario(manifest, scenario_id), values, changes, "section of %s" % scenario_id)
     for title, values in LAYOUT["sections_by_title"].items():

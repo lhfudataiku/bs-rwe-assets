@@ -40,7 +40,10 @@ MANIFEST = {"homepageSections": [
     {"sectionTitle": "Upload scripts and metadata", "tiles": [
         {"type": "MANAGED_FOLDER_ADD_FILE"}, {"type": "UPLOAD_DATASET_SET_FILE"}, scenario("CREATECOHORTSCRIPTS"),
         {"type": "MANAGED_FOLDER_LINK", "folderId": "lMM00YKr", "prompt": "View Mapped Scripts"}]},
-    {"sectionTitle": "Write", "tiles": [scenario("WRITECOHORTTODATASETS")]},
+    {"sectionTitle": "Write", "tiles": [scenario("WRITECOHORTTODATASETS"),
+        {"type": "PROJECT_VARIABLES_EDIT", "prompt": "Review Cohort", "html": "<button>"},
+        {"type": "PROJECT_VARIABLES_EDIT", "prompt": "Review Cohort Definition", "html": "<button>"},
+        {"type": "PROJECT_VARIABLES_EDIT", "prompt": "Review Cohort Log", "html": "<button>"}]},
     {"sectionTitle": "Dashboard", "tiles": [{"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cohort_definition_id"}], "python": "old"}]},
 ]}
 
@@ -62,11 +65,19 @@ class Apply(unittest.TestCase):
         self.assertEqual([t["module"] for t in by_title(self.m, "Cohort Script Table Naming")["tiles"]], ["table_naming"])
         upload = by_title(self.m, "Upload and Register Cohort SQL Scripts")
         self.assertEqual([t.get("type") if not t.get("module") else t["module"] for t in upload["tiles"]],
-                         ["MANAGED_FOLDER_ADD_FILE", "register_cohorts", "SCENARIO_RUN", "MANAGED_FOLDER_LINK"])
+                         ["MANAGED_FOLDER_ADD_FILE", "register_cohorts", "SCENARIO_RUN", "PROJECT_VARIABLES_EDIT"])
         self.assertEqual(upload["tiles"][2]["prompt"], "Write batch to cohort definition")
-        self.assertEqual(upload["tiles"][3]["prompt"], "View written scripts")
+        folder = upload["tiles"][3]
+        self.assertEqual(folder["prompt"], "View written scripts")
+        self.assertIn("/managedfolder/lMM00YKr/view/", folder["html"])
         build = by_title(self.m, "Build Cohorts")
-        self.assertEqual((build["tiles"][0]["prompt"], build["tiles"][-1]["module"]), ("Build cohorts", "built_cohorts"))
+        self.assertEqual([t.get("prompt") for t in build["tiles"]],
+                         ["Build cohorts", "Review Cohort", "Review Cohort Definition", "Review Cohort Log",
+                          "Built cohorts"])
+        for tile, name in zip(build["tiles"][1:4], ("cohort", "cohort_definition", "cohort_building_log")):
+            self.assertIn("/datasets/%s/explore/" % name, tile["html"])
+            self.assertIn('target="_blank"', tile["html"])
+            self.assertNotIn("SOL_", tile["html"])  # the key comes from the page URL
         omop = by_title(self.m, "Connect OMOP")["tiles"]
         self.assertEqual(omop[3]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")
         self.assertNotIn("mapping file", by_title(self.m, "**Pipeline Configuration** (One-time)")["sectionText"])
