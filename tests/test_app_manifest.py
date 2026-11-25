@@ -83,7 +83,7 @@ class Apply(unittest.TestCase):
         self.assertEqual(titles[titles.index("Build Cohorts") + 1], "Characterize Cohorts")
         char = by_title(self.m, "Characterize Cohorts")["tiles"]
         self.assertEqual([t.get("module") or t.get("scenarioId") or t.get("prompt") for t in char],
-                         ["characterization_batch", "CHARACTERIZECOHORTS", "Review Characterization Log"])
+                         ["characterization_batch", "Characterize_Cohorts", "Review Characterization Log"])
         self.assertIn("/datasets/characterization_log/explore/", char[2]["html"])
         omop = by_title(self.m, "Connect OMOP")["tiles"]
         self.assertEqual(omop[3]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")

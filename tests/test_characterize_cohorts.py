@@ -175,6 +175,26 @@ class RunStatements(unittest.TestCase):
         with self.assertRaises(ValueError):
             st.fill("SELECT * FROM @cdm_database_schema.drug_era", {"person": "p"}, "c")
 
+    def test_unaliased_tables_keep_their_name_as_alias(self):
+        tables = {"condition_era": '"D"."S"."K_condition_era"', "observation_period": "OP", "concept": "C"}
+        self.assertEqual(st.fill("FROM @cdm_database_schema.condition_era ON x", tables, "c"),
+                         'FROM "D"."S"."K_condition_era" condition_era ON x')
+        self.assertEqual(st.fill("JOIN @cdm_database_schema.observation_period op\nWHERE 1", tables, "c"),
+                         "JOIN OP op\nWHERE 1")
+        self.assertEqual(st.fill("FROM @cdm_database_schema.concept AS k", tables, "c"), "FROM C AS k")
+        self.assertEqual(st.fill("(SELECT * FROM @cdm_database_schema.concept)", tables, "c"),
+                         "(SELECT * FROM C concept)")
+
+    def test_every_qualified_omop_column_has_its_table_in_scope(self):
+        # First run on SOL: `condition_era.person_id` failed once the table had a quoted full name.
+        for ct in st.FOLDERS:
+            args = ("rwdtmp_sol__ch_", "`cat`.`scratch`") if ct == "Databricks" else (None, None)
+            statements, _, _ = st.run_statements(ct, TABLES, PATHS, [1], True, *args)
+            for statement in statements:
+                for name in set(re.findall(r"\b(%s)\.\w+" % "|".join(cc.OMOP_TABLES), statement)):
+                    in_scope = re.search(r"%s\s+(AS\s+)?%s\b" % (re.escape(TABLES[name]), name), statement)
+                    self.assertTrue(in_scope, "%s: %s.<column> without %s in scope" % (ct, name, name))
+
     def test_scratch_prefixes_do_not_cross(self):
         self.assertEqual(characterization_scratch_prefix("SOL"), "rwdtmp_sol__ch_")
         self.assertTrue(is_characterization_scratch_table("rwdtmp_sol__ch_rwdfeatxcov_1", "SOL"))

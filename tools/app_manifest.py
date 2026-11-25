@@ -85,7 +85,7 @@ def link_tile(prompt, path, text):
     """A Setup tile holding one link that opens `path` of this project in a new tab."""
     return {"type": "PROJECT_VARIABLES_EDIT", "behavior": "INLINE_AUTO_SAVE", "params": [],
             "prompt": prompt, "html": LINK_TILE_HTML % (path, text)}
-CHARACTERIZE_SCENARIO = "CHARACTERIZECOHORTS"
+CHARACTERIZE_SCENARIO = "Characterize_Cohorts"
 OWN_SECTIONS = {
     "naming": {
         "after": COHORT_INGESTION,

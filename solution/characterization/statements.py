@@ -31,6 +31,10 @@ POPULATION_ID = -1
 SQL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sql")
 FOLDERS = {"Snowflake": "snowflake", "Databricks": "databricks", "Redshift": "redshift"}
 OMOP_TOKEN = re.compile(r"@cdm_database_schema\.(\w+)", re.IGNORECASE)  # fixed token (part 1)
+# The token, and whether an alias follows it: a word that is not a clause keyword (`op`, `AS op`).
+OMOP_TOKEN_WITH_FOLLOWER = re.compile(
+    r"@cdm_database_schema\.(\w+)(?=(\s+(?!(?:ON|WHERE|INNER|LEFT|RIGHT|FULL|CROSS|JOIN|GROUP|ORDER|UNION|HAVING|"
+    r"LIMIT|QUALIFY|WINDOW)\b)[A-Za-z_]\w*)?)", re.IGNORECASE)
 COHORT_TOKEN = "@characterization_cohort"
 
 # Result tables: FeatureExtraction's aggregated format (decision 2), plus the run log.
@@ -118,13 +122,18 @@ def fill(sql, tables, cohort_name):
 
     tables: {OMOP table: resolved SQL name}. A token naming a table not in `tables` raises, so a run
     never sends a placeholder to the database.
+
+    FeatureExtraction leaves some tables unaliased and then qualifies their columns by the bare
+    table name (`FROM @cdm_database_schema.condition_era ... condition_era.person_id`). A resolved
+    name such as `"DB"."SCHEMA"."KEY_condition_era"` no longer answers to `condition_era`, so an
+    unaliased table keeps its bare name as its alias (step 4 part 5, first run on SOL).
     """
     def table(match):
         name = match.group(1).lower()
         if name not in tables:
             raise ValueError("The characterization SQL reads %s, which this project has not resolved" % name)
-        return tables[name]
-    return OMOP_TOKEN.sub(table, sql).replace(COHORT_TOKEN, cohort_name)
+        return tables[name] + ("" if match.group(2) else " " + name)
+    return OMOP_TOKEN_WITH_FOLLOWER.sub(table, sql).replace(COHORT_TOKEN, cohort_name)
 
 
 def _strip_header(sql):

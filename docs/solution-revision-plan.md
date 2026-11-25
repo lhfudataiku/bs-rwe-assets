@@ -1268,7 +1268,7 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    **Part 5, repo side done (2026-11-25).**
    - **Setup: the "Characterize Cohorts" section** (`tools/app_manifest.py`), placed after "Build
      Cohorts": a short text, the "Characterization batch" tile, the "Characterize cohorts" button
-     (scenario `CHARACTERIZECOHORTS`) and a link to `characterization_log`. The Cohort Ingestion
+     (scenario `Characterize_Cohorts`) and a link to `characterization_log`. The Cohort Ingestion
      text now points to it.
    - **The tile:** `app_manifest/tiles/characterization_batch.{py,html,js}`, built on "Register
      cohorts": the same fixed-height table, count line, refresh and kept edits. The population is a
