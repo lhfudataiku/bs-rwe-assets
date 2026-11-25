@@ -53,6 +53,8 @@ class RenderedSql(unittest.TestCase):
         self.assertEqual(self.manifest, self.tool.manifest())
         self.assertIn("VisitConceptCountLongTerm", self.manifest["presets"])
         self.assertNotIn("VisitConceptCountAnyTimePrior", self.manifest["presets"])  # no such preset
+        # Dropped (owner, 2026-11-25): biased against a population with one year of history.
+        self.assertFalse([p for p in self.manifest["presets"] if p.endswith("AnyTimePrior")])
 
     def test_every_folder_has_every_part(self):
         self.assertEqual(sorted(os.listdir(SQL_DIR)), ["MANIFEST.json", "NOTICE", "databricks", "redshift", "snowflake"])

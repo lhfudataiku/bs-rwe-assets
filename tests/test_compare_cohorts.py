@@ -41,7 +41,8 @@ def database():
     db.execute("CREATE TABLE covariate_ref (covariate_id, covariate_name, analysis_id)")
     db.execute("CREATE TABLE analysis_ref (analysis_id, missing_means_zero)")
     db.execute("CREATE TABLE covariate_balance (%s)" % ", ".join(bal.BALANCE_COLUMNS))
-    db.executemany("INSERT INTO covariate VALUES (?, ?, 0, ?)", BINARY)
+    db.executemany("INSERT INTO covariate VALUES (?, ?, ?, ?)",
+                   [(c, k, round(p * (1000 if c == -1 else 100)), p) for c, k, p in BINARY])
     db.executemany("INSERT INTO covariate_continuous VALUES (?, ?, ?, ?)", CONTINUOUS)
     db.executemany("INSERT INTO covariate_ref VALUES (?, ?, ?)", [(k, n, a) for k, (n, a) in REF.items()])
     db.executemany("INSERT INTO analysis_ref VALUES (?, ?)", list(ANALYSES.items()))
@@ -123,6 +124,34 @@ class Formulas(unittest.TestCase):
             bal.balance_sql({"covariate": "c"}, [1])
         with self.assertRaises(ValueError):
             bal.balance_sql(PATHS, ["1; DROP TABLE x"])
+
+
+class MinimumCellCount(unittest.TestCase):
+    def setUp(self):
+        self.db = database()
+        # Cohort 1: 3 of 100 people have 1004; the population: 40 of 1000. Cohort 2: 6 of 100 have 1005.
+        self.db.executemany("INSERT INTO covariate VALUES (?, ?, ?, ?)",
+                            [(1, 1004, 3, 0.03), (-1, 1004, 40, 0.04), (2, 1005, 6, 0.06)])
+        self.db.executemany("INSERT INTO covariate_ref VALUES (?, ?, ?)", [(1004, "rare", 210), (1005, "six", 210)])
+
+    def test_small_cells_never_reach_the_balance(self):
+        got = rows(self.db, bal.balance_sql(PATHS, [1]))
+        self.assertNotIn((1, -1, 1004), got)  # 3 people: left out
+        self.assertIn((1, -1, 1001), got)     # 20 against 100
+        self.assertIn((1, -1, 1002), got)     # 0 against 250: 0 is not a small cell
+        got = rows(self.db, bal.balance_sql(PATHS, [2], 1))
+        self.assertAlmostEqual(got[(2, 1, 1005)]["std_diff"], binary_smd(0.06, 0.0))
+        self.assertIn((1, -1, 1004), rows(self.db, bal.balance_sql(PATHS, [1], min_cell_count=1)))
+
+    def test_balance_first_then_the_cut(self):
+        for s in bal.write_balance_statements(PATHS, [1, 2]) + bal.censor_statements(PATHS, [1, 2, -1]):
+            self.db.execute(s)
+        stored = {(c, k) for c, k in self.db.execute("SELECT cohort_definition_id, covariate_id FROM covariate")}
+        self.assertNotIn((1, 1004), stored)
+        self.assertIn((-1, 1004), stored)
+        self.assertIn((2, 1005), stored)
+        # The balance against the population came from the full rows, before the cut.
+        self.assertIn((2, -1, 1001), rows(self.db, "SELECT * FROM covariate_balance"))
 
 
 class Cache(unittest.TestCase):

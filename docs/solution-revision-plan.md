@@ -264,8 +264,10 @@ every cohort and filter on the dashboard.
      DemographicsTimeInCohort, DemographicsPriorObservationTime and
      DemographicsPostObservationTime;
    - CharlsonIndex;
-   - ConditionGroupEra and DrugGroupEra, in the long-term window (365 days before index) and any
-     time prior;
+   - ConditionGroupEra and DrugGroupEra, in the long-term window (365 days before index). Any time
+     prior was dropped (owner, 2026-11-25): the population has exactly one year of history, so for
+     it any time prior equals long-term (identical counts on SOL), and a cohort with years of history
+     looks inflated against it;
    - VisitConceptCount in the long-term window only (owner, 2026-11-25): FeatureExtraction has no
      any-time-prior visit preset.
 7. **Prevalence by quarter and incidence by county stay** as cohort-level views. They are not
@@ -305,6 +307,22 @@ every cohort and filter on the dashboard.
     2026-11-25). As with registering an existing id, a characterized cohort ticked *In batch* is
     refused unless *Replace* is ticked too. Rebuilding a cohort or re-importing the data marks its
     characterization out of date in the tile but leaves it as it is.
+16. **Minimum cell count of 5** (owner, 2026-11-25). No binary covariate held by 1 to 4 people is
+    stored or shown. It is a privacy rule, as in OHDSI's tools, not a way to save space.
+    - On SOL (1K) about half the group covariates were held by fewer than 5 people. At 2.3M almost
+      none are: the 8,251 condition concepts in `condition_era` give about 9,800 condition groups
+      and about 2,400 drug groups (FeatureExtraction's filter applied to the 1K ratios), and only 126
+      concepts are held by fewer than 5 people. Expect about 12,000 rows per cohort and per table
+      there, about 600,000 at 50 cohorts: a few tens of MB.
+    - Readability is the dashboard's job (part 6): rank by absolute standardized difference, show
+      the top covariates, filter by prevalence. The run time at 2.3M, not storage, is the open risk,
+      measured in stage 5 before any trimming is considered.
+    - "Characterize cohorts" computes each cohort's balance against the population from the full
+      aggregates, then deletes the stored binary rows under 5. A balance row is kept only when each
+      side has 0 or at least 5 people.
+    - A pair requested later reads the censored rows, so a covariate under 5 on one side counts as 0
+      there: the difference is approximate by at most 4 people's worth of prevalence on that side.
+    - Continuous covariates (11 per cohort) are kept whole.
 
 **Design.**
 
@@ -344,7 +362,8 @@ every cohort and filter on the dashboard.
     characterized, entries counted, status and error. Setup compares it with
     `cohort_building_log` to show what is out of date.
   - Everything grows linearly with the number of cohorts. As an estimate, 50 cohorts at about
-    2,000 covariates each give about 100,000 rows per table.
+    2,000 covariates each give about 100,000 rows per table. Measured on SOL (part 5): about
+    15,000–19,000 covariates per cohort, so about a million rows per table at 50 cohorts.
 - **On request: a comparison between two chosen cohorts.**
   - The standardized differences of a pair are arithmetic on the two cohorts' stored aggregates:
     one SQL statement that joins about 2 × 2,000 rows. It never reads person-level data.
@@ -1286,9 +1305,53 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - **Tests:** 149 in all; the tile is run inlined, and the backend's routes with Flask stubbed.
    - **Applying it to SOL needs, in order:** the backup (stage 2); the library resync; the six
      result datasets and `comparison_requests`; the `characterize_cohorts` recipe; the scenario;
-     the Setup manifest; the webapp. The column names of the new Snowflake tables are upper case,
-     like `cohort_building_log`'s, so each dataset's schema is reloaded from its table after the
-     first run.
+     the Setup manifest; the webapp.
+
+   **Part 5 on SOL (owner-approved, 2026-11-25).**
+   - **Backup.** Saved outside the repo: the Setup manifest, the old dashboard (`4OpJPy0`) and the
+     "Write Cohort to Datasets" scenario. No new bundle: SOL's bundle exports dataset data, two old
+     dashboard datasets had no table (`cohort_condition_group_count`, `cohort_definition_filtered`;
+     both built, with the owner's approval), and the bundle content still lists `cohort_metadata`,
+     deleted in step 3. **Open, for step 5:** fix SOL's bundle content settings. A failed export
+     left the id `step4-part5-pre-2026-11-25` in the list; it is not a usable backup. The owner
+     chose to go on, since stage 3 only adds objects; `e4-rerun-pre-2026-11-19` is the last bundle.
+   - **Library** resynced to `5dfb54b`, then `69a9ec0` (the fix below).
+   - **Flow**, in zone "Cohorts": managed Snowflake datasets `covariate`, `covariate_continuous`,
+     `covariate_ref`, `analysis_ref`, `characterization_log`, `covariate_balance` and
+     `comparison_requests` on `bs-snowflake` (tables `${projectKey}_<NAME>`, upper case by the
+     connection's naming rule); the Python recipe `characterize_cohorts` (inputs `cohort`,
+     `cohort_definition`, `cohort_building_log` and the 7 OMOP tables it reads; the first six
+     datasets as outputs, append mode).
+   - **Scenario** "Characterize Cohorts": one non-recursive forced build of those outputs, no
+     trigger. DSS gave it the id `Characterize_Cohorts`, and the Setup button uses that id.
+   - **Setup** applied and checked: the "Characterize Cohorts" section, the Cohort Ingestion text,
+     and the refreshed inlined code of "Register cohorts" and "Built cohorts".
+   - **First run: failed, fixed.** FeatureExtraction reads some tables without an alias and
+     qualifies their columns by the bare table name (`condition_era.person_id`); the quoted full
+     name broke that. Nothing was deleted: the run failed in the construction script, and the log
+     recorded FAILED for 1, 2, 3 and −1. `fill()` now keeps the bare name as alias (`69a9ec0`), with a
+     test over every dialect's rendered SQL.
+   - **Second run: success in about 3.5 minutes.** Entries 611 / 593 / 247 (the E4 counts) and 935
+     for the population; the saved batch was cleared. DSS reads the new tables with their lowercase
+     schemas, as for `cohort_building_log`, so no schema reload was needed.
+   - **Sizes.** About 15,000–19,000 binary and 11 continuous covariates per cohort, 20,605 in
+     `covariate_ref` and 13 analyses: about ten times the 2,000 estimated above. `covariate_balance`
+     holds about 20,000 rows per cohort against the population.
+   - **Independent SQL checks, cohort 1:** share of women 0.520458 and mean age 72.942717, both
+     equal to the stored values; "Inflammatory disorder of the respiratory tract" in the long-term
+     window, 267 people both ways.
+   - **Standardized differences by hand:** cohort 3 against the population (a covariate present on
+     one side only, −0.11365), and the pair cohort 1 against cohort 2 through `pair_balance_sql`
+     (age 0.0280, women 0.00888, the condition group above 0.1843), all equal.
+   - **Pair timing:** the full pair query (17,448 rows) takes about 0.3–1 s on Snowflake, measured
+     against a 1.3 s client round trip.
+   - **Webapp** "Compare cohorts" (`c9UUBDz`): standard, Flask backend, single process, started
+     automatically, running. Its backend cannot be called with an API key (API access is off, and
+     stays off), so the request, the cache and "a second request computes nothing" are the owner's
+     browser check.
+   - **Superseded by decisions 6 (revised) and 16.** The results above still hold the any-time-prior
+     covariates and the small cells. The population is redone only after a re-import, so SOL's six
+     result tables have to be emptied before the next run, with the owner's approval.
 6. **Dashboard.**
    - A new "Cohort Characterization" dashboard.
    - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary

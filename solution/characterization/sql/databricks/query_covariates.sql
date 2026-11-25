@@ -13,10 +13,6 @@ SELECT cohort_definition_id, covariate_id, sum_value FROM @temp_database_schema.
 SELECT cohort_definition_id, covariate_id, sum_value FROM @temp_database_schema.rwdfeatxcov_8
  UNION ALL
 SELECT cohort_definition_id, covariate_id, sum_value FROM @temp_database_schema.rwdfeatxcov_11
- UNION ALL
-SELECT cohort_definition_id, covariate_id, sum_value FROM @temp_database_schema.rwdfeatxcov_12
- UNION ALL
-SELECT cohort_definition_id, covariate_id, sum_value FROM @temp_database_schema.rwdfeatxcov_13
 ) all_covariates
 INNER JOIN (
 SELECT cohort_definition_id, COUNT(*) AS total_count

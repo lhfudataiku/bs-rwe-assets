@@ -13,10 +13,6 @@ SELECT cohort_definition_id, covariate_id, sum_value FROM #cov_4
 SELECT cohort_definition_id, covariate_id, sum_value FROM #cov_8
  UNION ALL
 SELECT cohort_definition_id, covariate_id, sum_value FROM #cov_11
- UNION ALL
-SELECT cohort_definition_id, covariate_id, sum_value FROM #cov_12
- UNION ALL
-SELECT cohort_definition_id, covariate_id, sum_value FROM #cov_13
 ) all_covariates
 INNER JOIN (
 SELECT cohort_definition_id, COUNT(*) AS total_count

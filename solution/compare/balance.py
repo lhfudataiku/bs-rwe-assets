@@ -15,12 +15,21 @@ A covariate present on one side only:
 
 When both standard deviations are 0 the difference is NULL rather than a division by zero.
 
+Minimum cell count (owner, 2026-11-25): no binary covariate held by 1 to 4 people is shown.
+- A balance row is written only when each side's count is 0 or at least `MIN_CELL_COUNT`.
+- "Characterize cohorts" computes the balance against the population from the full aggregates,
+  then deletes the stored binary rows under the minimum (`censor_statements`).
+- A pair requested later reads the stored, censored rows, so a covariate below the minimum on one
+  side counts as 0 there. The difference is then approximate, by at most 4 people's worth of that
+  side's prevalence.
+
 The SQL uses only what Snowflake, Databricks and Redshift share (derived tables, UNION, CROSS JOIN,
 COALESCE, NULLIF, SQRT, ABS), so one text serves all three. Pure and import-free: it is tested
 offline, "Characterize cohorts" runs it against the population, and the "Compare cohorts" webapp
 backend runs `pair_balance_sql` for a requested pair (decision 10 as revised, 2026-11-25).
 """
 POPULATION_ID = -1
+MIN_CELL_COUNT = 5
 
 BALANCE_TABLE = "covariate_balance"
 BALANCE_COLUMNS = ["cohort_definition_id", "comparator_id", "covariate_id", "covariate_name", "analysis_id",
@@ -64,7 +73,8 @@ def _binary(paths, ids, comparator):
     p1, p2 = "COALESCE(t.average_value, 0)", "COALESCE(c.average_value, 0)"
     return ("SELECT k.cohort_id, k.covariate_id, r.covariate_name, r.analysis_id, 'Y' AS is_binary,\n"
             "  %s AS cohort_mean, SQRT(%s * (1 - %s)) AS cohort_sd,\n"
-            "  %s AS comparator_mean, SQRT(%s * (1 - %s)) AS comparator_sd\n"
+            "  %s AS comparator_mean, SQRT(%s * (1 - %s)) AS comparator_sd,\n"
+            "  COALESCE(t.sum_value, 0) AS cohort_count, COALESCE(c.sum_value, 0) AS comparator_count\n"
             "FROM (%s) k\n"
             "LEFT JOIN %s t ON t.cohort_definition_id = k.cohort_id AND t.covariate_id = k.covariate_id\n"
             "LEFT JOIN %s c ON c.cohort_definition_id = %d AND c.covariate_id = k.covariate_id\n"
@@ -80,7 +90,8 @@ def _continuous(paths, ids, comparator):
     table = paths["covariate_continuous"]
     return ("SELECT k.cohort_id, k.covariate_id, r.covariate_name, r.analysis_id, 'N' AS is_binary,\n"
             "  %s AS cohort_mean, %s AS cohort_sd,\n"
-            "  %s AS comparator_mean, %s AS comparator_sd\n"
+            "  %s AS comparator_mean, %s AS comparator_sd,\n"
+            "  NULL AS cohort_count, NULL AS comparator_count\n"
             "FROM (%s) k\n"
             "LEFT JOIN %s t ON t.cohort_definition_id = k.cohort_id AND t.covariate_id = k.covariate_id\n"
             "LEFT JOIN %s c ON c.cohort_definition_id = %d AND c.covariate_id = k.covariate_id\n"
@@ -91,8 +102,10 @@ def _continuous(paths, ids, comparator):
                paths["covariate_ref"], paths["analysis_ref"]))
 
 
-def balance_sql(paths, cohort_ids, comparator_id=POPULATION_ID):
+def balance_sql(paths, cohort_ids, comparator_id=POPULATION_ID, min_cell_count=MIN_CELL_COUNT):
     """One SELECT of the balance rows (`BALANCE_COLUMNS`) of each cohort against the comparator.
+
+    Binary rows with a side held by 1 to `min_cell_count - 1` people are left out.
 
     paths: {"covariate", "covariate_continuous", "covariate_ref", "analysis_ref": resolved name}.
     """
@@ -108,8 +121,11 @@ def balance_sql(paths, cohort_ids, comparator_id=POPULATION_ID):
     return ("SELECT v.cohort_id AS cohort_definition_id, %d AS comparator_id, v.covariate_id, v.covariate_name,\n"
             "  v.analysis_id, v.is_binary, v.cohort_mean, v.cohort_sd, v.comparator_mean, v.comparator_sd,\n"
             "  %s AS std_diff,\n  ABS(%s) AS abs_std_diff\n"
-            "FROM (\n%s\nUNION ALL\n%s\n) v"
-            % (comparator, diff, diff, _binary(paths, ids, comparator), _continuous(paths, ids, comparator)))
+            "FROM (\n%s\nUNION ALL\n%s\n) v\n"
+            "WHERE v.is_binary = 'N' OR ((v.cohort_count = 0 OR v.cohort_count >= %d)\n"
+            "  AND (v.comparator_count = 0 OR v.comparator_count >= %d))"
+            % (comparator, diff, diff, _binary(paths, ids, comparator), _continuous(paths, ids, comparator),
+               int(min_cell_count), int(min_cell_count)))
 
 
 def pair_balance_sql(paths, cohort_a, cohort_b):
@@ -144,6 +160,16 @@ def recharacterized_statements(paths, recharacterized_ids, population_balance_id
     if targets:
         statements += write_balance_statements(paths, targets, POPULATION_ID)
     return statements
+
+
+def censor_statements(paths, cohort_ids, min_cell_count=MIN_CELL_COUNT):
+    """Delete the stored binary covariates held by fewer than `min_cell_count` people in these cohorts.
+
+    Run after their balance against the population, which needs the full aggregates.
+    """
+    ids = _ids(cohort_ids)
+    return ["DELETE FROM %s WHERE cohort_definition_id IN (%s) AND sum_value < %d"
+            % (paths["covariate"], ", ".join(str(i) for i in ids), int(min_cell_count))]
 
 
 def cached_pairs_query(path):

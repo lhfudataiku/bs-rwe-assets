@@ -454,6 +454,8 @@ DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_2	Snowflake	managed-snowflake	ye
 DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_3	Snowflake	managed-snowflake	yes	12			-			
 DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_db	Snowflake	managed-snowflake	yes	17			-			
 DEMO_SF_OMOP2M_DATAPREP	vocabulary_db	Snowflake	managed-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	analysis_ref	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	characterization_log	Snowflake	bs-snowflake	yes	6			-			
 SOL_RWD_COHORT_DISCOVERY	charlson_concepts	Snowflake	bs-snowflake	yes	2			-			
 SOL_RWD_COHORT_DISCOVERY	charlson_score_occurrence	Snowflake	bs-snowflake	yes	9			-			
 SOL_RWD_COHORT_DISCOVERY	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
@@ -482,12 +484,17 @@ SOL_RWD_COHORT_DISCOVERY	cohort_observation	Snowflake	bs-snowflake	yes	9			-
 SOL_RWD_COHORT_DISCOVERY	cohort_prevalence	Snowflake	bs-snowflake	yes	8			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_visit_events	Snowflake	bs-snowflake	yes	9			-			
 SOL_RWD_COHORT_DISCOVERY	cohort_visit_joined	Snowflake	bs-snowflake	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	comparison_requests	Snowflake	bs-snowflake	yes	4			-			
 SOL_RWD_COHORT_DISCOVERY	concept	Snowflake	bs-snowflake	yes	10			-			
 SOL_RWD_COHORT_DISCOVERY	concept_ancestor	Snowflake	bs-snowflake	yes	4			-			
 SOL_RWD_COHORT_DISCOVERY	condition_era	Snowflake	bs-snowflake	yes	6			-			
 SOL_RWD_COHORT_DISCOVERY	condition_group_occurrence	Snowflake	bs-snowflake	yes	5			-			
 SOL_RWD_COHORT_DISCOVERY	condition_groups	Snowflake	bs-snowflake	yes	3			-			
 SOL_RWD_COHORT_DISCOVERY	condition_occurrence	Snowflake	bs-snowflake	yes	16			-			
+SOL_RWD_COHORT_DISCOVERY	covariate	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_balance	Snowflake	bs-snowflake	yes	12			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_continuous	Snowflake	bs-snowflake	yes	12			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_ref	Snowflake	bs-snowflake	yes	6			-			
 SOL_RWD_COHORT_DISCOVERY	death	Snowflake	bs-snowflake	yes	7			-			
 SOL_RWD_COHORT_DISCOVERY	demographic_covariates	Snowflake	bs-snowflake	yes	4			-			
 SOL_RWD_COHORT_DISCOVERY	device_exposure	Snowflake	bs-snowflake	yes	15			-			

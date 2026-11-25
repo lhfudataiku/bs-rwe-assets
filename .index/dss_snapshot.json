@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1305,
+ "dss_project_count": 1308,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-24T14:30Z",
+   "fetched_at": "2026-11-25T16:33Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-24T14:31Z",
+   "probed_at": "2026-11-25T16:33Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-24T14:30Z",
+   "fetched_at": "2026-11-25T16:33Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-24T14:31Z",
+   "probed_at": "2026-11-25T16:33Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -36183,6 +36183,72 @@
   },
   "SOL_RWD_COHORT_DISCOVERY": {
    "datasets": {
+    "analysis_ref": {
+     "columns": [
+      [
+       "analysis_id",
+       "bigint"
+      ],
+      [
+       "analysis_name",
+       "string"
+      ],
+      [
+       "domain_id",
+       "string"
+      ],
+      [
+       "start_day",
+       "int"
+      ],
+      [
+       "end_day",
+       "int"
+      ],
+      [
+       "is_binary",
+       "string"
+      ],
+      [
+       "missing_means_zero",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "characterization_log": {
+     "columns": [
+      [
+       "run_timestamp",
+       "string"
+      ],
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "build_timestamp",
+       "string"
+      ],
+      [
+       "cohort_count",
+       "bigint"
+      ],
+      [
+       "status",
+       "string"
+      ],
+      [
+       "error",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
     "charlson_concepts": {
      "columns": [
       [
@@ -37067,6 +37133,29 @@
      "managed": true,
      "type": "Snowflake"
     },
+    "comparison_requests": {
+     "columns": [
+      [
+       "request_timestamp",
+       "string"
+      ],
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "comparator_id",
+       "bigint"
+      ],
+      [
+       "requested_by",
+       "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
     "concept": {
      "columns": [
       [
@@ -37278,6 +37367,170 @@
       ],
       [
        "VISIT_DETAIL_ID",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate": {
+     "columns": [
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "covariate_id",
+       "bigint"
+      ],
+      [
+       "sum_value",
+       "bigint"
+      ],
+      [
+       "average_value",
+       "double"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate_balance": {
+     "columns": [
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "comparator_id",
+       "bigint"
+      ],
+      [
+       "covariate_id",
+       "bigint"
+      ],
+      [
+       "covariate_name",
+       "string"
+      ],
+      [
+       "analysis_id",
+       "int"
+      ],
+      [
+       "is_binary",
+       "string"
+      ],
+      [
+       "cohort_mean",
+       "double"
+      ],
+      [
+       "cohort_sd",
+       "double"
+      ],
+      [
+       "comparator_mean",
+       "double"
+      ],
+      [
+       "comparator_sd",
+       "double"
+      ],
+      [
+       "std_diff",
+       "double"
+      ],
+      [
+       "abs_std_diff",
+       "double"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate_continuous": {
+     "columns": [
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "covariate_id",
+       "bigint"
+      ],
+      [
+       "count_value",
+       "bigint"
+      ],
+      [
+       "min_value",
+       "double"
+      ],
+      [
+       "max_value",
+       "double"
+      ],
+      [
+       "average_value",
+       "double"
+      ],
+      [
+       "standard_deviation",
+       "double"
+      ],
+      [
+       "median_value",
+       "double"
+      ],
+      [
+       "p10_value",
+       "double"
+      ],
+      [
+       "p25_value",
+       "double"
+      ],
+      [
+       "p75_value",
+       "double"
+      ],
+      [
+       "p90_value",
+       "double"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate_ref": {
+     "columns": [
+      [
+       "covariate_id",
+       "bigint"
+      ],
+      [
+       "covariate_name",
+       "string"
+      ],
+      [
+       "analysis_id",
+       "int"
+      ],
+      [
+       "concept_id",
+       "int"
+      ],
+      [
+       "value_as_concept_id",
+       "int"
+      ],
+      [
+       "collisions",
        "int"
       ]
      ],
@@ -38621,7 +38874,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-24T14:30Z",
+   "fetched_at": "2026-11-25T16:33Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38638,7 +38891,8 @@
     "PREP_RWD_SF_1K.person_sf",
     "PREP_RWD_SF_1K.procedure_occurrence_sf",
     "PREP_RWD_SF_1K.visit_occurrence_sf",
-    "charlson_scoring"
+    "charlson_scoring",
+    "comparison_requests"
    ],
    "git_references": {
     "preview": {
@@ -38653,14 +38907,15 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "ba93630a79138725105d7e04a632659e65cd7294",
+     "hash": "69a9ec09ea9cdbbcc674e0a6c0392648265b9798",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-24T14:31Z",
+   "probed_at": "2026-11-25T16:33Z",
    "variables": {
     "local": {
+     "characterization_submission": [],
      "cohort_script_table_map": {
       "care_site": "@cdm_database_schema.care_site",
       "cdm_source": "@cdm_database_schema.cdm_source",
@@ -38706,36 +38961,22 @@
      "cohort_script_table_prefix": "",
      "cohort_submission": [
       {
-       "description": "first diagnosis of anemia",
-       "file": "feature_condition_anemia.sql",
-       "id": 1,
-       "name": "Anemia",
-       "replace": true
+       "description": "drug class for antiinflammatory agent",
+       "file": "feature_drug_antiinflammatory_agents.sql",
+       "id": 6,
+       "name": "Feature drug antiinflammatory agents",
+       "replace": false
       },
       {
-       "description": "first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",
-       "file": "feature_condition_depression.sql",
-       "id": 3,
-       "name": "Depression",
-       "replace": true
-      },
-      {
-       "description": "The first condition record of Type 2 Diabetes Mellitus, which is followed by another Type 2 Diabetes Mellitus condition record, at least 2 drugs used to treat Type 2 diabetes, or at least 2 HbA1c measurements with value > 6.5%",
-       "file": "feature_condition_dm2.sql",
-       "id": 2,
-       "name": "Diabetes mellitus type 2",
-       "replace": true
-      },
-      {
-       "description": "step 3 second-batch test (copy of cohort 1)",
-       "file": "step3_quote_test.sql",
-       "id": 4,
-       "name": "Anemia (Crohn's test)",
-       "replace": true
+       "description": "drug class for antiinflammator for antithrombotics",
+       "file": "feature_drug_antithrombotics.sql",
+       "id": 7,
+       "name": "Feature drug antithrombotics",
+       "replace": false
       }
      ],
      "data_preparation_project_key": "PREP_RWD_SF_1K",
-     "enable_pipeline": false,
+     "enable_pipeline": true,
      "folder_connection": "filesystem_folders",
      "main_connection": "bs-snowflake",
      "omop_cdm_standard_tables_import": [

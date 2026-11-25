@@ -54,13 +54,14 @@ JARS = [  # (file, source, SHA-256)
      "dc152542636e6f48d689a17b71cce31ce2d77160b76ce599b76f1e06a7e4d211"),
 ]
 
-# R3 decision 6 (owner, 2026-11-24; visits long-term only, 2026-11-25).
+# R3 decision 6 (owner, 2026-11-24; visits long-term only, 2026-11-25; any-time-prior dropped,
+# 2026-11-25: the population has exactly one year of history, so any-time-prior equals long-term for
+# it and inflates every cohort against it).
 PRESETS = [
     "DemographicsGender", "DemographicsRace", "DemographicsAge", "DemographicsAgeGroup",
     "DemographicsTimeInCohort", "DemographicsPriorObservationTime", "DemographicsPostObservationTime",
     "CharlsonIndex",
-    "ConditionGroupEraLongTerm", "ConditionGroupEraAnyTimePrior",
-    "DrugGroupEraLongTerm", "DrugGroupEraAnyTimePrior",
+    "ConditionGroupEraLongTerm", "DrugGroupEraLongTerm",
     "VisitConceptCountLongTerm",
 ]
 WINDOWS = {"longTermStartDays": -365, "mediumTermStartDays": -180, "shortTermStartDays": -30, "endDays": 0}

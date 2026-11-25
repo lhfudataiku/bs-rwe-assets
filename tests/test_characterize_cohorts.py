@@ -143,7 +143,10 @@ class RunStatements(unittest.TestCase):
             self.assertEqual(after[7], "DELETE FROM DB.RES.COVARIATE_BALANCE WHERE comparator_id = -1 AND "
                                        "cohort_definition_id IN (1, 2)", ct)
             self.assertTrue(after[8].startswith("INSERT INTO DB.RES.COVARIATE_BALANCE"), ct)
-            code = [re.sub(r"--[^\n]*", "", s).split()[0] for s in after[9:]]
+            # Minimum cell count: after the balance, which needs the full aggregates.
+            self.assertEqual(after[9], "DELETE FROM DB.RES.COVARIATE WHERE cohort_definition_id IN (-1, 1, 2) "
+                                       "AND sum_value < 5", ct)
+            code = [re.sub(r"--[^\n]*", "", s).split()[0] for s in after[10:]]
             self.assertEqual(set(code), {"DROP", "TRUNCATE"}, ct)  # cleanup only
 
     def test_cohort_table_and_population(self):

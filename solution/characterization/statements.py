@@ -13,7 +13,9 @@ Builds, as plain statement lists, everything `characterize_cohorts` runs in one 
 5. `covariate_balance` (part 4): the cached pairs naming a cohort of the run are deleted, and the
    balance against the population is recomputed for the run's cohorts, or for every characterized
    cohort when the population itself was recomputed;
-6. FeatureExtraction's cleanup script.
+6. the run's binary covariates held by fewer than 5 people are deleted (minimum cell count, after
+   the balance, which needs them);
+7. FeatureExtraction's cleanup script.
 
 The failure-prone work (2, 3) comes before any delete, so a run that fails there changes no
 result. Snowflake and Redshift commit at the end of the session; Databricks commits per statement.
@@ -23,7 +25,9 @@ Import-free apart from the pure SQL text helpers, so everything here is tested o
 import os
 import re
 
-from solution.compare.balance import BALANCE_COLUMNS, BALANCE_KINDS, BALANCE_TABLE, recharacterized_statements
+from solution.compare.balance import (
+    BALANCE_COLUMNS, BALANCE_KINDS, BALANCE_TABLE, censor_statements, recharacterized_statements,
+)
 from solution.compare.comparison import REQUEST_KINDS, REQUESTS_TABLE
 from solution.recipes.sql_text import render_temp_tables, split_statements, sql_literal
 
@@ -181,6 +185,7 @@ def run_statements(connection_type, tables, paths, cohort_ids, population, scrat
     statements += result_statements(connection_type, paths, cohort_name, ids, scratch_prefix, scratch_schema)
     balance_ids = cohort_ids if population_balance_ids is None else population_balance_ids
     statements += recharacterized_statements(paths, cohort_ids, balance_ids)
+    statements += censor_statements(paths, ids)
     cleanup, _ = render_temp_tables(read_sql(connection_type, "cleanup.sql"), connection_type,
                                     scratch_prefix, scratch_schema)
     statements += split_statements(cleanup)

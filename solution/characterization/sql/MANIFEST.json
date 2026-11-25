@@ -16,9 +16,7 @@
   "DemographicsPostObservationTime",
   "CharlsonIndex",
   "ConditionGroupEraLongTerm",
-  "ConditionGroupEraAnyTimePrior",
   "DrugGroupEraLongTerm",
-  "DrugGroupEraAnyTimePrior",
   "VisitConceptCountLongTerm"
  ],
  "settings": {
@@ -33,9 +31,7 @@
   "DemographicsPostObservationTime": true,
   "CharlsonIndex": true,
   "ConditionGroupEraLongTerm": true,
-  "ConditionGroupEraAnyTimePrior": true,
   "DrugGroupEraLongTerm": true,
-  "DrugGroupEraAnyTimePrior": true,
   "VisitConceptCountLongTerm": true,
   "longTermStartDays": -365,
   "mediumTermStartDays": -180,
