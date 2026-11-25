@@ -127,7 +127,7 @@ class RunStatements(unittest.TestCase):
             first_delete = next(i for i, s in enumerate(statements) if s.startswith("DELETE"))
             before, after = statements[:first_delete], statements[first_delete:]
             # Everything that can fail on the data runs before any result is deleted.
-            self.assertEqual(len([s for s in before if s.startswith("CREATE TABLE IF NOT EXISTS DB.RES.")]), 5, ct)
+            self.assertEqual(len([s for s in before if s.startswith("CREATE TABLE IF NOT EXISTS DB.RES.")]), 6, ct)
             self.assertTrue(any(s.startswith("CREATE") and cohort in s for s in before), ct)
             self.assertGreater(len(before), 190, ct)
             self.assertEqual(after[:2], ["DELETE FROM DB.RES.COVARIATE WHERE cohort_definition_id IN (1, 2, -1)",
@@ -137,7 +137,13 @@ class RunStatements(unittest.TestCase):
                                                                "DB.RES.COVARIATE_REF", "DB.RES.ANALYSIS_REF"], ct)
             self.assertIn("NOT IN (SELECT covariate_id FROM DB.RES.COVARIATE_REF)", inserts[2], ct)
             self.assertIn("NOT IN (SELECT analysis_id FROM DB.RES.ANALYSIS_REF)", inserts[3], ct)
-            code = [re.sub(r"--[^\n]*", "", s).split()[0] for s in after[6:]]
+            # Part 4: the cached pairs of the run's cohorts go; their balance against the population is redone.
+            self.assertEqual(after[6], "DELETE FROM DB.RES.COVARIATE_BALANCE WHERE comparator_id <> -1 AND "
+                                       "(cohort_definition_id IN (1, 2) OR comparator_id IN (1, 2))", ct)
+            self.assertEqual(after[7], "DELETE FROM DB.RES.COVARIATE_BALANCE WHERE comparator_id = -1 AND "
+                                       "cohort_definition_id IN (1, 2)", ct)
+            self.assertTrue(after[8].startswith("INSERT INTO DB.RES.COVARIATE_BALANCE"), ct)
+            code = [re.sub(r"--[^\n]*", "", s).split()[0] for s in after[9:]]
             self.assertEqual(set(code), {"DROP", "TRUNCATE"}, ct)  # cleanup only
 
     def test_cohort_table_and_population(self):

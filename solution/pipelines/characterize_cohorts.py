@@ -12,9 +12,9 @@ the "Characterization batch" tile in `characterization_submission`:
 
 Inputs, declared for lineage: `cohort`, `cohort_definition`, `cohort_building_log` and the OMOP tables
 the SQL reads. Outputs: `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`,
-`characterization_log`, written in-database. On Databricks the scratch tables are
-`rwdtmp_<project key>__ch_<name>`; any left by an earlier crash are dropped first, and the cohort
-build's are never touched.
+`characterization_log` and `covariate_balance` (the rows against the population; part 4), written
+in-database. On Databricks the scratch tables are `rwdtmp_<project key>__ch_<name>`; any left by an
+earlier crash are dropped first, and the cohort build's are never touched.
 """
 import datetime
 import logging
@@ -74,13 +74,18 @@ def sweep_scratch_tables(executor, schema, project_key):
         logger.warning("Could not sweep scratch tables in %s: %s", schema, e)
 
 
-def characterize(executor, connection_type, project_key, schema, cohort_ids, population, build_times):
-    """Run one characterization. Returns the log rows (SUCCESS per cohort, or FAILED for all)."""
+def characterize(executor, connection_type, project_key, schema, cohort_ids, population, build_times,
+                 population_balance_ids=None):
+    """Run one characterization. Returns the log rows (SUCCESS per cohort, or FAILED for all).
+
+    population_balance_ids: the cohorts whose balance against the population is recomputed (part 4);
+    by default the run's cohorts.
+    """
     tables = {t: get_sql_path(t) for t in OMOP_TABLES}
     paths = {t: get_sql_path(t) for t in list(RESULT_TABLES) + ["cohort"]}
     prefix = characterization_scratch_prefix(project_key) if schema else None
     statements, scratch, cohort_name = run_statements(connection_type, tables, paths, cohort_ids, population,
-                                                      prefix, schema)
+                                                      prefix, schema, population_balance_ids)
     run_timestamp = utc_timestamp()
     ids = sorted(cohort_ids) + ([POPULATION_ID] if population else [])
     try:
@@ -99,6 +104,19 @@ def characterize(executor, connection_type, project_key, schema, cohort_ids, pop
             logger.warning("Could not drop the characterization's scratch tables: %s", e)
     run(executor, log_statement(paths["characterization_log"], rows, connection_type), connection_type)
     return rows
+
+
+def population_balance_ids(char_logs, cohort_ids, population):
+    """The cohorts whose balance against the population the run recomputes (part 4).
+
+    The run's cohorts; and, when the population itself is recomputed, every cohort whose latest
+    characterization succeeded, so every balance uses the current population.
+    """
+    ids = set(cohort_ids)
+    if population:
+        ids |= {i for i, log in latest_by_id(char_logs).items()
+                if i != POPULATION_ID and str(log.get("status") or "").upper() == SUCCESS}
+    return sorted(ids)
 
 
 def characterize_cohorts():
@@ -125,7 +143,8 @@ def characterize_cohorts():
     if schema:
         sweep_scratch_tables(executor, schema, project_key)
     build_times = {i: str(built[i].get("run_timestamp") or "") for i in cohort_ids}
-    rows = characterize(executor, connection_type, project_key, schema, cohort_ids, population, build_times)
+    rows = characterize(executor, connection_type, project_key, schema, cohort_ids, population, build_times,
+                        population_balance_ids(char_logs, cohort_ids, population))
     failed = [r for r in rows if r[4] != SUCCESS]
     if failed:
         raise ValueError("Characterization failed for %s (see characterization_log): %s"

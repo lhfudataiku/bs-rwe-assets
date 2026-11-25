@@ -275,15 +275,23 @@ every cohort and filter on the dashboard.
    comparison reuses are precomputed, incrementally. A comparison between two chosen cohorts is
    computed on request. The earlier draft precomputed every pair, which grows with the square of
    the number of cohorts.
-10. **A requested comparison runs as a scenario and is cached** (owner, 2026-11-24), in
-    `covariate_balance` next to the precomputed rows against the population. The table keeps every pair computed so far. A pair already in the cache is not
-    computed again.
+10. **A requested comparison is computed by the webapp backend and cached** (owner, 2026-11-24;
+    revised 2026-11-25), in `covariate_balance` next to the precomputed rows against the population.
+    The table keeps every pair computed so far. A pair already in the cache is not computed again.
+    - Revised 2026-11-25: no "Compare cohorts" scenario. The pair's arithmetic runs in the database in
+      about a second, while a scenario adds about a minute of DSS job overhead. The backend runs
+      `pair_balance_sql` itself.
+    - Accepted in exchange: the flow shows no recipe for the cached pairs, and the backend writes
+      with its own identity, so it checks the viewer's project rights first and records who asked in
+      `comparison_requests`.
+    - The precomputed rows against the population stay (decision 9): they cost seconds and a few MB
+      per batch, and page 1 then reads a table with no wait.
 11. **Project Setup has no dashboard section** (owner, 2026-11-24; R3 as first proposed). Neither
     the dashboard nor the comparison is driven from Setup.
-12. **A code webapp requests comparisons** (owner, 2026-11-24). It selects the cohorts, runs the
-    scenario, and is inserted into the dashboard as a webapp tile.
+12. **A code webapp requests comparisons** (owner, 2026-11-24). It selects the cohorts, has the pair
+    computed (decision 10), and is inserted into the dashboard as a webapp tile.
 13. **Cohort B defaults to the population** (owner, 2026-11-24). That pair is precomputed, so the
-    default never runs a scenario.
+    default never computes anything.
 14. **Characterization has its own Setup section** (owner, 2026-11-25), "Characterize Cohorts",
     after "Build Cohorts", with its own button.
     - "Build cohorts" no longer characterizes. Building stays one cohort at a time; characterizing
@@ -341,9 +349,12 @@ every cohort and filter on the dashboard.
   - The standardized differences of a pair are arithmetic on the two cohorts' stored aggregates:
     one SQL statement that joins about 2 × 2,000 rows. It never reads person-level data.
   - One library function builds that statement, `pair_balance_sql(cohort_a, cohort_b)`. The 1.2
-    mechanism calls it now, and the v2.0 webapp later calls the same function at query time.
-  - In 1.2 it runs as a scenario, "Compare cohorts", whose results are cached in
-    `covariate_balance` (decision 10). The request does not come from Setup (decision 11).
+    webapp backend runs it, and the v2.0 Cohort Workbench can call the same function.
+  - Estimated time (not measured yet; part 8 measures it): under a second on a warm Snowflake
+    warehouse or Redshift, one to three seconds on a running Databricks SQL warehouse. A cold
+    warehouse adds its start-up time.
+  - The backend runs it directly, with no scenario, and caches the result in `covariate_balance`
+    (decision 10 as revised). The request does not come from Setup (decision 11).
   - **One balance table.** `covariate_balance` has one row per cohort, comparator and covariate:
     the two values and the standardized difference. The comparator is −1 for the population
     (precomputed) or a cohort id (computed on request). Every comparison, the default one
@@ -353,16 +364,19 @@ every cohort and filter on the dashboard.
     - It lists the built cohorts from `cohort_definition` and `cohort_building_log`. The user
       picks cohort A, and cohort B, which defaults to "Population" (decision 13).
     - If the pair is already in `covariate_balance`, as the population always is, the webapp says
-      so, and no scenario runs.
-    - Otherwise the backend appends the pair to `comparison_requests` (who asked, and when), runs
-      "Compare cohorts", and polls the run. It shows "computing", then "done: select the pair in
-      the page filter", or the run's error as a sentence.
+      so, and nothing runs.
+    - Otherwise the backend checks the viewer's project rights, then computes the pair in the
+      background, in one session: it records the request in `comparison_requests` (who asked, and
+      when), then deletes and inserts the pair. The tile polls the backend and shows "computing",
+      then "done: select the pair in the page filter", or the database error as a sentence.
+    - One backend process serves every viewer. A lock lets each pair be computed once at a time, and
+      a second request for a pair being computed joins it.
     - The logic lives in the project library (`solution/compare/`). Webapp backends, unlike Setup
       tiles, can import it.
     - The backend stays thin, so the v2.0 Cohort Workbench (FastAPI) can reuse the same services.
   - **Cache.**
-    - "Compare cohorts" computes only the requested pairs that are missing from
-      `covariate_balance`, and writes them by delete and insert per pair.
+    - The backend computes a requested pair only when it is missing from `covariate_balance`, and
+      writes it by delete and insert.
     - When a cohort is re-characterized, its rows against the population are recomputed with it,
       and its rows against other cohorts are deleted, to be recomputed on the next request.
       Rebuilding a cohort alone changes nothing here: its stored figures, and the pairs computed
@@ -1182,14 +1196,47 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
 4. **Standardized differences.**
    - Precomputed: `covariate_balance`, each cohort of the batch against the population.
    - On request: `pair_balance_sql(cohort_a, cohort_b)`, which builds one statement over the stored
-     aggregates, and `compare_cohorts()`, the scenario's recipe body. The latter reads
-     `comparison_requests`, computes only the pairs missing from `covariate_balance`, and skips
-     with a sentence any pair naming an unknown or unbuilt cohort.
-   - `solution/compare/` also holds the webapp's services: the list of built cohorts, the cache
-     lookup, appending a request, and starting and polling the run. Each is unit-tested with DSS
-     stubbed.
+     aggregates, run by the webapp backend (decision 10 as revised).
+   - `solution/compare/` also holds the webapp's services: the list of characterized cohorts, the
+     cache lookup, the rights check, and computing a pair in the background and reporting its
+     state. Each is unit-tested with DSS stubbed.
    - Unit tests cover the formulas, zero variance, the antisymmetry of A–B against B–A, and a
      covariate present in only one of the two cohorts.
+
+   **Part 4 done (2026-11-25), offline.**
+   - **The SQL: `solution/compare/balance.py`.** One SELECT of `covariate_balance` rows (cohort,
+     comparator, covariate, its name and analysis, binary or not, both means and standard
+     deviations, the standardized difference and its absolute value), for one or many cohorts
+     against one comparator. `pair_balance_sql(paths, a, b)` is the one-pair case. The text uses only
+     what Snowflake, Databricks and Redshift share, so one text serves all three.
+     - A covariate on one side only: binary is 0 (FeatureExtraction stores no row for a covariate
+       nobody has); continuous is 0 when its analysis says `missing_means_zero = 'Y'` (Charlson,
+       visit counts), and otherwise NULL, with no difference.
+     - Both standard deviations 0: the difference is NULL.
+     - Ids are checked as whole numbers, and a cohort compared with itself is refused.
+   - **Precomputed, inside "Characterize cohorts".** After the result inserts, the run deletes the
+     cached pairs naming its cohorts and recomputes the balance against the population for its
+     cohorts. When the population itself is recomputed, every cohort whose latest characterization
+     succeeded is rebalanced, and the pairs are kept. `covariate_balance` joins the tables the run
+     creates if missing.
+   - **Which pairs: `solution/compare/comparison.py`.** A pair can be compared when both sides'
+     latest characterization succeeded; cohort A is never the population, nor the same as B.
+     Re-characterizing a cohort drops its pairs until someone requests them again.
+   - **The webapp's services: `solution/compare/services.py`** (revised the same day, decision 10:
+     no scenario).
+     - The choices: cohort B defaults to the population.
+     - The request: a cached pair answers at once. Otherwise the viewer's project rights are
+       checked (owner, admin, write or run-scenarios), then the pair is computed in a background
+       thread, in one session: `comparison_requests` gets the request (time, pair, who asked;
+       created on first use), then the pair is deleted and inserted.
+     - The state: running, done, or failed with the database error, each as a sentence for the
+       tile. A second request for a pair being computed joins it; a lock keeps two computations of
+       one pair from doubling its rows on Databricks, which commits per statement.
+   - **Tests: `tests/test_compare_cohorts.py`** (18 tests; 143 in all). The SQL runs in SQLite
+     against a hand calculation of both formulas, plus the antisymmetry, the one-sided covariates,
+     zero variance, and many cohorts in one statement against one at a time.
+   - **Left for part 5:** the `covariate_balance` and `comparison_requests` datasets, and the webapp
+     itself (HTML, JS and a thin backend over these services).
 5. **Flow and scenarios.** Setup's dashboard section goes (part 7). A "Characterize Cohorts"
    section comes after "Build Cohorts" (decision 14):
    - a short text: what is characterized, that existing results are kept, how to redo one;
@@ -1208,9 +1255,9 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      shared parts move to one template that `tools/app_manifest.py` fills for each.
    - New:
      - the `comparison_requests` table (appended by the webapp);
-     - the "Compare cohorts" recipe and scenario, run by the webapp, with no trigger;
      - `covariate_balance`, holding both the population rows and the cached pairs;
-     - the "Compare cohorts" code webapp, with its backend started automatically.
+     - the "Compare cohorts" code webapp, with its backend started automatically. It computes
+       requested pairs itself; there is no "Compare cohorts" recipe or scenario (decision 10).
    - Re-characterizing a cohort deletes its cached pairs (part 4).
    - New recipe and scenario: "Characterize cohorts" (reads `cohort`, `cohort_building_log` and the
      OMOP tables; writes the four FeatureExtraction tables, the population rows of
@@ -1259,12 +1306,14 @@ Risks:
 
 - **Speed at 2.3M with 50 cohorts.** The population is characterized once per import, and cohorts
   once per batch. Partition the result tables by cohort id if needed.
-- **Waiting for a comparison.** The arithmetic takes seconds, but a scenario adds about a minute of
-  DSS job overhead. The time from request to chart is measured in part 8.
+- **Waiting for a comparison.** The arithmetic takes about a second and runs in the backend, with
+  no scenario (decision 10 as revised). A cold warehouse adds its start-up time; the tile polls, so
+  the request does not time out. The time from request to chart is measured in part 8.
 - **The webapp backend acts for the viewer.** It runs as one configured identity. A dashboard reader
-  without the right to run scenarios could still start one through it, so the backend checks the
-  caller's rights on the project before it runs anything. The webapp's "run as" user must be able
-  to run "Compare cohorts".
+  without the right to change the project could still have a pair written through it, so the
+  backend checks the caller's rights on the project before it writes anything, and records who
+  asked. The webapp's "run as" user must be able to write `covariate_balance` and
+  `comparison_requests` on the main connection.
 - **The backend must be running.** It is set to start automatically. If it is down, the tile says so
   in a sentence, and the dashboard's precomputed page 1 is unaffected.
 - **The presets differ from today's figures** (Charlson variant, windows). Step 0's mapping

@@ -10,7 +10,10 @@ Builds, as plain statement lists, everything `characterize_cohorts` runs in one 
    all of them;
 4. per result table, delete the run's cohorts and insert the new rows; `covariate_ref` and
    `analysis_ref` only gain the ids they do not hold yet;
-5. FeatureExtraction's cleanup script.
+5. `covariate_balance` (part 4): the cached pairs naming a cohort of the run are deleted, and the
+   balance against the population is recomputed for the run's cohorts, or for every characterized
+   cohort when the population itself was recomputed;
+6. FeatureExtraction's cleanup script.
 
 The failure-prone work (2, 3) comes before any delete, so a run that fails there changes no
 result. Snowflake and Redshift commit at the end of the session; Databricks commits per statement.
@@ -20,6 +23,8 @@ Import-free apart from the pure SQL text helpers, so everything here is tested o
 import os
 import re
 
+from solution.compare.balance import BALANCE_COLUMNS, BALANCE_KINDS, BALANCE_TABLE, recharacterized_statements
+from solution.compare.comparison import REQUEST_KINDS, REQUESTS_TABLE
 from solution.recipes.sql_text import render_temp_tables, split_statements, sql_literal
 
 POPULATION_ID = -1
@@ -43,7 +48,10 @@ RESULT_TABLES = {
                      ("end_day", INT), ("is_binary", SHORT), ("missing_means_zero", SHORT)],
     "characterization_log": [("run_timestamp", SHORT), ("cohort_definition_id", BIG), ("build_timestamp", SHORT),
                              ("cohort_count", BIG), ("status", SHORT), ("error", TEXT)],
+    BALANCE_TABLE: list(zip(BALANCE_COLUMNS, BALANCE_KINDS)),  # part 4: cohorts against the population
 }
+# Created on first use but not written by the characterization: the webapp appends requests to it.
+TABLES = dict(RESULT_TABLES, **{REQUESTS_TABLE: REQUEST_KINDS})
 TYPES = {
     "Snowflake": {INT: "INTEGER", BIG: "BIGINT", NUM: "FLOAT", TEXT: "VARCHAR", SHORT: "VARCHAR(255)"},
     "Redshift": {INT: "INTEGER", BIG: "BIGINT", NUM: "FLOAT8", TEXT: "VARCHAR(65535)", SHORT: "VARCHAR(255)"},
@@ -63,7 +71,7 @@ def read_sql(connection_type, name):
 
 
 def create_table(table, path, connection_type):
-    columns = ",\n  ".join("%s %s" % (name, TYPES[connection_type][kind]) for name, kind in RESULT_TABLES[table])
+    columns = ",\n  ".join("%s %s" % (name, TYPES[connection_type][kind]) for name, kind in TABLES[table])
     return "CREATE TABLE IF NOT EXISTS %s (\n  %s)" % (path, columns)
 
 
@@ -140,11 +148,14 @@ def result_statements(connection_type, paths, cohort_name, ids, scratch_prefix=N
     return statements
 
 
-def run_statements(connection_type, tables, paths, cohort_ids, population, scratch_prefix=None, scratch_schema=None):
+def run_statements(connection_type, tables, paths, cohort_ids, population, scratch_prefix=None, scratch_schema=None,
+                   population_balance_ids=None):
     """Every statement of one run, in order, and the Databricks scratch tables it uses.
 
     tables: {OMOP table: resolved name}, at least `observation_period` and what the SQL reads;
-    paths: {result table and "cohort": resolved name}. Returns (statements, scratch tables, the
+    paths: {result table and "cohort": resolved name}. population_balance_ids: the cohorts whose
+    balance against the population is recomputed; by default the run's cohorts. Returns
+    (statements, scratch tables, the
     run's cohort table name). The caller reads the entries per cohort from the cohort table, then
     drops the scratch tables.
     """
@@ -159,6 +170,8 @@ def run_statements(connection_type, tables, paths, cohort_ids, population, scrat
                                                connection_type, scratch_prefix, scratch_schema)
     statements += split_statements(construction)
     statements += result_statements(connection_type, paths, cohort_name, ids, scratch_prefix, scratch_schema)
+    balance_ids = cohort_ids if population_balance_ids is None else population_balance_ids
+    statements += recharacterized_statements(paths, cohort_ids, balance_ids)
     cleanup, _ = render_temp_tables(read_sql(connection_type, "cleanup.sql"), connection_type,
                                     scratch_prefix, scratch_schema)
     statements += split_statements(cleanup)
