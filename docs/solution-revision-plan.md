@@ -34,6 +34,7 @@ supersede R2 and R3. This plan stays the scope of 1.2 until the owner decides ot
 | [R6](#r6-databricks-temporary-tables) | Databricks temporary tables left behind | Review |
 | [R7](#r7-project-variables) | Project variables: one scope per purpose | Review |
 | [R8](#r8-code-environment) | Code environment: instance default | Review |
+| [R9](#r9-patient-level-covariates) | Patient-level covariates: `extract_patient_covariates`, on request, from the same 11 FeatureExtraction presets; one dataset per preset and an own reference, shareable to Part 3 (added 2026-11-26) | Owner |
 
 The review read the live Setup manifest, all 16 scenarios, the library references, the project variables,
 the flow (64 recipes, 66 datasets, 30 insights) and this repo's `solution/` code on 2026-11-20. Nothing in
@@ -418,6 +419,7 @@ every cohort and filter on the dashboard.
 - **For the decision register** (meets its admission rule; to add when the owner agrees): the
   FeatureExtraction result format as the contract between 1.2, the demo copy and v2.0, and the 5
   person-level tables as the contract with `DEMO_SF_RWE`.
+- **Patient-level covariates** for studies downstream: see [R9](#r9-patient-level-covariates).
 
 ### Step 4 part 0: today's figures mapped to the presets (2026-11-25)
 
@@ -598,6 +600,131 @@ solution never loads. **Keep the instance default.** The DSS built-in environmen
 numpy. State that requirement in the wiki's technical requirements article. `tests/test_imports.py` gains a
 check that `solution/` imports nothing outside the standard library and those four packages.
 
+## R9. Patient-level covariates
+
+**Today.** `characterize_cohorts` renders FeatureExtraction in aggregated mode
+(`solution/characterization/sql/MANIFEST.json`, `"aggregated": true`): it writes one row per cohort
+and covariate. The per-person rows exist only in its scratch tables (`rwdfeatxcov_N`), which
+`cleanup.sql` drops. `DEMO_SF_RWE` reads person-level features from the 5 hand-built tables
+(`charlson_score_occurrence`, `condition_group_occurrence`, `drug_class_exposure`,
+`person_location_joined`, `visit_occurrence_labeled`), whose definitions differ from the presets.
+
+**What a study downstream needs** (LEGEND-HTN, Suchard et al., *Lancet* 2019;394:1816–26, author
+manuscript NIHMS1546136, Methods):
+- Every eligible new user in each database; nothing is sampled, and no sample size is set
+  beforehand. Power is reported afterwards as a minimum detectable relative risk.
+- A regularized propensity model per comparison over 7,515 to 70,784 baseline characteristics,
+  stratification or variable-ratio matching, Cox models, then calibration with 76 negative-control
+  outcomes.
+- Estimates are trusted on diagnostics: empirical equipoise (most patients with preference scores
+  between 0.3 and 0.7) and every characteristic's absolute standardized difference below 0.1 after
+  adjustment. The unadjusted difference (its Table 2 "before") is what `covariate_balance` holds.
+- So effect estimation is Part 3's work. Part 2 supplies complete cohorts, their patient-level
+  covariates, feasibility counts and unadjusted balance.
+
+**Decided (owner, 2026-11-26).**
+
+1. **A separate function, `extract_patient_covariates`,** run on request for the cohorts a study
+   needs, never as part of characterization.
+2. **Option A for 1.2: it runs in SOL**, in its own zone "Patient Covariates", and its outputs are
+   shared to Part 3. A study extraction application owned by the data team (option C) is reserved
+   for v2.0 ([proposal](proposal-v2-cohort-workbench.md#study-extraction-option-c)). The boundary
+   between Part 2 and Part 3 is to be discussed with the team; nothing goes to the decision
+   register before that.
+3. **One row per cohort entry**, not per person: the study decides first entry or all entries.
+4. **No minimum cell count.** Decision 16 applies to aggregates shown or stored for review only.
+   The extract stays internal; the SYNPUF rules are unchanged.
+5. **Geolocation is not a preset.** `person_location_joined` stays outside FeatureExtraction.
+6. **Presets: today's 11, fixed.** The extraction uses the 11 presets of R3 decision 6, as
+   characterization does. Choosing presets, for characterization or extraction, is reserved for
+   v2.0.
+7. **One output dataset per preset.** An extract holds thousands of covariates, so each preset
+   gets its own dataset, which analysts find by name. Characterization keeps its single
+   `covariate` and `covariate_continuous` tables, since only the dashboard reads them.
+8. **Its own reference dataset.** The extract does not use `covariate_ref` or `analysis_ref`. It
+   writes its own reference, so it can be shared to the analytic team with the covariates, and it
+   names only covariates found in extracted cohorts.
+9. **Setup: its own part,** designed like "Cohort Characterization" and "Characterize Cohorts": a
+   part heading **Patient Covariates** and a section "Extract Patient Covariates".
+
+**Design.**
+
+- **Rendering.** `tools/render_feature_extraction.py` renders the same 11 presets a second time in
+  FeatureExtraction's non-aggregated mode, for each dialect, into
+  `solution/characterization/sql/<dialect>/person/`. `MANIFEST.json` records both modes, and
+  `--check` covers both.
+  - Analysis ids come from FeatureExtraction's `PrespecAnalyses.csv`, and covariate ids are concept
+    id × 1000 + analysis id, so they equal the characterization's ids. Checked on the rendered SQL
+    before the engine changes.
+  - The non-aggregated mode needs a `row_id` on the scratch cohort table; the engine adds it with
+    `ROW_NUMBER()`.
+- **Engine.** `solution/pipelines/extract_patient_covariates.py`, the body of one static recipe, like
+  `characterize_cohorts`. It builds the scratch cohort table for the batch, runs the
+  non-aggregated construction, then writes each preset's rows from that preset's scratch table, all
+  in-database.
+  - Complete cohorts only: no sampling, matching or trimming. Those belong to the analysis.
+  - Rows are replaced per extracted cohort (delete, then insert) in every output.
+- **Outputs**, zone "Patient Covariates", managed on the main connection, all with the prefix
+  `patient_cov_` so the set reads as one:
+  - **One dataset per preset**, named after FeatureExtraction's analysis name in snake case:
+
+    | Dataset | Preset (analysis id) | Kind |
+    | --- | --- | --- |
+    | `patient_cov_demographics_gender` | DemographicsGender (1) | binary |
+    | `patient_cov_demographics_age` | DemographicsAge (2) | continuous |
+    | `patient_cov_demographics_age_group` | DemographicsAgeGroup (3) | binary |
+    | `patient_cov_demographics_race` | DemographicsRace (4) | binary |
+    | `patient_cov_demographics_prior_observation_time` | DemographicsPriorObservationTime (8) | continuous |
+    | `patient_cov_demographics_post_observation_time` | DemographicsPostObservationTime (9) | continuous |
+    | `patient_cov_demographics_time_in_cohort` | DemographicsTimeInCohort (10) | continuous |
+    | `patient_cov_condition_group_era_long_term` | ConditionGroupEraLongTerm (210) | binary |
+    | `patient_cov_drug_group_era_long_term` | DrugGroupEraLongTerm (410) | binary |
+    | `patient_cov_charlson_index` | CharlsonIndex (901) | continuous |
+    | `patient_cov_visit_concept_count_long_term` | VisitConceptCountLongTerm (923) | continuous |
+
+    Each has `cohort_definition_id`, `subject_id`, `cohort_start_date`, `covariate_id` and
+    `covariate_value`. Binary covariates are present only where true (value 1); continuous ones carry
+    their value. Each dataset's description names its preset, window and kind.
+  - **`patient_cov_ref`**, the extract's own reference: one row per covariate found in an extracted
+    cohort, with `covariate_id`, `covariate_name`, `concept_id`, `analysis_id`, `analysis_name`,
+    `domain_id`, `start_day`, `end_day`, `is_binary` and `dataset` (the per-preset dataset that holds
+    it). It joins FeatureExtraction's covariate and analysis references into one table, so analysts
+    search one place and go to the dataset it names. New ids are inserted; existing ones are kept.
+  - **`patient_cov_log`**: one row per cohort and run, with row counts per preset, status and timing.
+  - Sharing to Part 3 covers the 11 datasets and `patient_cov_ref`; the log stays in SOL.
+  - Size grows with entries × covariates (about 50 to 500 rows per entry with today's presets), most
+    of it in the condition and drug group datasets. Partition those by cohort id if 2.3M needs it.
+- **Setup: "Patient Covariates".**
+  - A part heading **Patient Covariates** with a short text, after "Cohort Characterization"
+    (`HEADINGS` in `tools/app_manifest.py`).
+  - A section "Extract Patient Covariates":
+    - a short text: what is extracted, for which use, that results are kept until redone;
+    - an "Extraction batch" custom tile on the "Characterization batch" pattern: built cohorts with
+      their extraction status, *In batch* and *Replace*. Nothing is ticked by default, since an
+      extract is requested for a study. "Save batch" checks it and saves `extraction_submission`
+      (added to the variable contract), or lists every problem;
+    - an "Extract patient covariates" button that runs the new scenario `Extract_Patient_Covariates`
+      on the saved batch, and a link to `patient_cov_log`.
+  - Shared parts of the two batch tiles move to the one template the characterization part
+    anticipated (step 4 part 5).
+- **Part 3 in 1.2.** `DEMO_SF_RWE` keeps reading the 5 hand-built tables; they stay unchanged
+  (R3). Moving it to the `patient_cov_` datasets is Part 3 work after 1.2, with its models checked on
+  the new features. In 1.2 the boundary is project sharing only: whoever can read the shared
+  datasets reads every extracted cohort.
+
+**Verification.**
+
+- The renderer reproduces every file byte for byte, in both modes; analysis and covariate ids in the
+  non-aggregated render equal the aggregated render's.
+- An extract of one E4 cohort is identical on SF, DB and RS.
+- Every covariate in a per-preset dataset belongs to that preset's analysis id, and every one appears
+  in `patient_cov_ref` with that dataset's name.
+- Aggregate parity: per binary covariate, the count of rows with value 1 equals `covariate.sum_value`
+  for that cohort (before the minimum cell count); per continuous covariate, the mean of
+  `covariate_value` equals `covariate_continuous`'s mean.
+- An extracted cohort is redone only with *Replace*; a run with nothing ticked extracts nothing.
+- Characterization's outputs and `covariate_ref` are unchanged by an extraction.
+
 ## Accepted as is
 
 By the owner's decision, these stay unchanged. The built-in project macro test run before publication
@@ -742,6 +869,7 @@ tiles for the frequency tables. Open question 4 is closed.
 | 2. Cohort build | R5, R6 | Offline tests (statement splitter on every script in `cohort_scripts/`, literal escaping); E4 rerun; a forced failure on Databricks leaves no `rwdtmp_` table |
 | 3. Setup | R1, R2; regenerate tiles with `tools/app_manifest.py` | Two submissions in a row; a reused id is refused without **Replace** and accepted with it; "Built cohorts" lists both batches |
 | 4. Characterization and dashboard | R3 as decided | Same results on SF, DB and RS for the E4 cohorts; independent SQL checks of a binary, a continuous and a concept covariate; standardized differences (precomputed against the population, on request between two cohorts) equal a hand calculation; a batch computes only its own cohorts; all cohorts selectable by filter; the 9 `DEMO_SF_RWE` inputs unchanged. See the [step 4 work session](#step-4-work-session-draft-2026-11-24) |
+| 4b. Patient-level covariates | R9 (after step 4's gate) | Rendering check in both modes; one E4 extract identical on SF, DB and RS; per-preset datasets match `patient_cov_ref`; aggregate parity with `covariate` and `covariate_continuous`; *Replace* rule; characterization unchanged |
 | 5. Release check | Project macro test; `tools/app_manifest.py --check`; wiki articles 03, 09, 16, 17, 18, 23, 24, 28 and Release Notes 1.2.0, pushed with the owner's approval | Gate below |
 
 **Step 1 status (2026-11-23): repo part done (`d0a11e9`, fix `e41c6d3`); DSS part done; E4 passed on SF, DB and RS. Step 1 is done.**
@@ -1370,6 +1498,104 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      default. Below it, the charts of `covariate_balance`, filtered by cohort and comparator.
    - Every chart reads a small table in full.
    - It is built first, next to the old dashboard.
+
+   **Stage 4 inventory (read only, 2026-11-26).** Headless connected to the design instance
+   (profile "BS Design", DSS 15.2.0). Nothing changed on SOL.
+   - Old dashboard `4OpJPy0` "Cohort Discovery Insights": 2 pages, 45 tiles, version 390 (last
+     modified 2025-06-25). It is checked against that version at the end of the stage.
+   - `covariate_balance`: per cohort against the population, 11 continuous and 2,912–3,600 binary
+     rows (cohort 1: 425 with |d| ≥ 0.1, 7 with |d| ≥ 0.2); one cached pair (1 against 2).
+     Analyses 1, 2, 3, 4, 8, 9, 10, 210, 410, 901, 923.
+   - `covariate` and `covariate_continuous` hold ids only; names come from `covariate_ref`.
+     Covariate names carry FeatureExtraction's long prefix ("condition_era group
+     (ConditionGroupEraLongTerm) during day -365 through 0 days relative to index: …").
+   - The physical Snowflake columns are upper case and the DSS schemas lower case: DSS reads them,
+     but an in-database chart quotes the lower-case names and fails. `cohort_definition` is upper
+     case in DSS too, so its column does not match `cohort_definition_id` for a dashboard filter.
+   - Quarterly prevalence and county incidence have no per-cohort table: `cohort_prevalence` and
+     `cohort_location_prepared` are the old single-cohort datasets (the latter has no cohort id).
+     Part 5 did not add them (decision 7 says "keyed by cohort").
+   - `cohort_definition` also lists cohort 4, which is not characterized.
+
+   **Decided (owner, 2026-11-26).** Page 1 reads tables the flow builds from the precomputed
+   characterization; nothing creates datasets from the backend. Page 2 reads `covariate_balance`
+   itself, so a pair the webapp writes shows at once (long covariate names and ids accepted there).
+   The quarterly prevalence and county incidence views are deferred to a repo change of the
+   characterization recipe (decision 7 still holds); page 1 leaves room for them. An interim
+   attempt with SQL query datasets, then with library-generated queries, was dropped (never
+   committed).
+
+   **Result tables: upper-case DSS schemas (owner, 2026-11-26).** The library creates `covariate`,
+   `covariate_continuous`, `covariate_ref`, `analysis_ref`, `characterization_log` and
+   `covariate_balance` with unquoted columns, which Snowflake stores in upper case; their DSS
+   schemas were lower case, so any SQL DSS generates on them (visual recipes, in-database charts)
+   quoted names Snowflake does not hold. Their DSS schemas are now upper case, as the OMOP tables'
+   are. Redshift and Databricks ignore the case. The library is unaffected: it writes with its own
+   SQL, and `read_rows` matches columns in any case. The previous definitions are kept outside the
+   repo.
+
+   **Display flow (`dku`, 2026-11-26)**, zone "Cohorts", every recipe on the SQL engine, outputs
+   managed on the main connection with lower-case columns:
+
+   | Recipe | Type | Input → output | What it does |
+   | --- | --- | --- | --- |
+   | `compute_covariate_ref_display` | Prepare | `covariate_ref` → `covariate_ref_display` | `covariate` label by pattern replacement: regex `^.* relative to index: ` → empty (condition, drug and visit groups), `^age group:\s+(\d+)\s+-\s+(\d+)$` → `Age $1-$2`; `domain` from `analysis_id` (Demographics ≤ 10, Condition group 210, Drug group 410, Charlson index 901, Visits 923) |
+   | `compute_cohort_label` | Prepare | `cohort_definition` → `cohort_label` | `cohort` = "id · name", lower-case columns |
+   | `compute_characterization_latest` | Top N | `characterization_log` → `characterization_latest` | latest SUCCESS row per cohort, population included |
+   | `compute_covariate_balance_display` | Join | `covariate_balance` + `covariate_ref_display` + `cohort_label` (twice) → `covariate_balance_display` | labels for covariate, cohort and comparator; `comparator` = "Population" for −1 |
+   | `compute_covariate_continuous_display` | Join | `covariate_continuous` (cohorts) + `covariate_continuous` (−1) + `covariate_ref_display` + `cohort_label` → `covariate_continuous_display` | cohort and population figures on one row |
+   | `compute_cohort_summary` | Join | `cohort_label` + `characterization_latest` (inner) + `characterization_latest` (−1, cross) → `cohort_summary` | entries, population entries, last characterization |
+
+   - The three display datasets keep the names, and the columns, the insights read; they were
+     turned from query datasets into managed tables (not deleted). Built on SOL: 13,203 / 33 / 3
+     rows, every row labelled.
+   - Visual recipes generate their SQL for the connection they sit on, and "Reconfigure
+     Connections" moves their outputs like any managed dataset.
+   - The "Characterize Cohorts" scenario has two more steps, each a forced non-recursive build (a
+     recursive one could re-run the Python recipe): "Display: labels and latest runs", then
+     "Display: dashboard datasets". Not run yet: the saved batch holds cohorts 4, 6 and 7, so a
+     run would characterize them.
+   - Dashboard-only READ is granted on the three display datasets (Cobuild asked; the project
+     grants it on every old dashboard dataset the same way).
+
+   **Page 1 insights (Cobuild, 2026-11-26).** All charts on the SQL engine, whole table:
+   `la2qdJ1` Cohort summary (table); `bQK6isp` Largest differences vs population (horizontal
+   bars, top 20 by max |d|, coloured by domain); `IiqXkfk` Demographics, `KqOCUkX` Condition
+   groups and `KpOrTiJ` Drug groups vs population (grouped columns, cohort and population side by
+   side; the last two top 20 by max |d|; DSS has no horizontal grouped bars); `Tuy4BOP` Covariate
+   balance table vs population; `3tuEGAn` Continuous covariates vs population (table). The old
+   dashboard is unchanged (version 390, 45 tiles).
+
+   **How insights are built (owner, 2026-11-26).** An insight on one dataset is built as a chart in
+   that dataset's Charts tab, then published. KPI figures use chart custom aggregations (as the old
+   Prevalence card does), not new flow columns; the flow changes only for data no single dataset
+   holds. Page 1 is mapped insight by insight from the old page 1 (approved).
+
+   **Page 1 mapping, built (Cobuild, 2026-11-26).** Dataset charts published as insights, SQL
+   engine, whole table; the old insight each replaces is in brackets.
+   - Cohort statistics, KPI on `cohort_summary`: `RGxgbsb` Cohort ID (`fomAco8`), `Wt8i6Hp` Cohort
+     Name (`F5eprpJ`), `Kdk4yEF` Cohort Created Date (`tfptKTs`), `0iW8jiX` Cohort Entries
+     (`L5X1u3e`), `3dXg8Nb` Population (`rWJ8sZP`), `9ffUAnI` Population Prevalence, custom
+     aggregation `sum(entries)/sum(population_entries)` (`HLkoVom`). KPI on `cohort`: `B7pTaIj`
+     Distinct Patients, COUNTD(`SUBJECT_ID`) (`GuQHWHu`); `cohort` is authorized for dashboard
+     users. Its column is upper case (`COHORT_DEFINITION_ID`), so whether one dashboard cohort
+     filter reaches it is checked with the layout.
+   - Demographics, grouped columns on `covariate_balance_display` (comparator −1, cohort share
+     next to population share): `jA2lcxJ` Sex, analysis 1 (`KYmld44`, `APZqNnq`); `uZo0VHH` Race,
+     analysis 4 (`wcP3ndC`, `zQjpyjn`); `xkqhHqa` Age groups, analysis 3 (`AJxSRT8`). KPI on
+     `covariate_continuous_display`, analysis 2: `x37NrzF` mean age (cohort), `nJkGql3` median age
+     (cohort), `OSezm7a` mean age (population) (`ca7H0gj`).
+   - `iszrTW6` Charlson index, analysis 901: P10, P25, median, P75, P90, cohort next to population
+     (`IVpIey8`, `BBCEm32`); the preset has no score bins, so no histogram.
+   - `uEYMBcb` Observation time, pivot table, analyses 8–10 (`4iq4qRR`).
+   - Kept: `bQK6isp` Largest differences, `Tuy4BOP` Balance table. Move to page 2: `KqOCUkX`,
+     `KpOrTiJ`. Unused, to retire: `IiqXkfk` (split into the three demographic charts), `3tuEGAn`
+     (replaced by `uEYMBcb`), `la2qdJ1` (replaced by the KPI cards). Dropped: `t0koor2` (broken).
+     Deferred: `Xxqqxab`, `BOifR20`, `g5qMw28`, `MLL8Fq0`.
+   - `dku insight validate` flags `Kdk4yEF` (MIN of a date), `9ffUAnI` (custom measure) and
+     `uEYMBcb` (pivot rows in `yDimension`). The old dashboard renders all three patterns, so
+     these are taken as validator limits; the owner's visual check decides.
+
 7. **Retirement**, after a backup:
    - the 29 recipes and 30 datasets, and the old dashboard and its 30 insights;
    - Setup's dashboard section, `cohort_definition_id` and `section8_tile1.py`;
@@ -1427,7 +1653,9 @@ Risks:
 - the project macro test passes;
 - Setup has no custom-mapping, metadata-CSV or dashboard section, and has a "Characterize Cohorts"
   section whose batch tile includes new cohorts by default and redoes a characterized one only
-  with *Replace*.
+  with *Replace*;
+- Setup has a "Patient Covariates" part whose "Extract Patient Covariates" section extracts the
+  batch's cohorts into the per-preset datasets and `patient_cov_ref` (R9).
 
 **Execution sequence (draft, 2026-11-25).** Each stage ends at a gate. The next stage starts only
 after the gate passes and the owner approves it.
@@ -1499,5 +1727,10 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 - [x] `condition_count_for_charlson_score`: wire into the Charlson logic or drop. Dropped (owner,
   2026-11-23; R7)
 - [ ] Databricks scratch schema: the connection default, or a dedicated `temp_schema`
+- [ ] Boundary between Part 2 and Part 3 (R9): option A in 1.2, option C reserved for v2.0; to
+  discuss with the team before the decision register
+- [ ] When `DEMO_SF_RWE` moves from the 5 hand-built tables to the `patient_cov_` datasets, and with which
+  presets for its propensity models (LEGEND used thousands of characteristics; today's 11 presets
+  are a review set)
 - [x] If dashboard filters do not reach statistics cards: charts or a summary table instead. They do not
   (spike, 2026-11-20): charts for the distributions, dataset-table tiles for the frequency tables (R3)

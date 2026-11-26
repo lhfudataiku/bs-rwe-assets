@@ -21,6 +21,9 @@ library in one place.
 - **Build:** the MVP is estimated at **7–9 calendar weeks** as a controlled build by a coding assistant
   with gated human review.
 - **Go/no-go:** milestone M0, a one-week feasibility check, decides whether to go ahead.
+- **Study extraction (option C):** an application owned by the data team, one instance per
+  approved study, extracts only that study's cohorts and patient-level covariates for the analysts,
+  who never read the solution project. See [Study extraction](#study-extraction-option-c).
 - **Release line:** v1.2 ([`solution-revision-plan.md`](solution-revision-plan.md)) stays the release
   the demo suite is recreated from. v2.0 starts after the migration plan closes, unless the owner
   starts M0 earlier, and the demo is rebuilt on it afterwards (migration plan, Workstream D).
@@ -48,8 +51,9 @@ compared. The server holds 408 feature analyses, 106 of them presets.
 | Cohort library | List all cohorts with id, name, description, source (Atlas JSON or SQL), status, subject count and last build; cohort detail with Circepy's readable description |
 | Registration | Upload Atlas cohort JSON (compiled by Circepy) or rendered SQL (today's path); one form for id, name and description; repeated submissions; an existing id is refused unless **Replace** is chosen |
 | Build | Runs as a DSS job, never inside the webapp process. Per-cohort status, count and error; temporary tables cleaned up; one build at a time per project |
-| Characterization | Today's characteristics re-expressed as FeatureExtraction presets: gender, race, age, age group, time in cohort, prior and post observation, Charlson, condition groups, drug groups, visit counts, with time windows. Results stored per cohort |
+| Characterization | Today's characteristics re-expressed as FeatureExtraction presets: gender, race, age, age group, time in cohort, prior and post observation, Charlson, condition groups, drug groups, visit counts, with time windows. Results stored per cohort. **Preset selection** (new in v2.0; v1.2 runs a fixed set): the project's characterization presets are chosen in the workbench from a rendered catalogue. See [Preset selection](#preset-selection) |
 | Comparison | Two cohorts side by side: prevalence and distribution tables, standardized difference, a balance scatter plot |
+| Study extraction | A study extraction application (option C) produces each approved study's analytic extract, with its own preset selection. See [Study extraction](#study-extraction-option-c) |
 | Our own views | Quarterly prevalence and the county map, which FeatureExtraction does not cover |
 | Data contract | The 9 datasets `DEMO_SF_RWE` reads are still produced, same names and columns: `cohort`, `cohort_definition`, `concept`, `concept_ancestor`, `charlson_score_occurrence`, `condition_group_occurrence`, `drug_class_exposure`, `person_location_joined`, `visit_occurrence_labeled` |
 | Dialects | Snowflake, Databricks and Redshift, as in v1.x |
@@ -64,6 +68,70 @@ compared. The server holds 408 feature analyses, 106 of them presets.
 
 **Out of scope:** deploying Atlas or WebAPI themselves; sharing cohorts between projects;
 multiple users editing one project at the same time.
+
+## Preset selection
+
+v1.2 runs a fixed set of 11 presets for both characterization and patient-level extraction (R3
+decision 6, R9). v2.0 lets the user choose (owner, 2026-11-26).
+
+- **Rendering, one preset at a time.** The renderer renders each catalogue preset on its own, in
+  aggregated mode (characterization) and non-aggregated mode (extraction), for each dialect. At run
+  time the engine runs the selected presets' files in turn, so any subset works without rendering
+  combinations. Adding a preset to the catalogue is a rerender, not a code change.
+- **Stable ids.** Analysis ids come from `PrespecAnalyses.csv`, and covariate ids are concept id ×
+  1000 + analysis id, so a covariate keeps its id whatever the selection. To be checked in M0 on a
+  single-preset render against v1.2's all-preset render.
+- **Characterization.** One project-wide set, so the population and every cohort use the same
+  presets and standardized differences compare like with like. Changing it recomputes nothing by
+  itself: affected cohorts are shown as out of date, and an explicit request recomputes them, as in
+  v1.2 R3 decision 15.
+- **Extraction.** Chosen per study in the study extraction application; each selected preset gives
+  its own dataset.
+
+## Study extraction (option C)
+
+v1.2 extracts patient-level covariates inside the solution project and shares them to Part 3
+([R9](solution-revision-plan.md#r9-patient-level-covariates), option A). The personas of the two
+parts differ: the data team builds and reviews cohorts on the full OMOP data, and analysts answer
+one study question at a time. v2.0 separates them, so analysts never read the solution project or
+the OMOP data (owner, 2026-11-26; reserved for v2.0, boundary to be discussed with the team).
+
+- **Trigger: an approved study design.** It names the target, comparator and outcome cohorts, the
+  index rule (first entry or all entries), the presets, the time-at-risk and follow-up. The data
+  team reviews it; only then is anything extracted.
+- **A Dataiku Application, "Study Extraction".** The data team instantiates one project per
+  approved study from the template and enters the design as its settings, so the design is
+  recorded with the data. Several studies, or several analyses of one study, each get their own
+  instance, so the solution supports many analytic activities without mixing them.
+- **What it does.** It reads the solution's `cohort`, `cohort_definition`, `covariate_ref` and
+  `analysis_ref` and the OMOP tables, then runs `extract_patient_covariates` from the solution
+  library for the design's cohorts only, with complete cohorts (no sampling, matching or trimming).
+- **Preset selection.** Chosen per study from the rendered catalogue
+  ([Preset selection](#preset-selection)); it may be wider than the characterization set. LEGEND-HTN's propensity models drew on 7,515 to 70,784 characteristics, so
+  a study may need FeatureExtraction's default settings (conditions, drugs, procedures,
+  measurements, observations) rather than the review set. Covariate ids stay those of the
+  characterization, so the review's unadjusted balance and the study's adjusted balance compare
+  covariate by covariate.
+- **What analysts receive, shared to their project only:**
+  - `study_population`: a pseudonymized person key (a hash of `subject_id` with a per-study salt),
+    the role (target, comparator, outcome), index date, outcome and censoring dates; one row per
+    entry;
+  - one covariate dataset per selected preset, as in v1.2 R9 (`<preset>` in snake case, long
+    format), so analysts find a factor by its preset rather than in one table of thousands of
+    covariates;
+  - the study's own covariate reference, joining covariate and analysis references and naming the
+    dataset that holds each covariate. It lists only the study's covariates, and carries the names,
+    so analysts need neither `concept` nor `concept_ancestor`. The solution's `covariate_ref` and
+    `analysis_ref` are never shared;
+  - `study_design`: the approved design, kept with the extract for audit.
+  Geolocation is not a preset; a design that needs it asks for a separate extract.
+- **Isolation.** The application writes to a study schema or connection that only the study's
+  analysts can use, so a wrong project permission alone does not expose the data.
+- **Approval.** A sign-off step at first: the data team runs the extraction. Dataiku Govern, where
+  available, can record who asked, who approved and what was released.
+- **What stays in Part 3.** Effect estimation and its diagnostics: propensity models, matching or
+  stratification, Cox models, the minimum detectable relative risk, equipoise, balance after
+  adjustment and negative-control calibration.
 
 ## Architecture
 
@@ -194,6 +262,10 @@ these before M1:
 
   If v2.0 is accepted before v1.2's Setup work starts, the owner can drop those two from v1.2 and keep
   only the Setup simplification.
+- **R9 (patient-level covariates):** the `extract_patient_covariates` engine, its per-preset
+  datasets and its own reference are carried into v2.0. Running the extraction inside the solution
+  project (option A) is superseded by the study extraction application (option C), and the fixed
+  preset set by [preset selection](#preset-selection).
 - **Narrowed:** R1 (table naming) applies only to the SQL path, since Circepy generates fully qualified
   SQL from JSON.
 
@@ -202,4 +274,7 @@ these before M1:
 - [ ] Accept v2.0 as defined here, and when to run M0
 - [ ] Keep the v1.x DSS dashboard in v2.0 alongside the webapp, or retire it
 - [ ] Minimum Circepy version to pin after M0
+- [ ] Boundary between the solution (Part 2) and analytics (Part 3): the study extraction
+  application (option C) as the only route from Part 2 to analysts; to discuss with the team
+- [ ] When the 9-dataset contract with `DEMO_SF_RWE` gives way to a study extract
 - [ ] Whether v1.2 still ships R2 and R3, or only the Setup simplification, once v2.0 is accepted
