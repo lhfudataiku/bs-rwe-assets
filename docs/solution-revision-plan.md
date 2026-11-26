@@ -1357,6 +1357,10 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
        a side held by 1 to 4 people.
      - Binary covariates stored: 4,872 for the population, 3,595 / 2,839 / 2,725 for the cohorts,
        down from about 15,000–19,000. Balance rows against the population: 3,611 / 2,987 / 2,923.
+   - **Browser check passed (owner, 2026-11-26).** The "Compare cohorts" webapp works as expected:
+     a pair against the population answers at once, a new pair computes then reports done, and a
+     repeat request computes nothing. The batch tile and the "Cohort Characterization" heading are
+     in place. **Stage 3 gate passed.** The registry pins SOL's library at `b4b1400`.
 6. **Dashboard.**
    - A new "Cohort Characterization" dashboard.
    - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary

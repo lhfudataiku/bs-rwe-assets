@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-25T16:33Z",
+   "fetched_at": "2026-11-26T08:15Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-25T16:33Z",
+   "probed_at": "2026-11-26T08:15Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-25T16:33Z",
+   "fetched_at": "2026-11-26T08:15Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-25T16:33Z",
+   "probed_at": "2026-11-26T08:15Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -38874,7 +38874,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-25T16:33Z",
+   "fetched_at": "2026-11-26T08:15Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38907,15 +38907,28 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "69a9ec09ea9cdbbcc674e0a6c0392648265b9798",
+     "hash": "b4b1400fee4860cac466945cd241a5bdbdefc706",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-25T16:33Z",
+   "probed_at": "2026-11-26T08:15Z",
    "variables": {
     "local": {
-     "characterization_submission": [],
+     "characterization_submission": [
+      {
+       "id": 4,
+       "replace": false
+      },
+      {
+       "id": 6,
+       "replace": false
+      },
+      {
+       "id": 7,
+       "replace": false
+      }
+     ],
      "cohort_script_table_map": {
       "care_site": "@cdm_database_schema.care_site",
       "cdm_source": "@cdm_database_schema.cdm_source",
