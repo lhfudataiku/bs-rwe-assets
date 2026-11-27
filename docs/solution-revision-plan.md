@@ -794,6 +794,43 @@ separately. Tools as in step 4: the repo and `dku`; Setup and tile checks in the
    - `extraction_submission` added to the variable contract.
 
    Gate: offline tests pass. Commit with the owner's approval.
+
+   *Done (2026-11-27), repo only:*
+   - **What to extract: `solution/setup/extraction.py`.** Pure, for the tile to inline. Rows of
+     built cohorts (no population row) with their status and, once extracted, their entries;
+     nothing ticked by default; the batch check (an extracted cohort needs *Replace*; no successful
+     build is refused); `extraction_submission` entries stamped with `saved` and expired through
+     characterization's `live_submission`. Its top-level names differ from characterization's, which
+     the inliner requires.
+   - **The SQL of one extract: `solution/characterization/extraction.py`.** 151 statements in each dialect:
+     `CREATE TABLE IF NOT EXISTS` for the 13 outputs; the entry table (`rwdpcov_cohort`, `#` on
+     Redshift, `rwdtmp_<key>__pc_cohort` on Databricks) with `row_id` from `ROW_NUMBER()`; the
+     person-mode construction; per preset, delete the run's cohorts then insert from its scratch
+     table joined on `row_id`; new ids into `patient_cov_ref` (FeatureExtraction's covariate and
+     analysis references joined, with the dataset name); the cleanup. Every read runs before the
+     first delete. No minimum cell count, and no statement names a characterization table.
+     `statements.fill()` takes the cohort token as a parameter; the characterization's calls are
+     unchanged.
+   - **Columns.** Preset datasets: `cohort_definition_id`, `subject_id`, `cohort_start_date` (date),
+     `covariate_id`, `covariate_value` (float). `patient_cov_ref`: `covariate_id`, `covariate_name`,
+     `concept_id`, `analysis_id`, `analysis_name`, `domain_id`, `start_day`, `end_day`, `is_binary`,
+     `dataset`. `patient_cov_log`: `run_timestamp`, `cohort_definition_id`, `build_timestamp`,
+     `entry_count`, `status`, `error`, `seconds` (whole seconds of the run), and `rows_<preset>` for
+     each of the 11 datasets, read back from the outputs in the same session.
+   - **The recipe body: `solution/pipelines/extract_patient_covariates.py`** (recipe code in
+     `dss/recipes/extract_patient_covariates.py`). Checks the saved batch again as the authority, runs
+     everything in one session, logs SUCCESS with counts or FAILED with the error for every cohort,
+     clears the batch after a success, and does nothing, without failing, when nothing is ticked.
+     Databricks scratch tables `rwdtmp_<key>__pc_<name>` (`sql_text.extraction_scratch_prefix`),
+     swept before a run; the build's and the characterization's sweeps never match them.
+   - **Tests: `tests/test_extract_patient_covariates.py`** (22 tests; 191 in all). Rows, statuses,
+     *Replace*, expired entries; the presets, scratch tables and token against the renderer and
+     `MANIFEST.json`; the kinds against FeatureExtraction's `is_binary`; statement order per
+     dialect; the scratch names against what the construction creates; OMOP columns in scope; the
+     prefixes apart. The SQL this module writes runs in SQLite on stand-in scratch tables: one row
+     per entry (two entries of one subject kept apart), each in its preset's dataset, the reference
+     with its dataset, a redo that replaces only its cohort without duplicates, and the counts and
+     log row.
 3. **Setup (repo only).**
    - A part heading **Patient Covariates** after "Cohort Characterization"; a section "Extract
      Patient Covariates" with its text, the "Extraction batch" tile, the "Extract patient

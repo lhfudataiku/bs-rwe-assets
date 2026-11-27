@@ -110,6 +110,19 @@ def is_characterization_scratch_table(name, project_key):
     return name.lower().startswith(characterization_scratch_prefix(project_key))
 
 
+def extraction_scratch_prefix(project_key):
+    """`rwdtmp_<project key>__pc_`: the patient-level extract's scratch tables (R9).
+
+    Like the characterization's, one run covers many cohorts. `pc` is neither a number nor `ch`, so
+    no sweep drops another's tables: a build, a characterization and an extract can run at once.
+    """
+    return "%s%s__pc_" % (SCRATCH_PREFIX, project_key.lower())
+
+
+def is_extraction_scratch_table(name, project_key):
+    return name.lower().startswith(extraction_scratch_prefix(project_key))
+
+
 def render_temp_tables(sql, connection_type, prefix=None, qualifier=None):
     """Replace `@temp_database_schema.<name>` for the dialect.
 

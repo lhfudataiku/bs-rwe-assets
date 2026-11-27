@@ -123,8 +123,10 @@ def cohort_table_statements(connection_type, name, cohort_table, observation_per
     return ["DROP TABLE IF EXISTS %s" % name, create + select]
 
 
-def fill(sql, tables, cohort_name):
+def fill(sql, tables, cohort_name, cohort_token=COHORT_TOKEN):
     """Replace the part 1 placeholders: OMOP tokens by resolved names, the cohort token by the run's table.
+
+    cohort_token: `@characterization_cohort`, or `@extraction_cohort` for the person-mode SQL (R9).
 
     tables: {OMOP table: resolved SQL name}. A token naming a table not in `tables` raises, so a run
     never sends a placeholder to the database.
@@ -139,7 +141,7 @@ def fill(sql, tables, cohort_name):
         if name not in tables:
             raise ValueError("The characterization SQL reads %s, which this project has not resolved" % name)
         return tables[name] + ("" if match.group(2) else " " + name)
-    return OMOP_TOKEN_WITH_FOLLOWER.sub(table, sql).replace(COHORT_TOKEN, cohort_name)
+    return OMOP_TOKEN_WITH_FOLLOWER.sub(table, sql).replace(cohort_token, cohort_name)
 
 
 def _strip_header(sql):
