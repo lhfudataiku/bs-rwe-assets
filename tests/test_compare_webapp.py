@@ -63,6 +63,15 @@ class Routes(unittest.TestCase):
         args = self.service.request.call_args.args
         self.assertEqual(args[:3], ("1", "-1", {"authIdentifier": "ana"}))
 
+    def test_refresh_rebuilds_page_two_in_order(self):
+        dk = self.ns["dataiku"]
+        with mock.patch.object(dk, "api_client") as client:
+            project = client.return_value.get_default_project.return_value
+            self.ns["refresh_dashboard"]()
+        self.assertEqual([c.args[0] for c in project.get_dataset.call_args_list],
+                         ["covariate_balance_display", "comparison_filter"])
+        project.get_dataset.return_value.build.assert_called_with(job_type="NON_RECURSIVE_FORCED_BUILD", wait=True)
+
     def test_errors_are_sentences(self):
         self.request.args = {"cohort": "1", "comparator": "2"}
         self.service.status.side_effect = Exception("boom\n  at x")

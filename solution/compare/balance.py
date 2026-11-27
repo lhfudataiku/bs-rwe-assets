@@ -179,3 +179,18 @@ def cached_pairs_query(path):
 def pair_cached_query(path, cohort_a, cohort_b):
     return ("SELECT COUNT(*) AS n FROM %s WHERE cohort_definition_id = %d AND comparator_id = %d"
             % (path, _id(cohort_a), _id(cohort_b)))
+
+
+# The dashboard's page 2 reads this flow-built copy of `covariate_balance`, with labels (step 4 part 6).
+# Its columns are DSS-managed and lower case, so they are quoted on Snowflake.
+DISPLAY_TABLE = "covariate_balance_display"
+QUOTES = {"Snowflake": '"%s"', "Redshift": '"%s"', "Databricks": "`%s`"}
+
+
+def display_pair_query(path, cohort_a, cohort_b, connection_type):
+    """Rows of the pair in the dashboard's copy (0 until the copy is rebuilt after the pair)."""
+    if connection_type not in QUOTES:
+        raise ValueError("No quoting rule for connection type %r" % connection_type)
+    q = QUOTES[connection_type]
+    return ("SELECT COUNT(*) AS n FROM %s WHERE %s = %d AND %s = %d"
+            % (path, q % "cohort_definition_id", _id(cohort_a), q % "comparator_id", _id(cohort_b)))

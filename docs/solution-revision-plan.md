@@ -1543,7 +1543,8 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    | `compute_cohort_label` | Prepare | `cohort_definition` → `cohort_label` | `cohort` = "id · name", lower-case columns |
    | `compute_characterization_latest` | Top N | `characterization_log` → `characterization_latest` | latest SUCCESS row per cohort, population included |
    | `compute_covariate_balance_display` | Join | `covariate_balance` + `covariate_ref_display` + `cohort_label` (twice) → `covariate_balance_display` | labels for covariate, cohort and comparator; `comparator` = "Population" for −1 |
-   | `compute_covariate_continuous_display` | Join | `covariate_continuous` (cohorts) + `covariate_continuous` (−1) + `covariate_ref_display` + `cohort_label` → `covariate_continuous_display` | cohort and population figures on one row |
+   | `compute_covariate_continuous_display` | Join | `characterization_latest` (cohort ids) × `covariate_continuous` (cross) + `covariate_ref_display` + `cohort_label` → `covariate_continuous_display` | long form: one row per shown cohort, covariate and group; post-filter keeps the cohort's own rows and the population's (−1), and `group_label` says "Cohort" or "Population". The population rows repeat under each cohort id, so the cohort filter keeps them (reshaped 2026-11-26; was one wide row with `cohort_*` and `population_*` columns) |
+   | `compute_cohort_filter` | Prepare | `cohort_summary` → `cohort_filter` | `cohort_definition_id` and `cohort` of characterized cohorts: the dashboard filter's values, read by no tile (added 2026-11-27) |
    | `compute_cohort_summary` | Join | `cohort_label` + `characterization_latest` (inner) + `characterization_latest` (−1, cross) → `cohort_summary` | entries, population entries, last characterization |
 
    - The three display datasets keep the names, and the columns, the insights read; they were
@@ -1595,6 +1596,106 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - `dku insight validate` flags `Kdk4yEF` (MIN of a date), `9ffUAnI` (custom measure) and
      `uEYMBcb` (pivot rows in `yDimension`). The old dashboard renders all three patterns, so
      these are taken as validator limits; the owner's visual check decides.
+
+   **Page 1 review (owner, 2026-11-26).**
+   - **Observation time against the population says nothing.** The population's index is one year
+     after the start of observation, so its prior observation is 365 days for everyone, and its post
+     observation and time in cohort are both the rest of its observation (730 days on SYNPUF). Shown
+     for the cohort only.
+   - **No box plots (owner, 2026-11-26).** DSS's box-plot chart computes quartiles from rows,
+     which the display datasets do not hold. A matplotlib figure drawn from the precomputed
+     statistics was tried locally, but a static insight cannot follow the dashboard's cohort filter,
+     and refreshing it per selection would need a webapp and a scenario, with one image shared by
+     every viewer. Dropped, never deployed; the statistics tables carry the distributions.
+   - **Statistics tables** (Cobuild, pivot tables, SQL engine, whole table): `mIgsl1z` and `ps9exwQ`
+     Charlson (cohort, population); `vBKBS8Y` and `31npsjI` Age (cohort, population); `wKmqPnF`
+     Observation time (cohort); `3k4rL4P` Sex, `Fz2AbQs` Race, `yEQwNOL` Age groups (cohort %,
+     population %, std diff).
+   - **Cohort and population in one table (owner, 2026-11-26)** for Charlson and Age: `8Lg0Bno`
+     Charlson index statistics and `U9D7ap3` Age statistics, on the long form of
+     `covariate_continuous_display`. Pivot tables with rows = `group_label` (Cohort, then
+     Population) and columns N, mean, SD, min, P10, P25, median, P75, P90, max. `wKmqPnF`
+     Observation time: rows = covariate, cohort only. All three rely on the dashboard's single-select
+     cohort filter; without it they average across cohorts.
+   - N is FeatureExtraction's `count_value`. For Charlson it is below the entry count (556 of 611 for
+     cohort 1) while the minimum is 0: to confirm in step 8 whether it counts entries with a
+     non-zero score.
+   - Replaced, to retire: `iszrTW6` (Charlson columns), `uEYMBcb` (observation pivot with the
+     population), `x37NrzF`, `nJkGql3`, `OSezm7a` (age KPI cards), and `mIgsl1z`, `ps9exwQ`,
+     `vBKBS8Y`, `31npsjI` (the separate cohort and population tables). After the reshape, Cobuild moved
+     every chart on `covariate_continuous_display` to the long form (12 in its Charts tab, 9
+     published insights): `cohort_<stat>` became `<stat>` filtered to group "Cohort", `population_<stat>`
+     the same with "Population", and side-by-side charts use `group_label` as the dimension. No
+     insight references a removed column; `3tuEGAn` (dataset table) follows the schema.
+
+   **Page 1 layout (2026-11-26).** New dashboard `yBMGZvP` "Cohort Characterization", page
+   `4khRR12` "Cohort vs Population", built next to `4OpJPy0` (unchanged: version 390, 45 tiles).
+   - Tiles (Cobuild, 28, `dku dashboard validate` passes): an introduction; Cohort Statistics (the
+     7 KPI cards, then `bQK6isp`); Cohort Demographics (`U9D7ap3` with a note, then the age group,
+     sex and race charts each beside its table); Cohort Disease Burden (`8Lg0Bno` with a note);
+     Cohort Observation Duration (`wKmqPnF` with a note); All covariates (`Tuy4BOP`).
+   - Dropped (owner): the county views `g5qMw28` and `MLL8Fq0`. The quarterly views (`Xxqqxab`,
+     `BOifR20`) stay deferred, with no tile.
+   - **Cohort filter** (`dku`, since Cobuild cannot write dashboard filters): one single-select
+     page filter on `cohort` ("id · name"), values from `cohort_summary`, default "1 · Anemia".
+     `cohort_summary`, `covariate_balance_display` and `covariate_continuous_display` all carry
+     `cohort`; `cohort` (Distinct Patients, `B7pTaIj`) does not, so that card is expected not to
+     follow the filter. To confirm visually.
+   - **Owner's first look (2026-11-26).** The KPI cards do not follow the cohort filter (Distinct
+     Patients shows 849 for every cohort); `bQK6isp` removed from the page (`dku`, tiles below moved
+     up; 27 tiles). The DSS 15 filter page names charts and dataset tables as filterable and says
+     nothing on KPI charts. The cards on `cohort_summary` in fact show "Loading Failed", while their
+     chart data computes correctly with and without the filter (Cobuild, read only). The filter
+     panel ran on the DSS engine (`LINO`, copied from the page default) while the charts run in
+     Snowflake; it is now set to SQL. To confirm visually.
+   - The Age statistics row (`U9D7ap3` and its note) removed from the page (owner; 25 tiles).
+   - **Everything in-database (owner, 2026-11-26).** Every chart and KPI on the page runs on the SQL
+     engine over the whole table. The dataset table `Tuy4BOP` could not: it read the first 10,000
+     rows and filtered and sorted them in DSS. It is replaced on the page by `1BC5xDO` "All
+     covariates vs population", a pivot table on `covariate_balance_display` (SQL, whole table,
+     comparator −1, rows domain then covariate by |std diff| descending, up to 5,000 per domain,
+     columns cohort %, population %, std diff, |std diff|). `Tuy4BOP` joins the list to retire.
+   - **Second look (owner, 2026-11-27).** Distinct Patients (`B7pTaIj`) removed; the remaining three
+     cards of that row widened to 12 columns (24 tiles). `9ffUAnI` renamed "Characterization:
+     Incidence", tile "Incidence" (it is still entries over population entries). The KPI cards on
+     `cohort_summary` still failed with the panel on SQL; as a test the filter panel now takes its
+     values from `covariate_balance_display` (same `cohort` column), so no tile reads the panel's own
+     dataset except the balance charts that already loaded.
+   - **Cause found (owner, 2026-11-27).** With the panel on `covariate_balance_display` the KPI cards
+     loaded and the charts on that dataset failed instead. The `cohort` labels are byte-identical in
+     every dataset, so the rule is: a tile fails when it reads the filter panel's own source
+     dataset. The panel now takes its values from `cohort_label`, which no tile reads. It lists
+     every registered cohort, so a cohort not yet characterized (4, 6, 7 today) showed empty tiles.
+   - **Filter source of its own.** A Prepare recipe `compute_cohort_filter` (SQL, zone "Dashboard")
+     keeps `cohort_definition_id` and `cohort` from `cohort_summary` into `cohort_filter` (managed on
+     the main connection, 3 rows today: characterized cohorts only). No tile reads it; the filter
+     panel takes its values from it. The "Characterize Cohorts" scenario builds it in a fourth step,
+     "Display: dashboard filter" (forced, non-recursive), after the display datasets.
+     Dashboard-only users may need READ on `cohort_filter`; to check.
+   - **Page 1 accepted (owner, 2026-11-27):** every tile loads and follows the filter, which lists
+     the characterized cohorts only. Rule for page 2: each page's filter takes its values from a
+     dataset no tile on that page reads.
+
+   **Page 2 reads the display copy, rebuilt after each pair (owner, 2026-11-27).** Page 2's tables
+   read `covariate_balance_display` (labels, domain), not raw `covariate_balance`, which supersedes
+   the 2026-11-26 choice. So a pair the webapp writes must reach that copy before the tile says done.
+   - **Repo (uncommitted):** `solution/compare/services.py` takes a `refresh` callable. After writing
+     a pair it reports "Computed …; updating the dashboard", rebuilds, then "Done: select … in the
+     page filters". A pair in `covariate_balance` but missing from the copy (a failed rebuild, or
+     one written before this change) is rebuilt without being computed again. The population pair
+     (cohort B left at "Population") is already in the copy, so nothing runs. Rebuilds take their
+     own lock, since DSS refuses two jobs on the same outputs.
+   - `dss/webapps/compare_cohorts/backend.py` rebuilds, in order and each alone (forced,
+     non-recursive), `covariate_balance_display` and `comparison_filter` (page 2's filter values, to
+     create with page 2), as the webapp's run-as identity. `balance.display_pair_query` quotes the
+     copy's lower-case columns per dialect.
+   - Tests: 161 offline, including a new pair (compute, then rebuild), a pair already shown (nothing
+     runs), a cached pair missing from the copy (rebuild only; refused without rights), a failed
+     rebuild as a sentence, and the backend's build order.
+   - **To apply on SOL:** create `comparison_filter`; commit and push; resync the library; update the
+     webapp backend; restart it.
+   - **`Tuy4BOP`**: a "keep comparator_id = −1" step in its table script and a sort by
+     `abs_std_diff` descending (`dku`), so cached pairs do not appear on page 1.
 
 7. **Retirement**, after a backup:
    - the 29 recipes and 30 datasets, and the old dashboard and its 30 insights;

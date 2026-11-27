@@ -259,7 +259,7 @@ class Services(unittest.TestCase):
     def test_cached_invalid_and_forbidden_run_nothing(self):
         comparisons, ex = self.comparisons(cached=True)
         self.assertEqual(self.ask(comparisons, 1, -1),
-                         {"state": "cached", "message": "Ready: select Anemia (cohort 1) against Population in the page filter."})
+                         {"state": "cached", "message": "Ready: select Anemia (cohort 1) against Population in the page filters."})
         comparisons, ex = self.comparisons()
         self.assertEqual(self.ask(comparisons, 1, 3)["state"], "invalid")
         self.assertEqual(self.ask(comparisons, 1, 2, allowed=False)["state"], "forbidden")
@@ -270,7 +270,7 @@ class Services(unittest.TestCase):
         comparisons, ex = self.comparisons()
         self.assertEqual(self.ask(comparisons, 1, 2),
                          {"state": "done",
-                          "message": "Done: select Anemia (cohort 1) against Crohn's (cohort 2) in the page filter."})
+                          "message": "Done: select Anemia (cohort 1) against Crohn's (cohort 2) in the page filters."})
         session = ex.query_to_df.call_args
         statements = session.kwargs["pre_queries"]
         self.assertEqual([s.split()[0] for s in statements], ["CREATE", "CREATE", "INSERT", "DELETE", "INSERT"])
@@ -298,6 +298,77 @@ class Services(unittest.TestCase):
     def test_paths_are_required(self):
         with self.assertRaises(ValueError):
             svc.Comparisons(mock.MagicMock(), {"covariate": "c"}, "Snowflake")
+
+
+class DashboardRefresh(unittest.TestCase):
+    """Page 2 reads a flow-built copy; a written pair is done only once the copy is rebuilt."""
+    AUTH = Services.AUTH
+    PATHS = dict(Services.PATHS, **{bal.DISPLAY_TABLE: "R.COVARIATE_BALANCE_DISPLAY"})
+
+    def comparisons(self, cached=False, shown=False, refresh_error=None, connection_type="Snowflake"):
+        ex = mock.MagicMock()
+        calls = []
+
+        def query_to_df(query, pre_queries=None, post_queries=None):
+            if pre_queries:
+                calls.append("compute")
+                return FakeFrame([(1,)])
+            hit = shown if bal.DISPLAY_TABLE.upper() in query else cached
+            return FakeFrame([(5 if hit else 0,)])
+        ex.query_to_df.side_effect = query_to_df
+
+        def refresh():
+            calls.append("refresh")
+            if refresh_error:
+                raise Exception(refresh_error)
+        comparisons = svc.Comparisons(ex, self.PATHS, connection_type, start=lambda task: task(), refresh=refresh)
+        return comparisons, ex, calls
+
+    def ask(self, comparisons, a, b, allowed=True):
+        perms = {"owner": "ana" if allowed else "olga", "permissions": []}
+        return comparisons.request(a, b, self.AUTH, perms, DEFINITIONS, CHAR)
+
+    def test_new_pair_is_computed_then_the_dashboard_rebuilt(self):
+        comparisons, _, calls = self.comparisons()
+        self.assertEqual(self.ask(comparisons, 1, 2)["state"], "done")
+        self.assertEqual(calls, ["compute", "refresh"])
+
+    def test_pair_on_the_dashboard_runs_nothing(self):
+        comparisons, ex, calls = self.comparisons(cached=True, shown=True)
+        self.assertEqual(self.ask(comparisons, 1, -1)["state"], "cached")
+        self.assertEqual(calls, [])
+
+    def test_cached_pair_missing_from_the_dashboard_is_rebuilt_not_recomputed(self):
+        comparisons, _, calls = self.comparisons(cached=True, shown=False)
+        self.assertEqual(self.ask(comparisons, 1, 2),
+                         {"state": "done",
+                          "message": "Done: select Anemia (cohort 1) against Crohn's (cohort 2) in the page filters."})
+        self.assertEqual(calls, ["refresh"])
+
+    def test_cached_pair_missing_from_the_dashboard_needs_rights(self):
+        comparisons, _, calls = self.comparisons(cached=True, shown=False)
+        answer = self.ask(comparisons, 1, 2, allowed=False)
+        self.assertEqual(answer["state"], "forbidden")
+        self.assertIn("computed but not on the dashboard yet", answer["message"])
+        self.assertEqual(calls, [])
+
+    def test_failed_rebuild_is_a_sentence(self):
+        comparisons, _, calls = self.comparisons(refresh_error="Job failed:\n  busy")
+        self.assertEqual(self.ask(comparisons, 1, 2)["message"],
+                         "Anemia (cohort 1) against Crohn's (cohort 2) is computed, but the dashboard could not be "
+                         "updated: Job failed: busy. Request it again to retry.")
+        self.assertEqual(calls, ["compute", "refresh"])
+
+    def test_display_path_required_with_refresh(self):
+        with self.assertRaises(ValueError):
+            svc.Comparisons(mock.MagicMock(), Services.PATHS, "Snowflake", refresh=lambda: None)
+
+    def test_display_query_quotes_the_lower_case_columns(self):
+        self.assertEqual(bal.display_pair_query("D", 1, -1, "Snowflake"),
+                         'SELECT COUNT(*) AS n FROM D WHERE "cohort_definition_id" = 1 AND "comparator_id" = -1')
+        self.assertIn("`comparator_id` = 2", bal.display_pair_query("D", 1, 2, "Databricks"))
+        with self.assertRaises(ValueError):
+            bal.display_pair_query("D", 1, 2, "Oracle")
 
 
 class Tables(unittest.TestCase):

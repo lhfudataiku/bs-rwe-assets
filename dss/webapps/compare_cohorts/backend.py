@@ -1,13 +1,14 @@
 # Python backend of the "Compare cohorts" standard webapp (solution-revision-plan.md R3, decisions 10, 12, 13).
+# After writing a pair it rebuilds the dashboard's page 2 datasets (step 4 part 6, owner 2026-11-27).
 # DSS provides the Flask `app`. Each route calls one service in solution/compare/services.py, which
 # holds the logic and its tests; this file only wires DSS and Flask to it.
 import dataiku
 from dataiku import SQLExecutor2
 from flask import jsonify, request
 
-from solution.compare.balance import BALANCE_TABLE, INPUT_TABLES
+from solution.compare.balance import BALANCE_TABLE, DISPLAY_TABLE, INPUT_TABLES
 from solution.compare.comparison import REQUESTS_TABLE
-from solution.compare.services import Comparisons, choices
+from solution.compare.services import DASHBOARD_DATASETS, Comparisons, choices
 from solution.recipes.sql_script_function import cohort_connection_type, get_sql_path
 from solution.setup.characterization import CHARACTERIZATION_LOG_COLUMNS
 from solution.setup.registration import DEFINITION_COLUMNS, read_rows
@@ -16,11 +17,19 @@ from solution.utils.variables import get_setting
 _comparisons = []  # one per backend process, made on first use
 
 
+def refresh_dashboard():
+    """Rebuild page 2's datasets in order, each alone (forced, never upstream); raises if a job fails."""
+    project = dataiku.api_client().get_default_project()
+    for name in DASHBOARD_DATASETS:
+        project.get_dataset(name).build(job_type="NON_RECURSIVE_FORCED_BUILD", wait=True)
+
+
 def comparisons():
     if not _comparisons:
-        paths = {t: get_sql_path(t) for t in list(INPUT_TABLES) + [BALANCE_TABLE, REQUESTS_TABLE]}
+        tables = list(INPUT_TABLES) + [BALANCE_TABLE, REQUESTS_TABLE, DISPLAY_TABLE]
+        paths = {t: get_sql_path(t) for t in tables}
         executor = SQLExecutor2(connection=get_setting("main_connection"))
-        _comparisons.append(Comparisons(executor, paths, cohort_connection_type()))
+        _comparisons.append(Comparisons(executor, paths, cohort_connection_type(), refresh=refresh_dashboard))
     return _comparisons[0]
 
 
