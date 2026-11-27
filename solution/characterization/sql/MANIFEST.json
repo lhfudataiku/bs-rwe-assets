@@ -43,12 +43,10 @@
   "addDescendantsToExclude": false,
   "includedCovariateIds": []
  },
- "aggregated": true,
  "min_characterization_mean": 0,
  "min_characterization_count": 0,
  "placeholders": {
   "cdm_database_schema": "@cdm_database_schema (every OMOP table; fixed, not the user's naming)",
-  "cohort_table": "@characterization_cohort",
   "temp_database_schema": "@temp_database_schema (databricks only)",
   "session_id": "rwdfeatx"
  },
@@ -57,12 +55,50 @@
   "databricks": "spark=@temp_database_schema",
   "redshift": "redshift"
  },
- "files": {
-  "sqlConstruction": "construction.sql",
-  "sqlQueryFeatures": "query_covariates.sql",
-  "sqlQueryContinuousFeatures": "query_covariates_continuous.sql",
-  "sqlQueryFeatureRef": "query_covariate_ref.sql",
-  "sqlQueryAnalysisRef": "query_analysis_ref.sql",
-  "sqlCleanup": "cleanup.sql"
+ "modes": {
+  "aggregated": {
+   "aggregated": true,
+   "row_id_field": "subject_id",
+   "cohort_table": "@characterization_cohort",
+   "subfolder": "",
+   "files": {
+    "sqlConstruction": "construction.sql",
+    "sqlQueryFeatures": "query_covariates.sql",
+    "sqlQueryContinuousFeatures": "query_covariates_continuous.sql",
+    "sqlQueryFeatureRef": "query_covariate_ref.sql",
+    "sqlQueryAnalysisRef": "query_analysis_ref.sql",
+    "sqlCleanup": "cleanup.sql"
+   },
+   "folder": "<connection>/",
+   "rows": "one per cohort and covariate (characterization)"
+  },
+  "person": {
+   "aggregated": false,
+   "row_id_field": "row_id",
+   "cohort_table": "@extraction_cohort",
+   "subfolder": "person",
+   "files": {
+    "sqlConstruction": "construction.sql",
+    "sqlQueryFeatures": "query_covariates.sql",
+    "sqlQueryFeatureRef": "query_covariate_ref.sql",
+    "sqlQueryAnalysisRef": "query_analysis_ref.sql",
+    "sqlCleanup": "cleanup.sql"
+   },
+   "folder": "<connection>/person/",
+   "rows": "one per cohort entry (row_id) and covariate (patient-level extract, R9)",
+   "scratch_tables": {
+    "cov_1": 210,
+    "cov_2": 10,
+    "cov_3": 1,
+    "cov_4": 4,
+    "cov_5": 9,
+    "cov_6": 923,
+    "cov_7": 901,
+    "cov_8": 3,
+    "cov_9": 2,
+    "cov_10": 8,
+    "cov_11": 410
+   }
+  }
  }
 }

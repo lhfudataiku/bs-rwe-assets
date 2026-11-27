@@ -725,6 +725,125 @@ manuscript NIHMS1546136, Methods):
 - An extracted cohort is redone only with *Replace*; a run with nothing ticked extracts nothing.
 - Characterization's outputs and `covariate_ref` are unchanged by an extraction.
 
+### Step 4b execution sequence (draft, 2026-11-27)
+
+Each stage ends at a gate. The next stage starts only after the gate passes and the owner approves
+it. Every DSS change names its project and objects first; every commit and push is approved
+separately. Tools as in step 4: the repo and `dku`; Setup and tile checks in the owner's browser.
+
+**Before stage 1: offline render trial (2026-11-27, scratchpad only).** FeatureExtraction 3.14.0's
+`createSql` in non-aggregated mode (`rowIdField = row_id`), with the same settings:
+- returns five parts, not six: construction, one query over all covariates (a `UNION ALL` of the
+  scratch tables), `covariate_ref`, `analysis_ref` and cleanup. There is no continuous query; binary
+  and continuous rows share the columns `row_id`, `covariate_id`, `covariate_value`;
+- builds `rwdfeatxcov_1` to `rwdfeatxcov_11` in the aggregated render's order, one analysis each
+  (210, 10, 1, 4, 9, 923, 901, 3, 2, 8, 410), with the same covariate id expressions, so the ids are
+  the characterization's;
+- does not filter by cohort id, and joins on `cohort.row_id`, which the engine adds with
+  `ROW_NUMBER()`.
+
+**Stages.**
+
+1. **Rendering (repo only).**
+   - `tools/render_feature_extraction.py` also renders the 11 presets in non-aggregated mode into
+     `solution/characterization/sql/<dialect>/person/`.
+   - `MANIFEST.json` records both modes and, for the person mode, the analysis id each scratch table
+     holds; `--check` covers both.
+   - Tests: ids equal in both modes; the 20 aggregated files unchanged byte for byte; the person
+     files split, render their scratch tables and read only the 7 OMOP tables.
+
+   Gate: `--check` passes in both modes, the aggregated files are unchanged, the tests pass.
+   Commit with the owner's approval.
+
+   *Done (2026-11-27), repo only:*
+   - **Launcher.** `tools/feature_extraction/Render.java` takes the mode (aggregated or not), the
+     row id field and the parts to translate; the tool runs it once per mode.
+   - **Output.** 15 new files, `solution/characterization/sql/<dialect>/person/`: construction (87
+     statements in each dialect), `query_covariates.sql` (the union of the 11 scratch tables, kept
+     for reference), the two reference queries and cleanup. Their cohort table is
+     `@extraction_cohort`, which needs `row_id`. The 18 aggregated SQL files are unchanged byte for
+     byte; only `MANIFEST.json` and `NOTICE` changed.
+   - **Scratch tables.** Redshift keeps FeatureExtraction's bare `#cov_N`; Snowflake and Databricks
+     prefix the session id (`rwdfeatxcov_N`). So `MANIFEST.json` records them by bare name, under
+     `modes.person.scratch_tables`: `cov_1` 210, `cov_2` 10, `cov_3` 1, `cov_4` 4, `cov_5` 9,
+     `cov_6` 923, `cov_7` 901, `cov_8` 3, `cov_9` 2, `cov_10` 8, `cov_11` 410.
+   - **Ids.** Before writing, the tool checks, for each dialect, that the person render has the
+     aggregated render's covariate id expressions and analysis ids in the same order, and one
+     analysis per scratch table as recorded; a mismatch stops it.
+   - **`MANIFEST.json`** now has `modes` (aggregated and person: call, folder, cohort table, files)
+     in place of the top-level `aggregated`, `files` and `placeholders.cohort_table`. Nothing in
+     `solution/` reads it.
+   - **Tests.** `tests/test_characterization_sql.py` runs every check on both modes and adds the
+     ids, the scratch table map, a changed id that fails the check, and the rows keyed by `row_id`
+     (169 tests in all). `--check` passes (35 files), twice.
+2. **Engine (repo only).**
+   - `solution/setup/extraction.py`: the batch rules on `solution/setup/batch.py`. Rows of built
+     cohorts with their extraction status (Not extracted, In batch, Extracted, Rebuilt since
+     extracted, Data re-imported since extracted, Extraction failed); nothing ticked by default; an
+     extracted cohort is redone only with *Replace*; saved entries carry `saved` and expire once
+     extracted after it (the part 8 rule of `live_submission`).
+   - The SQL of one run, in one session: the scratch cohort table with `row_id`, the person-mode
+     construction, then per preset delete and insert by cohort id from that preset's scratch table
+     joined on `row_id`; `patient_cov_ref` gains new ids only, with its `dataset` column; the
+     cleanup. Every read runs before the first delete. No minimum cell count (decision 4).
+   - `solution/pipelines/extract_patient_covariates.py` and `dss/recipes/extract_patient_covariates.py`:
+     the saved batch checked again as the authority, `patient_cov_log` (one row per cohort and run:
+     status, error, timing, a row count per preset), the batch cleared after a success.
+   - Databricks scratch tables `rwdtmp_<key>__pc_<name>`, with a sweep that leaves the build's and
+     the characterization's alone.
+   - `extraction_submission` added to the variable contract.
+
+   Gate: offline tests pass. Commit with the owner's approval.
+3. **Setup (repo only).**
+   - A part heading **Patient Covariates** after "Cohort Characterization"; a section "Extract
+     Patient Covariates" with its text, the "Extraction batch" tile, the "Extract patient
+     covariates" button (scenario `Extract_Patient_Covariates`) and a link to `patient_cov_log`
+     (`HEADINGS`, `OWN_SECTIONS`, `CUSTOM_TILES`).
+   - "Refresh list" keeps only the user's ticks; status and times are read fresh (part 8).
+   - The shared parts of the two batch tiles move to one template filled by `tools/app_manifest.py`.
+
+   Gate: the inlined tiles run in the tests; the characterization tile behaves as before. Commit and
+   push with the owner's approval.
+4. **SOL (Snowflake).**
+   - Backup outside the repo: Setup manifest, variables, scenarios. Library resync.
+   - Zone "Patient Covariates": the 11 `patient_cov_*` datasets, `patient_cov_ref` and
+     `patient_cov_log`, managed on `bs-snowflake` (`managed: true` and a sibling's params); the recipe
+     `extract_patient_covariates`; the scenario "Extract Patient Covariates" (one forced,
+     non-recursive build, no trigger). Setup applied with `app-designer`, then `--check`.
+   - The owner saves cohorts 1–3 in the tile and runs the extract.
+
+   Gate, read with `dku`:
+   - every row of a per-preset dataset has that preset's analysis id, and every covariate is in
+     `patient_cov_ref` with that dataset's name;
+   - binary: rows per covariate equal `covariate.sum_value`; ids in `covariate_censored` have 1 to
+     4 rows; no other ids;
+   - continuous: the mean over the cohort's entries equals `covariate_continuous`'s mean;
+   - characterization unchanged: aggregate fingerprints of `covariate`, `covariate_continuous`,
+     `covariate_ref`, `analysis_ref`, `covariate_balance` and `covariate_censored` equal before and
+     after;
+   - *Replace*: cohort 1 ticked without it is refused and nothing is saved; with it, its rows are
+     replaced without duplicates; a run with nothing ticked extracts nothing; the saved batch has
+     expired after the run;
+   - timing recorded.
+5. **TMP: Redshift, then Databricks.** Objects as on SOL, without Setup; the E4 batch saved in
+   `extraction_submission` directly. Extract cohorts 1–3 on Redshift; switch to Databricks as in
+   stage 5 of step 4, rebuild E4, extract, check no `rwdtmp_` table is left; switch back and
+   register and build the Redshift E4 scripts again.
+
+   Gate: identical to Snowflake, compared only through aggregates computed in each database
+   (rows, distinct ids, value sums per dataset and cohort; `patient_cov_ref` rows).
+6. **Write-up.** Results in this plan, the step table row, the registry pin. Commit and push with
+   the owner's approval.
+
+**For the owner, before the stage that needs it.**
+- Continuous parity (stage 4): FeatureExtraction writes no row where a Charlson or visit count is
+  0, so the mean is taken over the cohort's entries with missing rows as 0, not over the rows
+  present. The verification bullet above would say so.
+- Sharing the 11 datasets and `patient_cov_ref` to Part 3: not in the gate, and `DEMO_SF_RWE` keeps
+  its 5 tables in 1.2. Proposed for step 5 or D1.
+- The shared tile template (stage 3) changes the characterization tile that passed part 8.
+  Proposed in stage 3, with tests that it behaves as before; or deferred.
+
 ## Accepted as is
 
 By the owner's decision, these stay unchanged. The built-in project macro test run before publication
