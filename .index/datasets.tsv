@@ -478,6 +478,7 @@ SOL_RWD_COHORT_DISCOVERY	condition_occurrence	Snowflake	bs-snowflake	yes	16			-
 SOL_RWD_COHORT_DISCOVERY	covariate	Snowflake	bs-snowflake	yes	4			-			
 SOL_RWD_COHORT_DISCOVERY	covariate_balance	Snowflake	bs-snowflake	yes	12			-			
 SOL_RWD_COHORT_DISCOVERY	covariate_balance_display	Snowflake	bs-snowflake	yes	17			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_censored	Snowflake	bs-snowflake	yes	2			-			
 SOL_RWD_COHORT_DISCOVERY	covariate_continuous	Snowflake	bs-snowflake	yes	12			-			
 SOL_RWD_COHORT_DISCOVERY	covariate_continuous_display	Snowflake	bs-snowflake	yes	17			-			
 SOL_RWD_COHORT_DISCOVERY	covariate_ref	Snowflake	bs-snowflake	yes	6			-			
@@ -725,6 +726,7 @@ TMP_RWD_SOL_V112_TEST	condition_groups	Redshift	redshift-solutions	yes	3			-
 TMP_RWD_SOL_V112_TEST	condition_occurrence	Redshift	redshift-solutions	yes	16			-			
 TMP_RWD_SOL_V112_TEST	covariate	Redshift	redshift-solutions	yes	4			-			
 TMP_RWD_SOL_V112_TEST	covariate_balance	Redshift	redshift-solutions	yes	12			-			
+TMP_RWD_SOL_V112_TEST	covariate_censored	Redshift	redshift-solutions	yes	2			-			
 TMP_RWD_SOL_V112_TEST	covariate_continuous	Redshift	redshift-solutions	yes	12			-			
 TMP_RWD_SOL_V112_TEST	covariate_ref	Redshift	redshift-solutions	yes	6			-			
 TMP_RWD_SOL_V112_TEST	death	Redshift	redshift-solutions	yes	7			-			

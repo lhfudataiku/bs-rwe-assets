@@ -21959,7 +21959,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T11:32Z",
+   "fetched_at": "2026-11-27T15:11Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -21979,7 +21979,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD RS 1K",
-   "probed_at": "2026-11-27T11:32Z",
+   "probed_at": "2026-11-27T15:12Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T14:58Z",
+   "fetched_at": "2026-11-27T15:11Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-27T14:58Z",
+   "probed_at": "2026-11-27T15:12Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T14:58Z",
+   "fetched_at": "2026-11-27T15:11Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-27T14:58Z",
+   "probed_at": "2026-11-27T15:12Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -36955,6 +36955,21 @@
      "managed": true,
      "type": "Snowflake"
     },
+    "covariate_censored": {
+     "columns": [
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "covariate_id",
+       "bigint"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
     "covariate_continuous": {
      "columns": [
       [
@@ -38156,7 +38171,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T14:58Z",
+   "fetched_at": "2026-11-27T15:11Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38189,12 +38204,12 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "90a35f778ba8d9253d6b876cd0108977d7814449",
+     "hash": "09ed6ae6cd5e44a7cd2676e26a72e3470fa4a94c",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-27T14:58Z",
+   "probed_at": "2026-11-27T15:12Z",
    "variables": {
     "local": {
      "characterization_submission": [],
@@ -38243,11 +38258,11 @@
      "cohort_script_table_prefix": "",
      "cohort_submission": [
       {
-       "description": "first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",
-       "file": "feature_condition_depression.sql",
-       "id": 3,
-       "name": "Depression",
-       "replace": true
+       "description": "fails on purpose: reads a column the person table does not have",
+       "file": "part8_failing_build.sql",
+       "id": 8,
+       "name": "Failing build (part 8 test)",
+       "replace": false
       }
      ],
      "data_preparation_project_key": "PREP_RWD_SF_1K",
@@ -57214,6 +57229,21 @@
      "managed": true,
      "type": "Redshift"
     },
+    "covariate_censored": {
+     "columns": [
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "covariate_id",
+       "bigint"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
     "covariate_continuous": {
      "columns": [
       [
@@ -58636,7 +58666,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T11:32Z",
+   "fetched_at": "2026-11-27T15:11Z",
    "flow_sources": [
     "PREP_RWD_RS_1K.concept_ancestor_rs",
     "PREP_RWD_RS_1K.concept_rs",
@@ -58669,12 +58699,12 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "8d4d282abd625ab20c43626914e0a16195a235c8",
+     "hash": "09ed6ae6cd5e44a7cd2676e26a72e3470fa4a94c",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "TMP RWD solution v1.1.2 test",
-   "probed_at": "2026-11-27T11:32Z",
+   "probed_at": "2026-11-27T15:12Z",
    "variables": {
     "local": {
      "cohort_build_error": 0,

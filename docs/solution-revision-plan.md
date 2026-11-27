@@ -1850,6 +1850,51 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - The filter shows each E4 cohort.
    - The schemas of the 9 `DEMO_SF_RWE` inputs are unchanged.
    - Timing of one batch, with population size and cohort count recorded.
+
+   **Part 8 on SOL (owner-approved, 2026-11-27).** Setup tile and webapp checks in the owner's
+   browser; tables and logs read with `dku` after each step.
+   - **Across databases:** stage 5 (above). TMP was not run again after the fixes below; they do not
+     change a run that characterizes the population with its cohorts, as stage 5's did.
+   - **Independent SQL, cohort 1:** women 0.520458, mean age 72.942717, "Inflammatory disorder of
+     the respiratory tract" in the long-term window 267: equal to the stored values.
+   - **Standardized differences by hand:** every balance row, against the population and for the
+     cached pairs, equals the formula on the stored covariates (largest difference 2×10⁻¹⁶).
+   - **Multi-batch:** the tile ticked cohorts 4 (built 2026-11-24 15:04) and 6, 7 (15:43); one run
+     characterized the three in 191 s, the population untouched. Cohort 4, a copy of cohort 1,
+     gave cohort 1's covariates exactly. A run with nothing ticked characterized nothing (30 s).
+   - **Refusal:** cohort 1 ticked without *Replace* was refused with a sentence; nothing was saved.
+   - **Rebuild and Replace:** cohort 3 rebuilt with *Replace* (247 again) showed "Rebuilt since
+     characterized" and kept its figures; ticked *In batch* and *Replace*, it was characterized
+     alone, and its cached pairs 2–3 and 3–2 left `covariate_balance`. `comparison_requests` keeps
+     the request history; the cache is `covariate_balance`.
+   - **Cache and webapp:** pair 2–3 requested from the dashboard computed once; the repeat
+     computed nothing (one new request row). The filter lists cohorts 1–4, 6, 7.
+   - **A failed build is not offered:** test cohort 8 ("Failing build (part 8 test)",
+     `part8_failing_build.sql`, a first statement reading a missing column) failed at build with 0
+     subjects and no `cohort` rows, and the tile does not list it. It stays registered, with test
+     cohort 4, until they are removed.
+   - **The 9 `DEMO_SF_RWE` inputs:** SOL's columns and types equal those of `DEMO_DB_RWD2`, which
+     `DEMO_SF_RWE` reads.
+   - **Timing (1K, whole scenario with its display steps):** the population (935) and 6 cohorts in
+     one run, 203 s; 3 cohorts, 191 s; cohort 3 alone, 182 s. Most of it is fixed cost.
+   - **Found and fixed during part 8:**
+     - *An open Setup page writes its old copy of the project variables back* while a scenario it
+       started runs (seen 14:16:25 and 14:16:28 after the recipe cleared the batch at 14:16:22), so
+       the next run would have refused the batch just run. Saved entries now carry `saved` and
+       expire once their cohort is characterized after it (`90a35f7`).
+     - *"Refresh list" kept a clicked row whole*, so cohort 3 kept its old build time and status;
+       it now keeps only the ticks (`09ed6ae`).
+     - *Balance against the population depended on the order of runs.* A cohort characterized
+       after the population read its trimmed rows, so a covariate held there by 1 to 4 people read
+       as 0 instead of hiding the row (cohort 4 had 32 rows cohort 1 did not, |std diff| up to
+       0.20). Owner's choice: hide them everywhere. Each run records the ids it trims in the new
+       dataset `covariate_censored` (SOL and TMP, an output of `characterize_cohorts`), and every
+       balance, requested pairs included, leaves out a binary row whose side is listed (`09ed6ae`).
+       SOL's result tables were emptied and everything characterized again; recomputing every
+       balance against the population from the stored rows now gives the run's 21,691 rows
+       exactly. Pairs lose the approximation noted in step 4 part 4: pair 2–3 has 2,453 rows
+       (3,147 before), equal to a recomputation, none with a trimmed side.
+   - **Libraries:** SOL and TMP at `09ed6ae`; SOL's webapp restarted.
 9. **Write-up.** Results in this plan; wiki articles listed for step 5.
 
 Risks:
