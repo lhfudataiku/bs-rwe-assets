@@ -841,6 +841,25 @@ separately. Tools as in step 4: the repo and `dku`; Setup and tile checks in the
 
    Gate: the inlined tiles run in the tests; the characterization tile behaves as before. Commit and
    push with the owner's approval.
+
+   *Done (2026-11-27), repo only:*
+   - **One template for both batch tiles:** `app_manifest/tiles/batch_tile.template.{html,js}`, filled
+     by `tools/app_manifest.py` from `BATCH_TILES` (controller, column and button names, the status
+     labels read from each tile's library module). `characterization_batch.{html,js}` are no longer
+     checked in: the template renders them byte for byte as deployed on SOL (part 8), and a test pins
+     their SHA-256. Both tiles share the part 8 "Refresh list" merge that keeps only the ticks.
+   - **The "Extraction batch" tile:** `app_manifest/tiles/extraction_batch.py` over
+     `solution/setup/extraction.py`, inlined with characterization, registration, batch and variables
+     (no shared top-level name). One row per built cohort with its status, when it was extracted and
+     its entries; nothing ticked; "Save batch" saves `extraction_submission` or lists every problem.
+   - **Setup layout:** after "Characterize Cohorts", the heading **Patient Covariates** and the section
+     "Extract Patient Covariates": its text, the tile, the "Extract patient covariates" button
+     (scenario `Extract_Patient_Covariates`) and "Review Extraction Log" (`patient_cov_log`, new tab).
+   - **Tests:** 196 in all. The extraction tile loads, refuses an empty batch and an extracted cohort
+     without *Replace*, and saves stamped entries; its HTML and JS hold no characterization wording
+     or unfilled key; a missing template value is refused.
+   - **Against SOL's live Setup** (fetched read-only, 2026-11-27), `--check` lists only the new
+     section with its tile and the new heading; the characterization tile shows no difference.
 4. **SOL (Snowflake).**
    - Backup outside the repo: Setup manifest, variables, scenarios. Library resync.
    - Zone "Patient Covariates": the 11 `patient_cov_*` datasets, `patient_cov_ref` and

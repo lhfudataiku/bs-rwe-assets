@@ -12,7 +12,8 @@ layout to it. Applying the output to DSS is a separate, approved step:
 
 What the repo owns (solution-revision-plan.md, R1 and R2):
 - the Python of the tiles in PYTHON_TILES, found by what they are, not by position;
-- the whole of the custom tiles in CUSTOM_TILES (Python, HTML and JS in app_manifest/tiles/);
+- the whole of the custom tiles in CUSTOM_TILES (Python, HTML and JS in app_manifest/tiles/); the
+  batch tiles in BATCH_TILES share one HTML and JS template, `batch_tile.template.{html,js}`;
 - the "Cohort Script Table Naming" section and the section texts of the cohort ingestion;
 - what LAYOUT removes, renames and relabels.
 
@@ -24,6 +25,7 @@ once. --import writes the bare wrappers instead, for re-testing that on a later 
 import argparse
 import ast
 import copy
+import importlib
 import json
 import os
 import re
@@ -64,7 +66,37 @@ CUSTOM_TILES = {
                 "A characterized cohort is redone only with In batch and Replace. Click Save batch, "
                 "then Characterize cohorts.",
         "own_section": "characterization"},
+    "extraction_batch": {
+        "prompt": "Extraction batch",
+        "help": "One row per cohort whose latest build succeeded. Nothing is ticked: tick In batch for the "
+                "cohorts a study needs. An extracted cohort is redone only with In batch and Replace. Click "
+                "Save batch, then Extract patient covariates.",
+        "own_section": "extraction"},
 }
+
+# Batch tiles built from one HTML and JS template (step 4 part 5 anticipated it; R9 stage 3). Each
+# `[[key]]` in the template is replaced by the tile's value; `labels` comes from the status labels
+# of its solution module, so the tile and the library name a status the same way.
+BATCH_TEMPLATE = "batch_tile.template"
+BATCH_TILES = {
+    "characterization_batch": {
+        "labels_from": ("solution.setup.characterization", "STATUS_LABELS"),
+        "controller": "CharacterizationBatchController", "css_class": "rwd-characterization-batch",
+        "done_header": "Characterized", "done_field": "characterized", "done_noun": "characterization",
+        "done_ids": "characterizedIds", "done_ids_key": "characterized_ids", "is_done": "isCharacterized",
+        "redo_verb": "Characterize", "run_button": "Characterize cohorts",
+        "population_title": "{{row.population ? 'Characterized automatically when it has none yet or the data "
+                            "was imported again' : ''}}",
+        "population_note": " The population is characterized in the same run."},
+    "extraction_batch": {
+        "labels_from": ("solution.setup.extraction", "EXTRACTION_STATUS_LABELS"),
+        "controller": "ExtractionBatchController", "css_class": "rwd-extraction-batch",
+        "done_header": "Extracted", "done_field": "extracted", "done_noun": "extraction",
+        "done_ids": "extractedIds", "done_ids_key": "extracted_ids", "is_done": "isExtracted",
+        "redo_verb": "Extract", "run_button": "Extract patient covariates",
+        "population_title": "", "population_note": ""},
+}
+TEMPLATE_KEY = re.compile(r"\[\[(\w+)\]\]")
 
 COHORT_INGESTION = "**Cohort Ingestion**"
 
@@ -85,6 +117,7 @@ def link_tile(prompt, path, text):
     return {"type": "PROJECT_VARIABLES_EDIT", "behavior": "INLINE_AUTO_SAVE", "params": [],
             "prompt": prompt, "html": LINK_TILE_HTML % (path, text)}
 CHARACTERIZE_SCENARIO = "Characterize_Cohorts"
+EXTRACT_SCENARIO = "Extract_Patient_Covariates"
 OWN_SECTIONS = {
     "naming": {
         "after": COHORT_INGESTION,
@@ -115,6 +148,27 @@ OWN_SECTIONS = {
                       "Explore the characterization log dataset"),
         ],
     },
+    # R9 decision 9: after "Characterize Cohorts", under its own part heading.
+    "extraction": {
+        "after": "Characterize Cohorts",
+        "sectionTitle": "Extract Patient Covariates",
+        "sectionText": "Writes the covariates of every entry of the chosen cohorts, for a study downstream "
+                       "(propensity models, outcome analyses): the same FeatureExtraction presets as the "
+                       "characterization, one row per cohort entry and covariate. Each preset has its own "
+                       "dataset, **patient_cov_**<preset>, and **patient_cov_ref** names every covariate "
+                       "and the dataset that holds it.\n\n"
+                       "1. In **Extraction batch**, tick *In batch* for the cohorts a study needs. Click "
+                       "**Save batch**.\n"
+                       "2. Click **Extract patient covariates**. One run covers the whole batch.\n\n"
+                       "Extracts are kept until you redo them: an extracted cohort is redone only when you "
+                       "tick *In batch* and *Replace*. Cohorts are extracted whole, with no minimum cell "
+                       "count, so the datasets stay internal.",
+        "extra_tiles": [
+            {"type": "SCENARIO_RUN", "scenarioId": EXTRACT_SCENARIO, "prompt": "Extract patient covariates"},
+            link_tile("Review Extraction Log", "datasets/patient_cov_log/explore/",
+                      "Explore the patient covariate log dataset"),
+        ],
+    },
 }
 
 # Part headings: a section with a bold title, a text and no tiles, like **Cohort Ingestion**. Each is
@@ -127,6 +181,11 @@ HEADINGS = [
                     "**cohort** table and never changes it, and existing results are kept unless you ask "
                     "for a cohort to be redone. Run **Characterize Cohorts** after one or several "
                     "batches of **Cohort Ingestion**."},
+    {"sectionTitle": "**Patient Covariates**", "before": "Extract Patient Covariates",
+     "sectionText": "A stand-alone part, run on request for the cohorts a study needs: extract the covariates "
+                    "of each cohort entry, from the same presets as **Cohort Characterization**, into datasets "
+                    "an analysis can use. It reads the **cohort** table and changes neither it nor the "
+                    "characterization's results. Run **Extract Patient Covariates** after **Build Cohorts**."},
 ]
 
 LAYOUT = {
@@ -251,8 +310,32 @@ def tile_code(fname, inline_library=True):
 
 
 def read_tile_file(name):
+    module, ext = os.path.splitext(name)
+    if module in BATCH_TILES:
+        return batch_tile_file(module, ext)
     with open(os.path.join(TILES_DIR, name)) as fh:
         return fh.read()
+
+
+def js_labels(labels):
+    """The `$scope.labels` block of a batch tile, from a {status: label} dict, in its order."""
+    lines = ",\n".join("        '%s': '%s'" % (k, v.replace("'", "\\'")) for k, v in labels.items())
+    return "    $scope.labels = {\n%s\n    };\n" % lines
+
+
+def batch_tile_file(module, ext):
+    """A batch tile's HTML or JS: the shared template filled with its values."""
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    spec = dict(BATCH_TILES[module], module=module)
+    source, attribute = spec.pop("labels_from")
+    spec["labels"] = js_labels(getattr(importlib.import_module(source), attribute))
+    with open(os.path.join(TILES_DIR, BATCH_TEMPLATE + ext)) as fh:
+        template = fh.read()
+    missing = sorted(set(TEMPLATE_KEY.findall(template)) - set(spec))
+    if missing:
+        raise SystemExit("%s%s: no value for %s" % (BATCH_TEMPLATE, ext, ", ".join(missing)))
+    return TEMPLATE_KEY.sub(lambda m: spec[m.group(1)], template)
 
 
 # ---------------------------------------------------------------- manifest

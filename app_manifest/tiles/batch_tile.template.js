@@ -1,22 +1,14 @@
-var app = angular.module('characterization_batch', []);
-app.controller('CharacterizationBatchController', function($scope) {
+var app = angular.module('[[module]]', []);
+app.controller('[[controller]]', function($scope) {
     $scope.rows = [];
     $scope.errors = [];
-    $scope.characterizedIds = [];
+    $scope.[[done_ids]] = [];
     $scope.message = '';
     $scope.refreshNote = '';
     $scope.loading = true;
     $scope.busy = false;
     var lastLoad = 0;
-    $scope.labels = {
-        'not characterized': 'Not characterized',
-        'in batch': 'In batch, not run yet',
-        'characterized': 'Characterized',
-        'rebuilt since characterized': 'Rebuilt since characterized',
-        'data re-imported since characterized': 'Data re-imported since characterized',
-        'characterization failed': 'Characterization failed'
-    };
-    var failed = function(data) {
+[[labels]]    var failed = function(data) {
         $scope.errors = (data && data.errors) || ['The tile could not reach its Python code.'];
         $scope.loading = false;
         $scope.busy = false;
@@ -30,10 +22,10 @@ app.controller('CharacterizationBatchController', function($scope) {
     };
     $scope.populationNote = function() {
         var population = $scope.rows.filter(function(row) { return row.population; })[0];
-        return (population && population.submit) ? ' The population is characterized in the same run.' : '';
+        return (population && population.submit) ? '[[population_note]]' : '';
     };
-    $scope.isCharacterized = function(id) {
-        return $scope.characterizedIds.indexOf(parseInt(id, 10)) >= 0;
+    $scope.[[is_done]] = function(id) {
+        return $scope.[[done_ids]].indexOf(parseInt(id, 10)) >= 0;
     };
     // "2026-11-25T10:00:00Z" -> "2026-11-25 10:00 UTC"
     $scope.when = function(text) {
@@ -43,7 +35,7 @@ app.controller('CharacterizationBatchController', function($scope) {
     var merge = function(fresh) {
         var edited = {};
         $scope.rows.forEach(function(row) { if (row.dirty && !row.population) { edited[row.id] = row; } });
-        // Only the ticks are kept: the status, build and characterization times are always fresh.
+        // Only the ticks are kept: the status, build and [[done_noun]] times are always fresh.
         return fresh.map(function(row) {
             var mine = edited[row.id];
             return mine ? angular.extend(row, {submit: mine.submit, replace: mine.replace, dirty: true}) : row;
@@ -57,7 +49,7 @@ app.controller('CharacterizationBatchController', function($scope) {
             if (!data.ok) { return failed(data); }
             var before = $scope.rows.length;
             $scope.rows = keepEdits ? merge(data.rows) : data.rows;
-            $scope.characterizedIds = data.characterized_ids || [];
+            $scope.[[done_ids]] = data.[[done_ids_key]] || [];
             $scope.refreshNote = (keepEdits && $scope.rows.length !== before) ? 'List updated with the cohorts built since.' : '';
             $scope.loading = false;
             $scope.busy = false;
@@ -77,7 +69,7 @@ app.controller('CharacterizationBatchController', function($scope) {
         $scope.callPythonDo({action: 'save', rows: $scope.rows}).then(function(data) {
             if (!data.ok) { return failed(data); }
             $scope.errors = [];
-            $scope.message = data.saved + ' cohort(s) in the batch. Click "Characterize cohorts" below to run it.';
+            $scope.message = data.saved + ' cohort(s) in the batch. Click "[[run_button]]" below to run it.';
             $scope.busy = false;
             $scope.load(false);
         }, failed);

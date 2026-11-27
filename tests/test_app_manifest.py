@@ -1,5 +1,6 @@
 """tools/app_manifest.py: the repo's Project Setup layout (R1, R2), applied by identity, inline."""
 import copy
+import hashlib
 import importlib.util
 import io
 import os
@@ -92,6 +93,16 @@ class Apply(unittest.TestCase):
         self.assertEqual([t.get("module") or t.get("scenarioId") or t.get("prompt") for t in char],
                          ["characterization_batch", "Characterize_Cohorts", "Review Characterization Log"])
         self.assertIn("/datasets/characterization_log/explore/", char[2]["html"])
+        # R9 decision 9: its own part, after the characterization.
+        titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
+        self.assertEqual(titles[titles.index("Characterize Cohorts") + 1:],
+                         ["**Patient Covariates**", "Extract Patient Covariates"])
+        self.assertEqual(by_title(self.m, "**Patient Covariates**")["tiles"], [])
+        extract = by_title(self.m, "Extract Patient Covariates")["tiles"]
+        self.assertEqual([t.get("module") or t.get("scenarioId") or t.get("prompt") for t in extract],
+                         ["extraction_batch", "Extract_Patient_Covariates", "Review Extraction Log"])
+        self.assertIn("/datasets/patient_cov_log/explore/", extract[2]["html"])
+        self.assertIn("patient_cov_ref", by_title(self.m, "Extract Patient Covariates")["sectionText"])
         omop = by_title(self.m, "Connect OMOP")["tiles"]
         self.assertEqual(omop[3]["scenarioId"], "IMPORTDATASETSFROMDATAPREPPROJECT")
         self.assertNotIn("mapping file", by_title(self.m, "**Pipeline Configuration** (One-time)")["sectionText"])
@@ -117,7 +128,7 @@ class Apply(unittest.TestCase):
         # R3, part 7: its heading, its section, and with it the cohort_definition_id tile.
         titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
         self.assertFalse({"**Dashboard Creation**", "Create Cohort Dashboard"} & set(titles))
-        self.assertEqual(titles[-1], "Characterize Cohorts")
+        self.assertEqual(titles[-1], "Extract Patient Covariates")
         self.assertNotIn("cohort_definition_id", str(self.m))
 
     def test_ambiguous_tile_is_refused(self):
@@ -246,11 +257,53 @@ class InlineTiles(unittest.TestCase):
                          [{"id": 1, "replace": True}, {"id": 2, "replace": False}])
         self.assertEqual(saved[0]["saved"], saved[1]["saved"])  # stamped, so a written-back batch expires
 
+    def test_extraction_tile_loads_and_saves(self):
+        do = self.tile("extraction_batch")
+        tables = {
+            "cohort_definition": (["COHORT_DEFINITION_ID", "COHORT_DEFINITION_NAME"], [(1, "Anemia"), (2, "Crohn's")]),
+            "cohort_building_log": (["RUN_TIMESTAMP", "COHORT_DEFINITION_ID", "COHORT_COUNT", "STATUS"],
+                                    [("2026-11-20T10:00:00Z", 1, 611, "SUCCESS"), ("2026-11-20T10:00:00Z", 2, 593, "SUCCESS")]),
+            "patient_cov_log": (["RUN_TIMESTAMP", "COHORT_DEFINITION_ID", "BUILD_TIMESTAMP", "ENTRY_COUNT", "STATUS"],
+                                [("2026-11-21T10:00:00Z", 1, "2026-11-20T10:00:00Z", 611, "SUCCESS")]),
+        }
+        dk, project = self.fake_dataiku()
+
+        def dataset(name, **kwargs):
+            ds = mock.MagicMock()
+            columns, rows = tables[name]
+            ds.read_schema.return_value = [{"name": c} for c in columns]
+            ds.iter_tuples.side_effect = lambda: iter(rows)
+            return ds
+        dk.Dataset.side_effect = dataset
+        project.get_scenario.return_value.get_last_successful_run.return_value = None
+        with mock.patch.dict(sys.modules, {"dataiku": dk}):
+            loaded = do({"action": "load"}, {}, {}, [])
+            self.assertTrue(loaded["ok"], loaded)
+            self.assertEqual(loaded["extracted_ids"], [1])
+            # On request: nothing ticked, no population row.
+            self.assertEqual([(r["id"], r["status"], r["submit"], r["entries"]) for r in loaded["rows"]],
+                             [(1, "extracted", False, 611), (2, "not extracted", False, None)])
+            self.assertEqual(do({"action": "save", "rows": loaded["rows"]}, {}, {}, [])["errors"],
+                             ["Tick In batch on at least one cohort."])
+            rows = [dict(r, submit=True) for r in loaded["rows"]]
+            refused = do({"action": "save", "rows": rows}, {}, {}, [])
+            self.assertEqual(refused["errors"], ["Anemia: cohort 1 is already extracted. Tick Replace to extract it again."])
+            project.set_variables.assert_not_called()
+            rows[0]["replace"] = True
+            self.assertEqual(do({"action": "save", "rows": rows}, {}, {}, []), {"ok": True, "saved": 2})
+        saved = project.set_variables.call_args.args[0]["local"]["extraction_submission"]
+        self.assertEqual([{k: r[k] for k in ("id", "replace")} for r in saved],
+                         [{"id": 1, "replace": True}, {"id": 2, "replace": False}])
+        self.assertEqual(saved[0]["saved"], saved[1]["saved"])  # stamped, so a written-back batch expires
+
     def test_inlined_modules_never_share_a_top_level_name(self):
         # One namespace: a second `submission` would silently replace the first (found in part 5).
         self.assertEqual(self.tool.name_clashes(["solution.setup.characterization", "solution.setup.registration",
                                                  "solution.setup.batch", "solution.utils.variables",
                                                  "solution.setup.sql_dialect"]), [])
+        self.assertEqual(self.tool.name_clashes(["solution.setup.extraction", "solution.setup.characterization",
+                                                 "solution.setup.registration", "solution.setup.batch",
+                                                 "solution.utils.variables"]), [])
         with mock.patch.object(self.tool, "top_level_names", return_value={"submission"}):
             self.assertEqual(self.tool.name_clashes(["solution.setup.batch", "solution.setup.registration"]),
                              ["submission (solution.setup.batch, solution.setup.registration)"])
@@ -263,6 +316,53 @@ class InlineTiles(unittest.TestCase):
                 with open(os.path.join(tiles, fname)) as fh:
                     exec(compile(fh.read(), fname, "exec"), ns)
                 self.assertTrue(callable(ns["do"]), fname)
+
+
+class BatchTemplate(unittest.TestCase):
+    """The two batch tiles share one HTML and JS template (R9 stage 3)."""
+
+    # The characterization tile as deployed on SOL and checked in part 8 (`09ed6ae`): the template must
+    # reproduce it byte for byte. Change these only with a deliberate change of that tile.
+    CHARACTERIZATION_SHA256 = {
+        ".html": "088b857eb8d878b183e7d256182cc4c6c5043a93b73184115155e5b09c272de9",
+        ".js": "8c33ab1bd30184f53c7fc64416d2b13fa79a5a79baea4c7d262d6932ba9b5126",
+    }
+
+    def setUp(self):
+        self.tool = load_tool()
+
+    def test_characterization_tile_is_unchanged(self):
+        for ext, digest in self.CHARACTERIZATION_SHA256.items():
+            text = self.tool.read_tile_file("characterization_batch" + ext)
+            self.assertEqual(hashlib.sha256(text.encode("utf-8")).hexdigest(), digest, ext)
+
+    def test_extraction_tile_is_its_own(self):
+        html = self.tool.read_tile_file("extraction_batch.html")
+        js = self.tool.read_tile_file("extraction_batch.js")
+        for text in (html, js):
+            self.assertNotIn("[[", text)
+            self.assertNotRegex(text, "(?i)characteri")
+        self.assertIn('ng-controller="ExtractionBatchController"', html)
+        self.assertIn("{{when(row.extracted)}}", html)
+        self.assertIn("isExtracted(row.id)", html)
+        self.assertIn("angular.module('extraction_batch', [])", js)
+        self.assertIn("$scope.extractedIds = data.extracted_ids || [];", js)
+        self.assertIn("'rebuilt since extracted': 'Rebuilt since extracted'", js)
+        self.assertIn('Click "Extract patient covariates" below to run it.', js)
+        # Refresh list keeps only the user's ticks (part 8): the merge is the template's, for both.
+        self.assertIn("angular.extend(row, {submit: mine.submit, replace: mine.replace, dirty: true})", js)
+
+    def test_labels_follow_the_library(self):
+        from solution.setup import extraction
+        js = self.tool.read_tile_file("extraction_batch.js")
+        for status, label in extraction.EXTRACTION_STATUS_LABELS.items():
+            self.assertIn("'%s': '%s'" % (status, label), js)
+
+    def test_a_missing_value_is_refused(self):
+        with mock.patch.dict(self.tool.BATCH_TILES["extraction_batch"], {}, clear=False):
+            del self.tool.BATCH_TILES["extraction_batch"]["run_button"]
+            with self.assertRaises(SystemExit):
+                self.tool.read_tile_file("extraction_batch.js")
 
 
 if __name__ == "__main__":
