@@ -1801,6 +1801,32 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - the 29 recipes and 30 datasets, and the old dashboard and its 30 insights;
    - Setup's dashboard section, `cohort_definition_id` and `section8_tile1.py`;
    - `RETIRING_KEYS` empties.
+
+   **Part 7 on SOL (owner-approved list, 2026-11-27).** With `dku`, on SOL only.
+   - **Backup.** No bundle: the owner leaves the export to the project macro test. Saved outside the
+     repo: the definitions of every retired recipe, dataset, insight and scenario step, both
+     dashboards, the Setup manifest, the variables and the permissions.
+   - **Flow.** 30 recipes (the plan's 29 and `compute_cohort_definition_filtered`, whose output went
+     too) and 30 datasets, everything downstream of it; the 4 zones they left empty ("Covariate
+     Visualisation", "Cohort Features", "Cohort Selection", "Cohort Visualization"). Nothing kept read
+     them. The flow check passes (104 OK, 2 unchecked, no error).
+   - **Dashboard.** `4OpJPy0` and its 30 insights, and the 18 insights on no dashboard (part 6's 16,
+     plus `KpOrTiJ` and `KqOCUkX`, owner). The 18 left are exactly those of `yBMGZvP`.
+   - **Scenarios.** "Update Dashboard Metrics" deleted. "Build Cohort Dashboard" (id kept) is now
+     "Refresh Dashboard": the SQL-engine step and a chart-cache refresh of `cohort_summary`,
+     `covariate_balance_display` and `covariate_continuous_display`; a refresh by dashboard fails on
+     `yBMGZvP` ("Cannot read field selection"), so it names the datasets. It ran: SUCCESS. "Format
+     Solution" lost its 5 steps on the old zones and datasets; "Reconfigure Connections" no longer
+     materializes the 4 retired intermediates.
+   - **Setup.** The "Dashboard Creation" heading and "Create Cohort Dashboard" section removed through
+     `tools/app_manifest.py`; `--check` passes on the live manifest. `section8_tile1.py`,
+     `cohort_definition_choices` and `cohort_definition_id` are gone; `RETIRING_KEYS` is empty.
+   - **Permissions.** 15 dashboard READ grants removed: `cohort` and the 14 retired datasets that
+     still had one. 23 remain.
+   - **Registry.** SOL's library pin corrected to `b89f27e`, which DSS had since part 6.
+   - **Snowflake tables.** Deleting the datasets did not drop their tables; the 30 retired
+     `SOL_RWD_COHORT_DISCOVERY_<name>` tables in `DKU_SOLUTION_DESIGN.SOL_DESIGN` were dropped by name
+     (owner). None remains; SOL keeps 48 tables there.
 8. **Verification.**
    - E4 on SOL (Snowflake) and TMP (Redshift, Databricks): identical results across the three.
    - Independent SQL checks: share of women, mean age, one condition group in the long-term

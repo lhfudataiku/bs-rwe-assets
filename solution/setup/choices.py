@@ -62,25 +62,3 @@ def omop_table_choices(client=None, project_key=None):
 
     datasets = client.get_project(prep_key).list_datasets()
     return _options(d["name"] for d in datasets if d.get("type") == connection_type)
-
-
-def cohort_definition_choices(dataset=None):
-    """Cohorts in `cohort_definition`, matched on column names in any case.
-
-    Returns no choices while the dataset is unbuilt or unreadable.
-    """
-    if dataset is None:
-        dataset = _dataiku().Dataset("cohort_definition")
-    try:
-        names = [c["name"] for c in dataset.read_schema()]
-        index = {n.upper(): i for i, n in enumerate(names)}
-        id_col, name_col = index["COHORT_DEFINITION_ID"], index.get("COHORT_DEFINITION_NAME")
-        choices = []
-        for row in dataset.iter_tuples():
-            label = row[name_col] if name_col is not None else row[id_col]
-            choices.append({"value": row[id_col], "label": label})
-    except Exception as exc:  # unbuilt, unreadable, or without the id column
-        logger.warning("cohort_definition has no readable cohorts: %s", exc)
-        return {"choices": []}
-    choices.sort(key=lambda c: str(c["value"]))
-    return {"choices": choices}

@@ -44,7 +44,10 @@ MANIFEST = {"homepageSections": [
         {"type": "PROJECT_VARIABLES_EDIT", "prompt": "Review Cohort", "html": "<button>"},
         {"type": "PROJECT_VARIABLES_EDIT", "prompt": "Review Cohort Definition", "html": "<button>"},
         {"type": "PROJECT_VARIABLES_EDIT", "prompt": "Review Cohort Log", "html": "<button>"}]},
-    {"sectionTitle": "Dashboard", "tiles": [{"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cohort_definition_id"}], "python": "old"}]},
+    {"sectionTitle": "**Dashboard Creation**"},
+    {"sectionTitle": "Create Cohort Dashboard", "tiles": [
+        {"type": "PROJECT_VARIABLES_EDIT", "params": [{"name": "cohort_definition_id"}], "python": "old"},
+        scenario("BUILDCOHORTDASHBOARD"), {"type": "DASHBOARD_LINK"}]},
 ]}
 
 
@@ -109,7 +112,13 @@ class Apply(unittest.TestCase):
 
     def test_python_tiles_are_found_after_sections_move(self):
         self.assertIn("omop_table_choices()", by_title(self.m, "Connect OMOP")["tiles"][1]["python"])
-        self.assertIn("cohort_definition_choices()", by_title(self.m, "Dashboard")["tiles"][0]["python"])
+
+    def test_old_dashboard_section_goes(self):
+        # R3, part 7: its heading, its section, and with it the cohort_definition_id tile.
+        titles = [s.get("sectionTitle") for s in self.m["homepageSections"]]
+        self.assertFalse({"**Dashboard Creation**", "Create Cohort Dashboard"} & set(titles))
+        self.assertEqual(titles[-1], "Characterize Cohorts")
+        self.assertNotIn("cohort_definition_id", str(self.m))
 
     def test_ambiguous_tile_is_refused(self):
         m = copy.deepcopy(MANIFEST)

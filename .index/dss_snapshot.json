@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T11:32Z",
+   "fetched_at": "2026-11-27T13:30Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-27T11:32Z",
+   "probed_at": "2026-11-27T13:30Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-26T08:15Z",
+   "fetched_at": "2026-11-27T13:30Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-26T08:15Z",
+   "probed_at": "2026-11-27T13:30Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -36186,32 +36186,51 @@
     "analysis_ref": {
      "columns": [
       [
-       "analysis_id",
+       "ANALYSIS_ID",
        "bigint"
       ],
       [
-       "analysis_name",
+       "ANALYSIS_NAME",
        "string"
       ],
       [
-       "domain_id",
+       "DOMAIN_ID",
        "string"
       ],
       [
-       "start_day",
+       "START_DAY",
        "int"
       ],
       [
-       "end_day",
+       "END_DAY",
        "int"
       ],
       [
-       "is_binary",
+       "IS_BINARY",
        "string"
       ],
       [
-       "missing_means_zero",
+       "MISSING_MEANS_ZERO",
        "string"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "characterization_latest": {
+     "columns": [
+      [
+       "RUN_TIMESTAMP",
+       "string"
+      ],
+      [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "COHORT_COUNT",
+       "bigint"
       ]
      ],
      "connection": "bs-snowflake",
@@ -36221,27 +36240,27 @@
     "characterization_log": {
      "columns": [
       [
-       "run_timestamp",
+       "RUN_TIMESTAMP",
        "string"
       ],
       [
-       "cohort_definition_id",
+       "COHORT_DEFINITION_ID",
        "bigint"
       ],
       [
-       "build_timestamp",
+       "BUILD_TIMESTAMP",
        "string"
       ],
       [
-       "cohort_count",
+       "COHORT_COUNT",
        "bigint"
       ],
       [
-       "status",
+       "STATUS",
        "string"
       ],
       [
-       "error",
+       "ERROR",
        "string"
       ]
      ],
@@ -36403,164 +36422,6 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "cohort_condition_group_count": {
-     "columns": [
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "OCCURRENCE",
-       "bigint"
-      ],
-      [
-       "KEY",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_condition_group_events": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_ID",
-       "string"
-      ],
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "CONDITION_START_DATE",
-       "dateonly"
-      ],
-      [
-       "CONDITION_END_DATE",
-       "dateonly"
-      ],
-      [
-       "ANCESTOR_CONCEPT_ID",
-       "int"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "TEMPOPRAL_RELATIONSHIP",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_condition_group_joint": {
-     "columns": [
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_ID",
-       "string"
-      ],
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "CONDITION_START_DATE",
-       "dateonly"
-      ],
-      [
-       "CONDITION_END_DATE",
-       "dateonly"
-      ],
-      [
-       "ANCESTOR_CONCEPT_ID",
-       "int"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_condition_group_prevalence": {
-     "columns": [
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "OCCURRENCE",
-       "bigint"
-      ],
-      [
-       "COHORT_COUNT",
-       "bigint"
-      ],
-      [
-       "PREVALENCE_RATE",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_condition_group_prevalence_prepared": {
-     "columns": [
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "OCCURRENCE",
-       "bigint"
-      ],
-      [
-       "PREVALENCE_%",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_count": {
-     "columns": [
-      [
-       "KEY",
-       "double"
-      ],
-      [
-       "COHORT_COUNT",
-       "bigint"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
     "cohort_definition": {
      "columns": [
       [
@@ -36596,175 +36457,14 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "cohort_definition_filtered": {
+    "cohort_filter": {
      "columns": [
       [
-       "COHORT_DEFINITION_ID",
+       "cohort_definition_id",
        "bigint"
       ],
       [
-       "COHORT_DEFINITION_NAME",
-       "string"
-      ],
-      [
-       "COHORT_DEFINITION_DESCRIPTION",
-       "string"
-      ],
-      [
-       "DEFINITION_TYPE_CONCEPT_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_DEFINITION_SYNTAX",
-       "string"
-      ],
-      [
-       "SUBJECT_CONCEPT_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_INITIATION_DATE",
-       "dateonly"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_demographics": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_DURATION",
-       "double"
-      ],
-      [
-       "OBSERVATION_PERIOD_START_DATE",
-       "dateonly"
-      ],
-      [
-       "OBSERVATION_PERIOD_END_DATE",
-       "dateonly"
-      ],
-      [
-       "PRIOR_OBSERVATION_TIME",
-       "int"
-      ],
-      [
-       "FOLLOWUP_TIME",
-       "int"
-      ],
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "BIRTH_DATETIME",
-       "datetimenotz"
-      ],
-      [
-       "LOCATION_ID",
-       "int"
-      ],
-      [
-       "STATE",
-       "string"
-      ],
-      [
-       "COUNTY",
-       "string"
-      ],
-      [
-       "AGE",
-       "float"
-      ],
-      [
-       "RACE",
-       "string"
-      ],
-      [
-       "SEX",
-       "string"
-      ],
-      [
-       "CHARLSON_SCORE",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_drug_group_count": {
-     "columns": [
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "OCCURRENCE",
-       "bigint"
-      ],
-      [
-       "KEY",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_drug_group_events": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_ID",
-       "string"
-      ],
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "DRUG_EXPOSURE_START_DATE",
-       "dateonly"
-      ],
-      [
-       "DRUG_EXPOSURE_END_DATE",
-       "dateonly"
-      ],
-      [
-       "ANCESTOR_CONCEPT_ID",
-       "int"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "TEMPOPRAL_RELATIONSHIP",
+       "cohort",
        "string"
       ]
      ],
@@ -36772,99 +36472,26 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "cohort_drug_group_joined": {
+    "cohort_label": {
      "columns": [
       [
-       "COHORT_START_DATE",
-       "dateonly"
+       "cohort_definition_id",
+       "bigint"
       ],
       [
-       "COHORT_ID",
+       "name",
        "string"
       ],
       [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "DRUG_EXPOSURE_START_DATE",
-       "dateonly"
-      ],
-      [
-       "DRUG_EXPOSURE_END_DATE",
-       "dateonly"
-      ],
-      [
-       "ANCESTOR_CONCEPT_ID",
-       "int"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_drug_group_prevalence": {
-     "columns": [
-      [
-       "CONCEPT_NAME",
+       "cohort",
        "string"
       ],
       [
-       "OCCURRENCE",
-       "bigint"
-      ],
-      [
-       "COHORT_COUNT",
-       "bigint"
-      ],
-      [
-       "PREVALENCE_RATE",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_drug_group_prevalence_prepared": {
-     "columns": [
-      [
-       "CONCEPT_NAME",
+       "description",
        "string"
       ],
       [
-       "OCCURRENCE",
-       "bigint"
-      ],
-      [
-       "PREVALENCE_%",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_filtered": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "SUBJECT_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
+       "created",
        "dateonly"
       ]
      ],
@@ -36872,174 +36499,38 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "cohort_filtered_exploded_by_quarter": {
+    "cohort_summary": {
      "columns": [
       [
-       "COHORT_DEFINITION_ID",
+       "cohort_definition_id",
        "bigint"
       ],
       [
-       "SUBJECT_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "month_range",
-       "bigint"
-      ],
-      [
-       "QUARTER",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_location": {
-     "columns": [
-      [
-       "COUNTY",
+       "cohort",
        "string"
       ],
       [
-       "STATE",
+       "name",
        "string"
       ],
       [
-       "OBSERVED_POPULATION",
-       "bigint"
-      ],
-      [
-       "INCIDENCE",
-       "bigint"
-      ],
-      [
-       "INCIDENCE_RATE_PER_1K_PERSON_YEAR",
-       "double"
-      ],
-      [
-       "TOTAL_OBSERVED_YEAR",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_location_prepared": {
-     "columns": [
-      [
-       "COUNTY",
+       "description",
        "string"
       ],
       [
-       "STATE",
+       "created",
+       "dateonly"
+      ],
+      [
+       "entries",
+       "bigint"
+      ],
+      [
+       "characterized_at",
        "string"
       ],
       [
-       "INCIDENCE",
-       "bigint"
-      ],
-      [
-       "INCIDENCE_RATE_PER_1K_PERSON_YEAR",
-       "float"
-      ],
-      [
-       "OBSERVED_POPULATION",
-       "bigint"
-      ],
-      [
-       "TOTAL_OBSERVED_YEAR",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_observation": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "SUBJECT_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_DURATION",
-       "double"
-      ],
-      [
-       "OBSERVATION_PERIOD_START_DATE",
-       "dateonly"
-      ],
-      [
-       "OBSERVATION_PERIOD_END_DATE",
-       "dateonly"
-      ],
-      [
-       "PRIOR_OBSERVATION_TIME",
-       "int"
-      ],
-      [
-       "FOLLOWUP_TIME",
-       "int"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_prevalence": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "SUBJECT_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "QUARTER",
-       "string"
-      ],
-      [
-       "OBSERVATION_PERIOD_START_DATE",
-       "dateonly"
-      ],
-      [
-       "OBSERVATION_PERIOD_END_DATE",
-       "dateonly"
-      ],
-      [
-       "QUARTER_POPULATION",
+       "population_entries",
        "bigint"
       ]
      ],
@@ -37047,85 +36538,22 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "cohort_visit_events": {
+    "comparison_filter": {
      "columns": [
       [
-       "COHORT_DEFINITION_ID",
+       "cohort_definition_id",
        "bigint"
       ],
       [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "VISIT_OCCURRENCE_ID",
-       "int"
-      ],
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "VISIT_CONCEPT_ID",
-       "int"
-      ],
-      [
-       "VISIT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "CONCEPT_NAME",
+       "cohort",
        "string"
       ],
       [
-       "TEMPOPRAL_RELATIONSHIP",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "cohort_visit_joined": {
-     "columns": [
-      [
-       "COHORT_DEFINITION_ID",
+       "comparator_id",
        "bigint"
       ],
       [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_END_DATE",
-       "dateonly"
-      ],
-      [
-       "VISIT_OCCURRENCE_ID",
-       "int"
-      ],
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "VISIT_CONCEPT_ID",
-       "int"
-      ],
-      [
-       "VISIT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "TEMPOPRAL_RELATIONSHIP",
+       "comparator",
        "string"
       ]
      ],
@@ -37377,19 +36805,19 @@
     "covariate": {
      "columns": [
       [
-       "cohort_definition_id",
+       "COHORT_DEFINITION_ID",
        "bigint"
       ],
       [
-       "covariate_id",
+       "COVARIATE_ID",
        "bigint"
       ],
       [
-       "sum_value",
+       "SUM_VALUE",
        "bigint"
       ],
       [
-       "average_value",
+       "AVERAGE_VALUE",
        "double"
       ]
      ],
@@ -37398,6 +36826,61 @@
      "type": "Snowflake"
     },
     "covariate_balance": {
+     "columns": [
+      [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "COMPARATOR_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_NAME",
+       "string"
+      ],
+      [
+       "ANALYSIS_ID",
+       "int"
+      ],
+      [
+       "IS_BINARY",
+       "string"
+      ],
+      [
+       "COHORT_MEAN",
+       "double"
+      ],
+      [
+       "COHORT_SD",
+       "double"
+      ],
+      [
+       "COMPARATOR_MEAN",
+       "double"
+      ],
+      [
+       "COMPARATOR_SD",
+       "double"
+      ],
+      [
+       "STD_DIFF",
+       "double"
+      ],
+      [
+       "ABS_STD_DIFF",
+       "double"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate_balance_display": {
      "columns": [
       [
        "cohort_definition_id",
@@ -37410,10 +36893,6 @@
       [
        "covariate_id",
        "bigint"
-      ],
-      [
-       "covariate_name",
-       "string"
       ],
       [
        "analysis_id",
@@ -37446,6 +36925,30 @@
       [
        "abs_std_diff",
        "double"
+      ],
+      [
+       "covariate_full_name",
+       "string"
+      ],
+      [
+       "covariate",
+       "string"
+      ],
+      [
+       "domain",
+       "string"
+      ],
+      [
+       "cohort",
+       "string"
+      ],
+      [
+       "comparator_cohort",
+       "string"
+      ],
+      [
+       "comparator",
+       "string"
       ]
      ],
      "connection": "bs-snowflake",
@@ -37455,7 +36958,66 @@
     "covariate_continuous": {
      "columns": [
       [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "COUNT_VALUE",
+       "bigint"
+      ],
+      [
+       "MIN_VALUE",
+       "double"
+      ],
+      [
+       "MAX_VALUE",
+       "double"
+      ],
+      [
+       "AVERAGE_VALUE",
+       "double"
+      ],
+      [
+       "STANDARD_DEVIATION",
+       "double"
+      ],
+      [
+       "MEDIAN_VALUE",
+       "double"
+      ],
+      [
+       "P10_VALUE",
+       "double"
+      ],
+      [
+       "P25_VALUE",
+       "double"
+      ],
+      [
+       "P75_VALUE",
+       "double"
+      ],
+      [
+       "P90_VALUE",
+       "double"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate_continuous_display": {
+     "columns": [
+      [
        "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "source_id",
        "bigint"
       ],
       [
@@ -37463,44 +37025,60 @@
        "bigint"
       ],
       [
-       "count_value",
+       "count",
        "bigint"
       ],
       [
-       "min_value",
+       "mean",
        "double"
       ],
       [
-       "max_value",
+       "sd",
        "double"
       ],
       [
-       "average_value",
+       "min",
        "double"
       ],
       [
-       "standard_deviation",
+       "p10",
        "double"
       ],
       [
-       "median_value",
+       "p25",
        "double"
       ],
       [
-       "p10_value",
+       "median",
        "double"
       ],
       [
-       "p25_value",
+       "p75",
        "double"
       ],
       [
-       "p75_value",
+       "p90",
        "double"
       ],
       [
-       "p90_value",
+       "max",
        "double"
+      ],
+      [
+       "covariate",
+       "string"
+      ],
+      [
+       "analysis_id",
+       "bigint"
+      ],
+      [
+       "cohort",
+       "string"
+      ],
+      [
+       "group_label",
+       "string"
       ]
      ],
      "connection": "bs-snowflake",
@@ -37510,28 +37088,55 @@
     "covariate_ref": {
      "columns": [
       [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_NAME",
+       "string"
+      ],
+      [
+       "ANALYSIS_ID",
+       "int"
+      ],
+      [
+       "CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "COLLISIONS",
+       "int"
+      ]
+     ],
+     "connection": "bs-snowflake",
+     "managed": true,
+     "type": "Snowflake"
+    },
+    "covariate_ref_display": {
+     "columns": [
+      [
        "covariate_id",
        "bigint"
       ],
       [
-       "covariate_name",
+       "covariate_full_name",
+       "string"
+      ],
+      [
+       "covariate",
        "string"
       ],
       [
        "analysis_id",
-       "int"
+       "bigint"
       ],
       [
-       "concept_id",
-       "int"
-      ],
-      [
-       "value_as_concept_id",
-       "int"
-      ],
-      [
-       "collisions",
-       "int"
+       "domain",
+       "string"
       ]
      ],
      "connection": "bs-snowflake",
@@ -38330,329 +37935,6 @@
      "managed": true,
      "type": "Snowflake"
     },
-    "popoulation_cohort_charlson_score": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ],
-      [
-       "CHARLSON_SCORE",
-       "double"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_cohort_charlson_event_count": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "DIAG_CATEGORY_ID",
-       "int"
-      ],
-      [
-       "DIAG_CATEGORY_NAME",
-       "string"
-      ],
-      [
-       "CONDITION_ERA_START_DATE_last",
-       "string"
-      ],
-      [
-       "CONDITION_OCCURRENCE_COUNT_sum",
-       "bigint"
-      ],
-      [
-       "WEIGHT_first",
-       "double"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_cohort_charlson_score_joined": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "CONDITION_ERA_START_DATE",
-       "dateonly"
-      ],
-      [
-       "CONDITION_ERA_END_DATE",
-       "dateonly"
-      ],
-      [
-       "CONDITION_OCCURRENCE_COUNT",
-       "int"
-      ],
-      [
-       "DIAG_CATEGORY_ID",
-       "int"
-      ],
-      [
-       "DIAG_CATEGORY_NAME",
-       "string"
-      ],
-      [
-       "WEIGHT",
-       "double"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_cohort_charlson_score_prepared": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "CONDITION_ERA_START_DATE",
-       "string"
-      ],
-      [
-       "CONDITION_ERA_END_DATE",
-       "string"
-      ],
-      [
-       "CONDITION_OCCURRENCE_COUNT",
-       "bigint"
-      ],
-      [
-       "DIAG_CATEGORY_ID",
-       "int"
-      ],
-      [
-       "DIAG_CATEGORY_NAME",
-       "string"
-      ],
-      [
-       "WEIGHT",
-       "double"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_cohort_demographic_prepared": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "bigint"
-      ],
-      [
-       "COVARIATE",
-       "string"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_cohort_race": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "bigint"
-      ],
-      [
-       "COVARIATE",
-       "string"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_cohort_sex": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "bigint"
-      ],
-      [
-       "COVARIATE",
-       "string"
-      ],
-      [
-       "CONCEPT_NAME",
-       "string"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_w_cohort_first_occurrence": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "BIRTH_DATETIME",
-       "datetimenotz"
-      ],
-      [
-       "LOCATION_ID",
-       "int"
-      ],
-      [
-       "STATE",
-       "string"
-      ],
-      [
-       "COUNTY",
-       "string"
-      ],
-      [
-       "LOCATION_SOURCE_VALUE",
-       "string"
-      ],
-      [
-       "OBSERVATION_PERIOD",
-       "double"
-      ],
-      [
-       "AGE",
-       "float"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ],
-      [
-       "rownumber",
-       "bigint"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
-    "population_w_cohort_prepared": {
-     "columns": [
-      [
-       "PERSON_ID",
-       "int"
-      ],
-      [
-       "BIRTH_DATETIME",
-       "datetimenotz"
-      ],
-      [
-       "LOCATION_ID",
-       "int"
-      ],
-      [
-       "STATE",
-       "string"
-      ],
-      [
-       "COUNTY",
-       "string"
-      ],
-      [
-       "LOCATION_SOURCE_VALUE",
-       "string"
-      ],
-      [
-       "OBSERVATION_PERIOD",
-       "double"
-      ],
-      [
-       "AGE",
-       "float"
-      ],
-      [
-       "COHORT_DEFINITION_ID",
-       "bigint"
-      ],
-      [
-       "COHORT_START_DATE",
-       "dateonly"
-      ],
-      [
-       "COHORT_FLAG",
-       "string"
-      ]
-     ],
-     "connection": "bs-snowflake",
-     "managed": true,
-     "type": "Snowflake"
-    },
     "procedure_occurrence": {
      "columns": [
       [
@@ -38874,7 +38156,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-26T08:15Z",
+   "fetched_at": "2026-11-27T13:30Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38907,12 +38189,12 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "b4b1400fee4860cac466945cd241a5bdbdefc706",
+     "hash": "b89f27ee79445437372c930c5f468b1be8dfe387",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-26T08:15Z",
+   "probed_at": "2026-11-27T13:30Z",
    "variables": {
     "local": {
      "characterization_submission": [
@@ -39013,7 +38295,6 @@
      ]
     },
     "standard": {
-     "cohort_definition_id": 1,
      "cohort_script_table_naming": "atlas",
      "days_prior_to_cohort_startdate": 365,
      "enable_pipeline": false,

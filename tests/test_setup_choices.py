@@ -50,24 +50,3 @@ class OmopTableChoices(unittest.TestCase):
         cl.get_connection.return_value.get_info.side_effect = Exception("not found")
         self.assertEqual(c.omop_table_choices(cl, "SOL"), {"choices": [c.NO_MAIN_CONNECTION]})
 
-
-class CohortDefinitionChoices(unittest.TestCase):
-    def dataset(self, names, rows):
-        ds = mock.MagicMock()
-        ds.read_schema.return_value = [{"name": n} for n in names]
-        ds.iter_tuples.return_value = iter(rows)
-        return ds
-
-    def test_reads_columns_in_any_case(self):
-        ds = self.dataset(["cohort_definition_id", "Cohort_Definition_Name"], [(2, "Stroke"), (1, "HF")])
-        self.assertEqual(c.cohort_definition_choices(ds), {"choices": [
-            {"value": 1, "label": "HF"}, {"value": 2, "label": "Stroke"}]})
-
-    def test_unbuilt_dataset_gives_no_choices(self):
-        ds = self.dataset(["COHORT_DEFINITION_ID"], [])
-        ds.iter_tuples.side_effect = Exception("dataset is not built")
-        self.assertEqual(c.cohort_definition_choices(ds), {"choices": []})
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -38,7 +38,6 @@ PYTHON_TILES = [
     ("section2_tile0.py", {"module": "input_data_source_project_selectbox"}),
     ("section2_tile3.py", {"first_param": "person"}),
     ("section2_tile5.py", {"first_param": "concept"}),
-    ("section8_tile1.py", {"first_param": "cohort_definition_id"}),
 ]
 
 # Tiles the repo defines entirely: module -> prompt, help, and where the tile goes.
@@ -131,8 +130,10 @@ HEADINGS = [
 ]
 
 LAYOUT = {
-    # R1: the custom table mapping goes (its section holds this scenario's button).
-    "remove_sections_with_scenario": ["CHECKOMOPTABLEVARIABLESMAPPING"],
+    # R1: the custom table mapping goes (its section holds this scenario's button). R3, part 7: the
+    # old dashboard's section goes with it, and its heading below.
+    "remove_sections_with_scenario": ["CHECKOMOPTABLEVARIABLESMAPPING", "BUILDCOHORTDASHBOARD"],
+    "remove_sections_titled": ["**Dashboard Creation**"],
     # R2: the metadata CSV upload goes.
     "remove_tile_types": ["UPLOAD_DATASET_SET_FILE"],
     # R1, first layout: the naming parameters sat in the OMOP section. Now a custom tile.
@@ -311,6 +312,11 @@ def apply_layout(manifest, changes):
                 if not any(t.get("scenarioId") == scenario_id for t in s.get("tiles") or [])]
         if len(kept) != len(sections(manifest)):
             changes.append("removed the section of scenario %s" % scenario_id)
+            manifest["homepageSections"] = kept
+    for title in LAYOUT["remove_sections_titled"]:
+        kept = [s for s in sections(manifest) if s.get("sectionTitle") != title]
+        if len(kept) != len(sections(manifest)):
+            changes.append("removed the section %s" % title)
             manifest["homepageSections"] = kept
     for section in sections(manifest):
         tiles = section.get("tiles") or []

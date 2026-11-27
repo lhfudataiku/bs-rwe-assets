@@ -30,7 +30,7 @@ LOCAL_KEYS = frozenset([
 ] + OMOP_CDM_KEYS)
 
 # Still in use until the named item removes them.
-RETIRING_KEYS = {"cohort_definition_id": "R3"}
+RETIRING_KEYS = {}  # cohort_definition_id went with the old dashboard (R3, part 7)
 
 VARIABLE_CONTRACT = frozenset(STANDARD_DEFAULTS) | LOCAL_KEYS | frozenset(RETIRING_KEYS)
 

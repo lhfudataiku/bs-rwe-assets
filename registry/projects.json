@@ -362,7 +362,7 @@
       "library": {
         "python/solution": {
           "branch": "solution-revision-v1-2",
-          "hash": "b4b1400fee"
+          "hash": "b89f27ee79"
         },
         "python/ds_common": {
           "branch": "v2-3-1",
