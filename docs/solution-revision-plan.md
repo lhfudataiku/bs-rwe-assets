@@ -1489,7 +1489,7 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      a pair against the population answers at once, a new pair computes then reports done, and a
      repeat request computes nothing. The batch tile and the "Cohort Characterization" heading are
      in place. **Stage 3 gate passed.** The registry pins SOL's library at `b4b1400`.
-6. **Dashboard.**
+6. **Dashboard.** *Done (2026-11-27): stage 4 gate passed, part closed below.*
    - A new "Cohort Characterization" dashboard.
    - Page 1, filtered by cohort: the cohort against the population. It shows prevalence of binary
      covariates, distributions of continuous covariates, the covariates with the largest absolute
@@ -1747,6 +1747,18 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    `x37NrzF`, `nJkGql3`, `OSezm7a`, `mIgsl1z`, `ps9exwQ`, `vBKBS8Y`, `31npsjI`, `Tuy4BOP`, and the
    tiles dropped from page 1: `bQK6isp`, `B7pTaIj`, `U9D7ap3`). Next: stage 5, the TMP round trip on
    Redshift and Databricks.
+
+   **Part 6 closed (owner, 2026-11-27).**
+   - **Dashboard-only access.** `cohort_filter`, `comparison_filter` and the webapp `c9UUBDz` were
+     not authorized for dashboard-only users (read from the project permissions); READ is now
+     granted on all three, the other 35 grants unchanged (backup outside the repo). The READ on
+     `cohort`, needed only by the dropped Distinct Patients card, goes in part 7.
+   - **Readability items of the stage brief.** Ranking is kept: every covariate table is sorted by
+     |std diff| descending. The top-N chart was dropped by the owner (`bQK6isp`), and no prevalence
+     filter is added. Accepted as covered by the ranking.
+   - **Moved out of part 6.** Quarterly prevalence (decision 7, a change of the characterization
+     recipe) to the open questions; the county views are dropped. The meaning of Charlson's N to
+     part 8. The replaced insights to part 7.
    - **`Tuy4BOP`**: a "keep comparator_id = −1" step in its table script and a sort by
      `abs_std_diff` descending (`dku`), so cached pairs do not appear on page 1.
 
@@ -1883,6 +1895,8 @@ Then D1 copies the solution on the head of `solution-revision-v1-2`.
 - [ ] Databricks scratch schema: the connection default, or a dedicated `temp_schema`
 - [ ] Boundary between Part 2 and Part 3 (R9): option A in 1.2, option C reserved for v2.0; to
   discuss with the team before the decision register
+- [ ] Quarterly prevalence per cohort (R3 decision 7): a change of the characterization recipe; the
+  dashboard has no tile for it yet (part 6 closed without it, 2026-11-27). The county views are dropped
 - [ ] When `DEMO_SF_RWE` moves from the 5 hand-built tables to the `patient_cov_` datasets, and with which
   presets for its propensity models (LEGEND used thousands of characteristics; today's 11 presets
   are a review set)
