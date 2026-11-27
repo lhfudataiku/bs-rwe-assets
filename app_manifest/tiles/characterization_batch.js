@@ -43,7 +43,11 @@ app.controller('CharacterizationBatchController', function($scope) {
     var merge = function(fresh) {
         var edited = {};
         $scope.rows.forEach(function(row) { if (row.dirty && !row.population) { edited[row.id] = row; } });
-        return fresh.map(function(row) { return edited[row.id] || row; });
+        // Only the ticks are kept: the status, build and characterization times are always fresh.
+        return fresh.map(function(row) {
+            var mine = edited[row.id];
+            return mine ? angular.extend(row, {submit: mine.submit, replace: mine.replace, dirty: true}) : row;
+        });
     };
     $scope.load = function(keepEdits) {
         if ($scope.busy) { return; }

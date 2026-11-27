@@ -14,8 +14,8 @@ the "Characterization batch" tile in `characterization_submission`:
 
 Inputs, declared for lineage: `cohort`, `cohort_definition`, `cohort_building_log` and the OMOP tables
 the SQL reads. Outputs: `covariate`, `covariate_continuous`, `covariate_ref`, `analysis_ref`,
-`characterization_log` and `covariate_balance` (the rows against the population; part 4), written
-in-database. On Databricks the scratch tables are `rwdtmp_<project key>__ch_<name>`; any left by an
+`characterization_log`, `covariate_balance` (the rows against the population; part 4) and
+`covariate_censored` (the ids trimmed under the minimum cell count), written in-database. On Databricks the scratch tables are `rwdtmp_<project key>__ch_<name>`; any left by an
 earlier crash are dropped first, and the cohort build's are never touched.
 """
 import logging

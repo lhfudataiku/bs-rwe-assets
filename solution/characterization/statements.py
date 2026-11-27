@@ -9,12 +9,13 @@ Builds, as plain statement lists, everything `characterize_cohorts` runs in one 
 3. FeatureExtraction's construction script (`sql/<connection>/construction.sql`, part 1), once for
    all of them;
 4. per result table, delete the run's cohorts and insert the new rows; `covariate_ref` and
-   `analysis_ref` only gain the ids they do not hold yet;
+   `analysis_ref` only gain the ids they do not hold yet; the run's rows of `covariate_censored`
+   are deleted too;
 5. `covariate_balance` (part 4): the cached pairs naming a cohort of the run are deleted, and the
    balance against the population is recomputed for the run's cohorts, or for every characterized
    cohort when the population itself was recomputed;
-6. the run's binary covariates held by fewer than 5 people are deleted (minimum cell count, after
-   the balance, which needs them);
+6. the run's binary covariates held by fewer than 5 people are recorded in `covariate_censored`,
+   then deleted (minimum cell count, after the balance, which needs them);
 7. FeatureExtraction's cleanup script.
 
 The failure-prone work (2, 3) comes before any delete, so a run that fails there changes no
@@ -26,7 +27,7 @@ import os
 import re
 
 from solution.compare.balance import (
-    BALANCE_COLUMNS, BALANCE_KINDS, BALANCE_TABLE, censor_statements, recharacterized_statements,
+    BALANCE_COLUMNS, BALANCE_KINDS, BALANCE_TABLE, CENSORED_TABLE, censor_statements, recharacterized_statements,
 )
 from solution.compare.comparison import REQUEST_KINDS, REQUESTS_TABLE
 from solution.recipes.sql_text import render_temp_tables, split_statements, sql_literal
@@ -57,6 +58,7 @@ RESULT_TABLES = {
     "characterization_log": [("run_timestamp", SHORT), ("cohort_definition_id", BIG), ("build_timestamp", SHORT),
                              ("cohort_count", BIG), ("status", SHORT), ("error", TEXT)],
     BALANCE_TABLE: list(zip(BALANCE_COLUMNS, BALANCE_KINDS)),  # part 4: cohorts against the population
+    CENSORED_TABLE: [("cohort_definition_id", BIG), ("covariate_id", BIG)],  # trimmed under the minimum
 }
 # Created on first use but not written by the characterization: the webapp appends requests to it.
 TABLES = dict(RESULT_TABLES, **{REQUESTS_TABLE: REQUEST_KINDS})
@@ -147,7 +149,7 @@ def _strip_header(sql):
 def result_statements(connection_type, paths, cohort_name, ids, scratch_prefix=None, scratch_schema=None):
     """Delete the run's ids from the result tables, then insert the new rows."""
     statements = ["DELETE FROM %s WHERE cohort_definition_id IN (%s)" % (paths[t], _ids(ids))
-                  for t in ("covariate", "covariate_continuous")]
+                  for t in ("covariate", "covariate_continuous", CENSORED_TABLE)]
     for name, table in QUERIES:
         query = fill(read_sql(connection_type, name), {}, cohort_name)
         query, _ = render_temp_tables(query, connection_type, scratch_prefix, scratch_schema)

@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T13:30Z",
+   "fetched_at": "2026-11-27T14:58Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-27T13:30Z",
+   "probed_at": "2026-11-27T14:58Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -33597,7 +33597,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T13:30Z",
+   "fetched_at": "2026-11-27T14:58Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -33617,7 +33617,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD SF 1K",
-   "probed_at": "2026-11-27T13:30Z",
+   "probed_at": "2026-11-27T14:58Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -38156,7 +38156,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-27T13:30Z",
+   "fetched_at": "2026-11-27T14:58Z",
    "flow_sources": [
     "PREP_RWD_SF_1K.concept_ancestor_sf",
     "PREP_RWD_SF_1K.concept_sf",
@@ -38189,28 +38189,15 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "b89f27ee79445437372c930c5f468b1be8dfe387",
+     "hash": "90a35f778ba8d9253d6b876cd0108977d7814449",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "RWD Cohort Discovery",
-   "probed_at": "2026-11-27T13:30Z",
+   "probed_at": "2026-11-27T14:58Z",
    "variables": {
     "local": {
-     "characterization_submission": [
-      {
-       "id": 4,
-       "replace": false
-      },
-      {
-       "id": 6,
-       "replace": false
-      },
-      {
-       "id": 7,
-       "replace": false
-      }
-     ],
+     "characterization_submission": [],
      "cohort_script_table_map": {
       "care_site": "@cdm_database_schema.care_site",
       "cdm_source": "@cdm_database_schema.cdm_source",
@@ -38256,18 +38243,11 @@
      "cohort_script_table_prefix": "",
      "cohort_submission": [
       {
-       "description": "drug class for antiinflammatory agent",
-       "file": "feature_drug_antiinflammatory_agents.sql",
-       "id": 6,
-       "name": "Feature drug antiinflammatory agents",
-       "replace": false
-      },
-      {
-       "description": "drug class for antiinflammator for antithrombotics",
-       "file": "feature_drug_antithrombotics.sql",
-       "id": 7,
-       "name": "Feature drug antithrombotics",
-       "replace": false
+       "description": "first diagnosis followed by at least two record of antidepressant or depression procedure within 30 days, or second diagnosis in the following history.",
+       "file": "feature_condition_depression.sql",
+       "id": 3,
+       "name": "Depression",
+       "replace": true
       }
      ],
      "data_preparation_project_key": "PREP_RWD_SF_1K",

@@ -41,6 +41,7 @@ def database():
     db.execute("CREATE TABLE covariate_ref (covariate_id, covariate_name, analysis_id)")
     db.execute("CREATE TABLE analysis_ref (analysis_id, missing_means_zero)")
     db.execute("CREATE TABLE covariate_balance (%s)" % ", ".join(bal.BALANCE_COLUMNS))
+    db.execute("CREATE TABLE covariate_censored (%s)" % ", ".join(bal.CENSORED_COLUMNS))
     db.executemany("INSERT INTO covariate VALUES (?, ?, ?, ?)",
                    [(c, k, round(p * (1000 if c == -1 else 100)), p) for c, k, p in BINARY])
     db.executemany("INSERT INTO covariate_continuous VALUES (?, ?, ?, ?)", CONTINUOUS)
@@ -152,6 +153,22 @@ class MinimumCellCount(unittest.TestCase):
         self.assertIn((2, 1005), stored)
         # The balance against the population came from the full rows, before the cut.
         self.assertIn((2, -1, 1001), rows(self.db, "SELECT * FROM covariate_balance"))
+        self.assertEqual({(c, k) for c, k in self.db.execute("SELECT * FROM covariate_censored")}, {(1, 1004)})
+
+    def test_rows_do_not_depend_on_the_order_of_runs(self):
+        # The population holds 1006 for 3 people; cohort 2 for 10 (part 8: cohort 4 against cohort 1).
+        self.db.executemany("INSERT INTO covariate VALUES (?, ?, ?, ?)", [(-1, 1006, 3, 0.003), (2, 1006, 10, 0.1)])
+        self.db.execute("INSERT INTO covariate_ref VALUES (1006, 'rare in the population', 210)")
+        with_population = rows(self.db, bal.balance_sql(PATHS, [2]))
+        self.assertNotIn((2, -1, 1006), with_population)
+        for s in bal.censor_statements(PATHS, [-1]):  # the population's run ends; cohort 2 runs later
+            self.db.execute(s)
+        self.assertEqual(rows(self.db, bal.balance_sql(PATHS, [2])), with_population)
+        # A requested pair reads trimmed rows too: cohort 1's 3 people with 1004 hide the row.
+        for s in bal.censor_statements(PATHS, [1, 2]):
+            self.db.execute(s)
+        self.assertNotIn((2, 1, 1004), rows(self.db, bal.pair_balance_sql(PATHS, 2, 1)))
+        self.assertIn((2, 1, 1005), rows(self.db, bal.pair_balance_sql(PATHS, 2, 1)))
 
 
 class Cache(unittest.TestCase):
