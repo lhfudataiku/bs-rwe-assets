@@ -4,7 +4,9 @@ Run from the "Characterize Cohorts" section of Project Setup (decision 14), on t
 the "Characterization batch" tile in `characterization_submission`:
 
 - the batch is checked again here, as the authority: every cohort must have a successful latest
-  build, and a characterized cohort needs *Replace* (decision 15);
+  build, and a characterized cohort needs *Replace* (decision 15). Entries a run already
+  characterized after they were saved are dropped first (`live_submission`): an open Setup page can
+  write the batch just run back;
 - the population (id -1) is added when it was never characterized or the data was imported since;
 - one FeatureExtraction run covers all of them, in one session (`statements.run_statements`);
 - `characterization_log` gets one row per cohort, SUCCESS with its entry count, or FAILED with the
@@ -28,7 +30,7 @@ from solution.recipes.sql_text import characterization_scratch_prefix, is_charac
 from solution.setup.batch import latest_by_id
 from solution.setup.characterization import (  # noqa: F401 (re-exported for the recipe and tests)
     CHARACTERIZATION_LOG_COLUMNS, IMPORT_SCENARIO, POPULATION_ID, SUBMISSION, SUCCESS, batch_ids, imported_at,
-    population_needed, selected_ids, utc_timestamp,
+    live_submission, population_needed, selected_ids, utc_timestamp,
 )
 from solution.setup.registration import DEFINITION_COLUMNS, LOG_COLUMNS, read_rows
 from solution.utils.variables import get_setting, set_local
@@ -110,7 +112,12 @@ def characterize_cohorts():
     built = latest_by_id(build_logs)
     built_ids, characterized = batch_ids(definitions, build_logs, char_logs)
 
-    cohort_ids = selected_ids(get_setting(SUBMISSION, default=[]), built_ids, characterized)
+    saved = get_setting(SUBMISSION, default=[]) or []
+    live = live_submission(saved, char_logs)
+    if len(live) != len(saved):
+        logger.info("Ignored %d entries of the saved batch already characterized since they were saved.",
+                    len(saved) - len(live))
+    cohort_ids = selected_ids(live, built_ids, characterized)
     population = population_needed(char_logs, imported_at(project))
     if not cohort_ids and not population:
         logger.info("Nothing to characterize: no cohort in the batch, and the population is up to date.")
@@ -125,6 +132,6 @@ def characterize_cohorts():
     if failed:
         raise ValueError("Characterization failed for %s (see characterization_log): %s"
                          % (", ".join(str(r[1]) for r in failed), failed[0][5]))
-    if cohort_ids:
+    if saved:
         set_local(project, SUBMISSION, [])
     return rows

@@ -242,7 +242,9 @@ class InlineTiles(unittest.TestCase):
             rows[1]["replace"] = True
             self.assertEqual(do({"action": "save", "rows": rows}, {}, {}, []), {"ok": True, "saved": 2})
         saved = project.set_variables.call_args.args[0]["local"]["characterization_submission"]
-        self.assertEqual(saved, [{"id": 1, "replace": True}, {"id": 2, "replace": False}])
+        self.assertEqual([{k: r[k] for k in ("id", "replace")} for r in saved],
+                         [{"id": 1, "replace": True}, {"id": 2, "replace": False}])
+        self.assertEqual(saved[0]["saved"], saved[1]["saved"])  # stamped, so a written-back batch expires
 
     def test_inlined_modules_never_share_a_top_level_name(self):
         # One namespace: a second `submission` would silently replace the first (found in part 5).

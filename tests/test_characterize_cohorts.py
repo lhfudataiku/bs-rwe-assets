@@ -82,8 +82,20 @@ class CharacterizationRows(unittest.TestCase):
         self.assertFalse(ch.population_needed([char(T2, -1, "")], T1))
 
     def test_saved_batch_shows_as_in_batch(self):
-        rows = by_id(ch.characterization_rows(DEFINITIONS, BUILDS, [char(T2, 1)], [{"id": 1, "replace": True}]))
+        saved = [{"id": 1, "replace": True, "saved": T3}]
+        rows = by_id(ch.characterization_rows(DEFINITIONS, BUILDS, [char(T2, 1)], saved))
         self.assertEqual((rows[1]["status"], rows[1]["submit"], rows[1]["replace"]), (ch.IN_BATCH, True, True))
+
+    def test_a_batch_written_back_after_its_run_is_ignored(self):
+        # An open Setup page restored the batch the run had cleared (DSS, 2026-11-27).
+        stale = [{"id": 1, "replace": False, "saved": T1}, {"id": 2, "replace": True}]
+        logs = [char(T2, -1, ""), char(T2, 1), char(T2, 2)]
+        self.assertEqual(ch.live_submission(stale, logs), [])
+        rows = by_id(ch.characterization_rows(DEFINITIONS, BUILDS, logs, stale))
+        self.assertEqual((rows[1]["status"], rows[1]["submit"]), (ch.CHARACTERIZED, False))
+        # Kept: a cohort not characterized since, a failed run, and a redo saved after the run.
+        live = [{"id": 3, "saved": T1}, {"id": 1, "replace": True, "saved": T3}]
+        self.assertEqual(ch.live_submission(live, logs + [char(T3, 3, status="FAILED")]), live)
 
 
 class Selection(unittest.TestCase):
@@ -102,8 +114,8 @@ class Selection(unittest.TestCase):
 
     def test_submission_and_authority(self):
         rows = ch.characterization_rows(DEFINITIONS, BUILDS, [])
-        self.assertEqual(ch.batch_submission(rows), [{"id": 1, "replace": False}, {"id": 2, "replace": False},
-                                               {"id": 3, "replace": False}])
+        self.assertEqual(ch.batch_submission(rows, T3), [{"id": i, "replace": False, "saved": T3} for i in (1, 2, 3)])
+        self.assertRegex(ch.batch_submission(rows)[0]["saved"], r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
         self.assertEqual(ch.selected_ids([{"id": 2}, {"id": 1}], [1, 2], []), [1, 2])
         self.assertEqual(ch.selected_ids([], [1], []), [])
         with self.assertRaises(ValueError):
@@ -276,9 +288,15 @@ class Recipe(unittest.TestCase):
         set_local.assert_called_once()
         self.assertEqual(set_local.call_args.args[1:], (cc.SUBMISSION, []))
 
+    def test_a_written_back_batch_runs_nothing(self):
+        result, characterize, set_local = self.run_recipe([{"id": 1, "replace": False, "saved": T1}],
+                                                          [char(T2, -1, ""), char(T2, 1)])
+        self.assertEqual(result, [])
+        characterize.assert_not_called()
+
     def test_refusals_and_failures(self):
-        with self.assertRaises(ValueError):  # characterized without Replace
-            self.run_recipe([{"id": 1}], [char(T2, -1, ""), char(T2, 1)])
+        with self.assertRaises(ValueError):  # characterized, then saved again without Replace
+            self.run_recipe([{"id": 1, "saved": T3}], [char(T2, -1, ""), char(T2, 1)])
         with self.assertRaises(ValueError):
             self.run_recipe([{"id": 1}], rows=[[T2, 1, T1, 0, "FAILED", "boom"]])
 

@@ -8,6 +8,10 @@ the recipe repeats every check and is the authority, as for registration.
 - A characterized cohort is never redone unless it is ticked *In batch* and *Replace*.
 - The population (id -1) is not chosen by the user: it is characterized when it has never been, or
   when the data was imported after its last characterization.
+- Each saved entry carries when it was saved, and expires once a run characterizes its cohort after
+  that (`live_submission`). The run clears the saved batch, but an open Project Setup page writes its
+  own, older copy of the project variables back while a scenario it started runs (seen on DSS,
+  2026-11-27), which restores the batch just run; an expired entry then does nothing.
 
 Timestamps are ISO strings (`%Y-%m-%dT%H:%M:%SZ`, UTC), as `cohort_building_log` writes them.
 Pure apart from `imported_at`, which reads a scenario run from the project handle it is given, and
@@ -72,20 +76,34 @@ def population_needed(characterization_logs, imported_at=None):
     return done is None or bool(imported_at and str(imported_at) > str(done.get("run_timestamp") or ""))
 
 
+def live_submission(submission, characterization_logs):
+    """The saved batch without its expired entries: those whose cohort a run characterized
+    successfully at or after the entry was saved. An entry without `saved` (written before entries
+    carried it) expires on any successful characterization of its cohort."""
+    done = latest_by_id(characterization_logs, keep=_succeeded)
+    live = []
+    for row in submission or []:
+        last = done.get(as_int(row.get("id")))
+        if last is not None and str(last.get("run_timestamp") or "") >= str(row.get("saved") or ""):
+            continue
+        live.append(row)
+    return live
+
+
 def characterization_rows(definitions, build_logs, characterization_logs, submission=None, imported_at=None):
     """The tile's rows: the population first, then each cohort whose latest build succeeded.
 
     definitions: [{"id", "name"}] from `cohort_definition`; build_logs: [{"run_timestamp", "id",
     "count", "status"}] from `cohort_building_log`; characterization_logs: [{"run_timestamp", "id",
     "build_timestamp", "count", "status"}] from `characterization_log`; submission: the saved
-    `characterization_submission` ([{"id", "replace"}]); imported_at: when "Import Datasets" last
-    succeeded, or None.
+    `characterization_submission` ([{"id", "replace", "saved"}]), whose expired entries are ignored;
+    imported_at: when "Import Datasets" last succeeded, or None.
     """
     names = {as_int(d.get("id")): d.get("name") or "" for d in definitions}
     built = latest_by_id(build_logs)
     done = latest_by_id(characterization_logs, keep=_succeeded)
     last_try = latest_by_id(characterization_logs)
-    pending = {as_int(r.get("id")): r for r in (submission or [])}
+    pending = {as_int(r.get("id")): r for r in live_submission(submission, characterization_logs)}
 
     needed = population_needed(characterization_logs, imported_at)
     population = done.get(POPULATION_ID)
@@ -142,9 +160,11 @@ def _label(row):
     return (row.get("name") or "").strip() or "Cohort %s" % row.get("id")
 
 
-def batch_submission(rows):
-    """The `characterization_submission` value for the ticked cohort rows (the population excluded)."""
-    return [{"id": as_int(r.get("id")), "replace": bool(r.get("replace"))}
+def batch_submission(rows, saved=None):
+    """The `characterization_submission` value for the ticked cohort rows (the population excluded),
+    each stamped with when it was saved (now, by default)."""
+    saved = saved or utc_timestamp()
+    return [{"id": as_int(r.get("id")), "replace": bool(r.get("replace")), "saved": saved}
             for r in rows if r.get("submit") and not r.get("population") and as_int(r.get("id")) != POPULATION_ID]
 
 
