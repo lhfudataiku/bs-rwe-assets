@@ -25,7 +25,8 @@ second lock: DSS refuses two jobs on the same outputs, and a rebuild that waits 
 written meanwhile.
 
 States: `invalid`, `forbidden`, `cached`, `running`, `done`, `failed`. Each answer carries a
-`message` sentence the tile shows as it is.
+`message` sentence the tile shows as it is; `cached` and `done` also carry `page_filters`, the
+dashboard URL value that selects the pair on page 2, so the tile can show it.
 """
 import datetime
 import threading
@@ -35,7 +36,7 @@ from solution.compare.balance import (
     BALANCE_TABLE, DISPLAY_TABLE, INPUT_TABLES, display_pair_query, pair_cached_query, write_balance_statements,
 )
 from solution.compare.comparison import (
-    REQUEST_KINDS, REQUESTS_TABLE, comparable, cohort_choices, label, pair_problem,
+    REQUEST_KINDS, REQUESTS_TABLE, comparable, cohort_choices, label, page_filters, pair_problem,
 )
 from solution.recipes.sql_text import SESSION_COMMIT, sql_literal
 from solution.setup.batch import as_int
@@ -154,9 +155,10 @@ class Comparisons(object):
             job = self.jobs.get((a, b))
             if job and job["state"] == "running":
                 return dict(job)
+        filters = page_filters(a, b, names)
         cached = is_cached(self.executor, self.paths[BALANCE_TABLE], a, b)
         if cached and (self.refresh is None or self._shown(a, b)):
-            return {"state": "cached", "message": "Ready: select %s in the page filters." % text}
+            return {"state": "cached", "message": "Ready: %s." % text, "page_filters": filters}
         if not can_compute(auth_info, permissions):
             if cached:
                 return {"state": "forbidden",
@@ -175,9 +177,9 @@ class Comparisons(object):
                 self.jobs[(a, b)] = {"state": "running", "message": "Computing %s." % text}
         login = (auth_info or {}).get("authIdentifier")
         if cached:
-            self.start(lambda: self._finish(a, b, text))
+            self.start(lambda: self._finish(a, b, text, filters))
         else:
-            self.start(lambda: self._compute(a, b, text, login))
+            self.start(lambda: self._compute(a, b, text, login, filters))
         return self.status(a, b)
 
     def _shown(self, a, b):
@@ -187,7 +189,7 @@ class Comparisons(object):
         with self.lock:
             self.jobs[(a, b)] = job
 
-    def _compute(self, a, b, text, login):
+    def _compute(self, a, b, text, login, filters):
         try:
             self.executor.query_to_df("SELECT 1", pre_queries=compute_statements(
                 self.paths, self.connection_type, a, b, login),
@@ -197,9 +199,9 @@ class Comparisons(object):
             return
         if self.refresh is not None:
             self._set(a, b, {"state": "running", "message": "Computed %s; updating the dashboard." % text})
-        self._finish(a, b, text)
+        self._finish(a, b, text, filters)
 
-    def _finish(self, a, b, text):
+    def _finish(self, a, b, text, filters):
         """Rebuild the dashboard's copies, then report done (at once without `refresh`)."""
         if self.refresh is not None:
             try:
@@ -210,7 +212,7 @@ class Comparisons(object):
                                  "message": "%s is computed, but the dashboard could not be updated: %s. "
                                             "Request it again to retry." % (text, _clean(e))})
                 return
-        self._set(a, b, {"state": "done", "message": "Done: select %s in the page filters." % text})
+        self._set(a, b, {"state": "done", "message": "Done: %s." % text, "page_filters": filters})
 
     def status(self, cohort_a, cohort_b):
         a, b = as_int(cohort_a), as_int(cohort_b)

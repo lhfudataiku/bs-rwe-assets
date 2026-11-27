@@ -218,6 +218,15 @@ class Requests(unittest.TestCase):
         self.assertEqual(got["comparators"][0]["label"], "Population")
         self.assertEqual(got["default_comparator"], -1)
         self.assertIsNone(cmp.cohort_choices(DEFINITIONS, CHAR[1:])["default_comparator"])
+        self.assertEqual([c["filter"] for c in got["comparators"]], ["Population", "1 \u00b7 Anemia", "2 \u00b7 Crohn's"])
+
+    def test_page_filters_select_the_pair_as_the_dashboard_labels_it(self):
+        names = {1: "Anemia", 2: 'Say "hi" \\ bye'}
+        self.assertEqual(cmp.filter_label(-1, names), "Population")
+        self.assertEqual(cmp.filter_label(1, names), "1 \u00b7 Anemia")
+        self.assertEqual(cmp.page_filters(1, -1, names), 'cohort:in("1 \u00b7 Anemia");comparator:in("Population")')
+        self.assertEqual(cmp.page_filters("2", "1", names),
+                         'cohort:in("2 \u00b7 Say \\"hi\\" \\\\ bye");comparator:in("1 \u00b7 Anemia")')
 
 
 class FakeFrame:
@@ -259,7 +268,8 @@ class Services(unittest.TestCase):
     def test_cached_invalid_and_forbidden_run_nothing(self):
         comparisons, ex = self.comparisons(cached=True)
         self.assertEqual(self.ask(comparisons, 1, -1),
-                         {"state": "cached", "message": "Ready: select Anemia (cohort 1) against Population in the page filters."})
+                         {"state": "cached", "message": "Ready: Anemia (cohort 1) against Population.",
+                          "page_filters": 'cohort:in("1 \u00b7 Anemia");comparator:in("Population")'})
         comparisons, ex = self.comparisons()
         self.assertEqual(self.ask(comparisons, 1, 3)["state"], "invalid")
         self.assertEqual(self.ask(comparisons, 1, 2, allowed=False)["state"], "forbidden")
@@ -269,8 +279,8 @@ class Services(unittest.TestCase):
     def test_computed_in_one_session(self):
         comparisons, ex = self.comparisons()
         self.assertEqual(self.ask(comparisons, 1, 2),
-                         {"state": "done",
-                          "message": "Done: select Anemia (cohort 1) against Crohn's (cohort 2) in the page filters."})
+                         {"state": "done", "message": "Done: Anemia (cohort 1) against Crohn's (cohort 2).",
+                          "page_filters": 'cohort:in("1 \u00b7 Anemia");comparator:in("2 \u00b7 Crohn\'s")'})
         session = ex.query_to_df.call_args
         statements = session.kwargs["pre_queries"]
         self.assertEqual([s.split()[0] for s in statements], ["CREATE", "CREATE", "INSERT", "DELETE", "INSERT"])
@@ -341,8 +351,8 @@ class DashboardRefresh(unittest.TestCase):
     def test_cached_pair_missing_from_the_dashboard_is_rebuilt_not_recomputed(self):
         comparisons, _, calls = self.comparisons(cached=True, shown=False)
         self.assertEqual(self.ask(comparisons, 1, 2),
-                         {"state": "done",
-                          "message": "Done: select Anemia (cohort 1) against Crohn's (cohort 2) in the page filters."})
+                         {"state": "done", "message": "Done: Anemia (cohort 1) against Crohn's (cohort 2).",
+                          "page_filters": 'cohort:in("1 \u00b7 Anemia");comparator:in("2 \u00b7 Crohn\'s")'})
         self.assertEqual(calls, ["refresh"])
 
     def test_cached_pair_missing_from_the_dashboard_needs_rights(self):

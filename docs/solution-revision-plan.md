@@ -1679,7 +1679,7 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    **Page 2 reads the display copy, rebuilt after each pair (owner, 2026-11-27).** Page 2's tables
    read `covariate_balance_display` (labels, domain), not raw `covariate_balance`, which supersedes
    the 2026-11-26 choice. So a pair the webapp writes must reach that copy before the tile says done.
-   - **Repo (uncommitted):** `solution/compare/services.py` takes a `refresh` callable. After writing
+   - **Repo (`d17047c`):** `solution/compare/services.py` takes a `refresh` callable. After writing
      a pair it reports "Computed …; updating the dashboard", rebuilds, then "Done: select … in the
      page filters". A pair in `covariate_balance` but missing from the copy (a failed rebuild, or
      one written before this change) is rebuilt without being computed again. The population pair
@@ -1692,8 +1692,51 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - Tests: 161 offline, including a new pair (compute, then rebuild), a pair already shown (nothing
      runs), a cached pair missing from the copy (rebuild only; refused without rights), a failed
      rebuild as a sentence, and the backend's build order.
-   - **To apply on SOL:** create `comparison_filter`; commit and push; resync the library; update the
-     webapp backend; restart it.
+   - **Applied on SOL (owner-approved, 2026-11-27).**
+     - `compute_comparison_filter` (Group, SQL, zone "Dashboard"): distinct `cohort_definition_id`,
+       `cohort`, `comparator_id`, `comparator` of `covariate_balance_display` into
+       `comparison_filter` (4 rows: cohorts 1, 2 and 3 against the population, 1 against 2). The
+       scenario's last step, now "Display: dashboard filters", builds `cohort_filter` and
+       `comparison_filter`.
+     - Library `python/solution` reset to `d17047c` (DSS's library reset, through the dataikuapi
+       client `dku` ships with; `dku` has no command for it).
+     - Webapp `c9UUBDz`: backend code replaced from the repo (the live code equalled the previous
+       repo version; backup outside the repo), restarted; it started without errors.
+
+   **Page 2 (2026-11-27).** Page `kB8Z5m6` "Cohort vs Cohort" on `yBMGZvP`, 7 tiles,
+   `dku dashboard validate` passes; page 1 and `4OpJPy0` (version 390, 45 tiles) unchanged.
+   - `4JKB47c` "Characterization: Compare cohorts": the webapp insight for `c9UUBDz` (`dku`; Cobuild
+     cannot create webapp insights), full width at the top, titled "Request a comparison".
+   - `4O5IvG9` Pair, binary covariates (rows domain then covariate by |std diff| descending; cohort %,
+     comparator %, std diff, |std diff|) and `YgJfYlq` Pair, continuous covariates (cohort and
+     comparator mean and SD, std diff): pivot tables on `covariate_balance_display`, SQL engine,
+     whole table (Cobuild), each under a heading. An introduction says how to request a pair and
+     select it.
+   - Filters (`dku`): single-select `cohort` (default "1 · Anemia") and `comparator` (default
+     "Population"), values from `comparison_filter`, which no tile reads (page 1's rule). The
+     comparator list shows only pairs already computed.
+   - **Owner's check (2026-11-27): the tables did not follow page 2's filters.** The definitions match
+     page 1's working filter and the data supports them (Cobuild, read only: 3,600 binary rows for
+     Anemia against the population, 3,671 against diabetes). Page 1's working filter carries a DSS id
+     (`<epoch ms>_<n>`) because the owner re-created it in the UI; page 2's were hand-written
+     (`p2_cohort`). They now carry DSS-style ids. If the tables still do not follow, the filters are
+     re-created in the dashboard editor (Edit → page filters), as page 1's was. With DSS-style ids
+     they follow (owner, 2026-11-27): hand-written filter ids must have DSS's form.
+   - **Webapp follows and sets the page (owner, 2026-11-27; repo, uncommitted).** The rebuild is
+     done by the backend through the API (two forced, non-recursive dataset builds), not a scenario.
+     DSS 15 documents two hooks this uses:
+     - a standard webapp in a dashboard receives the page filters as `message` events
+       (`event.data.type === 'filters'`): the tile's cohort A and B lists now follow the page's
+       `cohort` and `comparator` filters;
+     - a dashboard URL takes `pageFilters` (`cohort:in("1 · Anemia");comparator:in("Population")`):
+       once a pair is ready (`cached` or `done`) and the page does not already show it, the tile
+       reloads the page with that pair selected, which also refreshes the comparator list. If the
+       dashboard does not let the tile navigate it, a "Show this pair on the dashboard" link stays.
+     - `comparison.filter_label` and `page_filters` give the dashboard's labels ("id · name",
+       "Population"); `choices` and the `cached` and `done` answers carry them. The tile's sentences
+       no longer say "select … in the page filters".
+     - The message schema is not documented, so the tile accepts any object naming the column
+       with one selected value. Tests: 162 offline; the two browser helpers were run in node.
    - **`Tuy4BOP`**: a "keep comparator_id = −1" step in its table script and a sort by
      `abs_std_diff` descending (`dku`), so cached pairs do not appear on page 1.
 

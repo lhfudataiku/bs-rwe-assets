@@ -43,6 +43,25 @@ def label(cohort_id, names):
     return "%s (cohort %d)" % (name, cohort_id) if name else "Cohort %d" % cohort_id
 
 
+def filter_label(cohort_id, names):
+    """The value the dashboard's filters show: `cohort_label`'s "id · name" (recipe
+    `compute_cohort_label`), or "Population" for -1 (recipe `compute_covariate_balance_display`)."""
+    if cohort_id == POPULATION_ID:
+        return POPULATION_LABEL
+    return "%d \u00b7 %s" % (cohort_id, (names or {}).get(cohort_id) or "")
+
+
+def _quoted(text):
+    return '"%s"' % str(text).replace("\\", "\\\\").replace('"', '\\"')
+
+
+def page_filters(cohort_a, cohort_b, names):
+    """The dashboard's `pageFilters` URL value selecting the pair on page 2 (DSS 15 syntax, not yet
+    URL-encoded): `cohort:in("1 · Anemia");comparator:in("Population")`."""
+    return "cohort:in(%s);comparator:in(%s)" % (_quoted(filter_label(as_int(cohort_a), names)),
+                                                 _quoted(filter_label(as_int(cohort_b), names)))
+
+
 def pair_problem(cohort_a, cohort_b, characterized, names=None):
     """Why the pair cannot be compared, as a sentence, or None when it can."""
     a, b = as_int(cohort_a), as_int(cohort_b)
@@ -63,14 +82,16 @@ def pair_problem(cohort_a, cohort_b, characterized, names=None):
 def cohort_choices(definitions, characterization_logs):
     """The webapp's lists: cohort A from the characterized cohorts; cohort B adds the population first.
 
-    definitions: [{"id", "name"}] from `cohort_definition`. Returns {"cohorts": [{"id", "label"}],
-    "comparators": [...]} with the population as cohort B's default (decision 13).
+    definitions: [{"id", "name"}] from `cohort_definition`. Returns {"cohorts": [{"id", "label",
+    "filter"}], "comparators": [...]} with the population as cohort B's default (decision 13);
+    `filter` is the value the dashboard's filters show, so the webapp can follow them.
     """
     names = {as_int(d.get("id")): d.get("name") or "" for d in definitions}
     characterized = comparable(characterization_logs)
-    cohorts = [{"id": i, "label": label(i, names)} for i in sorted(characterized) if i >= 0 and i in names]
+    cohorts = [{"id": i, "label": label(i, names), "filter": filter_label(i, names)}
+               for i in sorted(characterized) if i >= 0 and i in names]
     comparators = cohorts[:]
     if POPULATION_ID in characterized:
-        comparators.insert(0, {"id": POPULATION_ID, "label": POPULATION_LABEL})
+        comparators.insert(0, {"id": POPULATION_ID, "label": POPULATION_LABEL, "filter": POPULATION_LABEL})
     return {"cohorts": cohorts, "comparators": comparators,
             "default_comparator": POPULATION_ID if POPULATION_ID in characterized else None}
