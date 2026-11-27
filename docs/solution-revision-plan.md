@@ -1762,6 +1762,41 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
    - **`Tuy4BOP`**: a "keep comparator_id = −1" step in its table script and a sort by
      `abs_std_diff` descending (`dku`), so cached pairs do not appear on page 1.
 
+   **Stage 5 on TMP (owner-approved, 2026-11-27).** On `TMP_RWD_SOL_V112_TEST` only, without the
+   Setup, the webapp or the dashboard.
+   - **Objects.** Library resynced to `8d4d282`; the 7 datasets, the recipe `characterize_cohorts`
+     and the scenario "Characterize Cohorts" (id `Characterize_Cohorts`, its first step only) created
+     as on SOL. The E4 batch was saved in `characterization_submission` directly; each run cleared it.
+     Variables and scenarios were saved outside the repo first.
+   - **Redshift** (`PREP_RWD_RS_1K`): cohorts 1–3 and the population characterized in 50 s.
+   - **Databricks** (`PREP_RWD_DB_1K` on `bs-databricks-per-user`, switched as in step 2): the E4
+     cohorts rebuilt to 611 / 593 / 247 with the step 2 checksums, then characterized in about 6
+     minutes. No `rwdtmp_` table was left. TMP is back on Redshift; "Reconfigure Connections" empties
+     the script folders, so the Redshift E4 scripts were registered and built again (same counts and
+     checksums).
+   - **Same results as Snowflake.** Compared through aggregates computed in each database (no rows
+     left the instances):
+     - binary covariates: the same ids, counts and sums per cohort (4,872 / 3,595 / 2,839 / 2,725);
+       `covariate_ref` 10,292 rows and 11 analyses everywhere;
+     - balance against the population: the same rows (3,611 / 2,987 / 2,923, same covariate ids);
+       the pairs 1–2 and 2–3 computed on Redshift with `pair_balance_sql` give SOL's cached rows
+       (3,682 and 3,147);
+     - continuous covariates: the same counts and means.
+   - **Rounding differs by dialect, accepted (owner, 2026-11-27).** FeatureExtraction writes
+     `1.0 * x`, a decimal literal, and SqlRender keeps it. Snowflake stores binary prevalences to 6
+     decimals; Redshift divides to 4 decimals before the square root of a variance, so its standard
+     deviations of count covariates are low by up to 0.12% (checked against an exact recomputation);
+     Databricks casts results to its 32-bit `FLOAT`. A standardized difference moves by about 10⁻⁵
+     for a binary covariate and by up to about 0.1% for a count covariate on Redshift. The rendered
+     SQL stays exactly SqlRender's output; a cast to double, tried in the renderer, was reverted.
+   - **The 9 `DEMO_SF_RWE` inputs** (read from `DEMO_DB_RWD2`): schemas unchanged against the
+     snapshot of 2026-11-18.
+   - **2.3M timing deferred to D1** (owner): no project reads `DEMO_SF_PREP_OMOP_2M3` with this flow
+     yet; it is measured when the demo copy is made from this branch.
+   - **Left on Databricks:** 39 managed `tmp_rwd_sol_v112_test_*` tables in
+     `business_solutions.default` (33 of the flow's datasets plus the characterization's 6), as in
+     step 2. Dropping them waits for the owner.
+
 7. **Retirement**, after a backup:
    - the 29 recipes and 30 datasets, and the old dashboard and its 30 insights;
    - Setup's dashboard section, `cohort_definition_id` and `section8_tile1.py`;

@@ -708,6 +708,8 @@ TMP_RWD_SF_COLCASE_TEST	cohort_upper	Snowflake	bs-snowflake	no	1			-
 TMP_RWD_SF_COLCASE_TEST	lower_sf	Snowflake	bs-snowflake	yes	3			-			
 TMP_RWD_SF_COLCASE_TEST	persons	UploadedFiles		no	3			-			
 TMP_RWD_SF_COLCASE_TEST	upper_sf	Snowflake	bs-snowflake	yes	3			-			
+TMP_RWD_SOL_V112_TEST	analysis_ref	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	characterization_log	Redshift	redshift-solutions	yes	6			-			
 TMP_RWD_SOL_V112_TEST	charlson_concepts	Redshift	redshift-solutions	yes	2			-			
 TMP_RWD_SOL_V112_TEST	charlson_score_occurrence	Redshift	redshift-solutions	yes	9			-			
 TMP_RWD_SOL_V112_TEST	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
@@ -736,12 +738,17 @@ TMP_RWD_SOL_V112_TEST	cohort_observation	Redshift	redshift-solutions	yes	9			-
 TMP_RWD_SOL_V112_TEST	cohort_prevalence	Redshift	redshift-solutions	yes	8			-			
 TMP_RWD_SOL_V112_TEST	cohort_visit_events	Redshift	redshift-solutions	yes	9			-			
 TMP_RWD_SOL_V112_TEST	cohort_visit_joined	Redshift	redshift-solutions	yes	9			-			
+TMP_RWD_SOL_V112_TEST	comparison_requests	Redshift	redshift-solutions	yes	4			-			
 TMP_RWD_SOL_V112_TEST	concept	Redshift	redshift-solutions	yes	10			-			
 TMP_RWD_SOL_V112_TEST	concept_ancestor	Redshift	redshift-solutions	yes	4			-			
 TMP_RWD_SOL_V112_TEST	condition_era	Redshift	redshift-solutions	yes	6			-			
 TMP_RWD_SOL_V112_TEST	condition_group_occurrence	Redshift	redshift-solutions	yes	5			-			
 TMP_RWD_SOL_V112_TEST	condition_groups	Redshift	redshift-solutions	yes	3			-			
 TMP_RWD_SOL_V112_TEST	condition_occurrence	Redshift	redshift-solutions	yes	16			-			
+TMP_RWD_SOL_V112_TEST	covariate	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	covariate_balance	Redshift	redshift-solutions	yes	12			-			
+TMP_RWD_SOL_V112_TEST	covariate_continuous	Redshift	redshift-solutions	yes	12			-			
+TMP_RWD_SOL_V112_TEST	covariate_ref	Redshift	redshift-solutions	yes	6			-			
 TMP_RWD_SOL_V112_TEST	death	Redshift	redshift-solutions	yes	7			-			
 TMP_RWD_SOL_V112_TEST	demographic_covariates	Redshift	redshift-solutions	yes	4			-			
 TMP_RWD_SOL_V112_TEST	device_exposure	Redshift	redshift-solutions	yes	15			-			

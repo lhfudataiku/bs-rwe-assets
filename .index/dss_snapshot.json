@@ -24,7 +24,7 @@
   "TMP_RWD_SF_COLCASE_TEST",
   "TMP_RWD_SOL_V112_TEST"
  ],
- "dss_project_count": 1308,
+ "dss_project_count": 1313,
  "external_projects": {
   "SNOWFLAKESYNPUFOMOP23DATAPREPERATION": false
  },
@@ -21959,7 +21959,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-24T14:30Z",
+   "fetched_at": "2026-11-27T11:32Z",
    "flow_sources": [
     "PREP_RWD_S3_1K.concept",
     "PREP_RWD_S3_1K.concept_ancestor",
@@ -21979,7 +21979,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD RS 1K",
-   "probed_at": "2026-11-24T14:31Z",
+   "probed_at": "2026-11-27T11:32Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -27302,7 +27302,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-26T08:15Z",
+   "fetched_at": "2026-11-27T11:32Z",
    "flow_sources": [
     "ATHENA_CONCEPT",
     "ATHENA_CONCEPT_ANCESTOR",
@@ -27326,7 +27326,7 @@
    ],
    "git_references": {},
    "name": "PREP RWD S3 1K",
-   "probed_at": "2026-11-26T08:15Z",
+   "probed_at": "2026-11-27T11:32Z",
    "variables": {
     "local": {},
     "standard": {}
@@ -56684,6 +56684,72 @@
   },
   "TMP_RWD_SOL_V112_TEST": {
    "datasets": {
+    "analysis_ref": {
+     "columns": [
+      [
+       "ANALYSIS_ID",
+       "bigint"
+      ],
+      [
+       "ANALYSIS_NAME",
+       "string"
+      ],
+      [
+       "DOMAIN_ID",
+       "string"
+      ],
+      [
+       "START_DAY",
+       "int"
+      ],
+      [
+       "END_DAY",
+       "int"
+      ],
+      [
+       "IS_BINARY",
+       "string"
+      ],
+      [
+       "MISSING_MEANS_ZERO",
+       "string"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
+    "characterization_log": {
+     "columns": [
+      [
+       "RUN_TIMESTAMP",
+       "string"
+      ],
+      [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "BUILD_TIMESTAMP",
+       "string"
+      ],
+      [
+       "COHORT_COUNT",
+       "bigint"
+      ],
+      [
+       "STATUS",
+       "string"
+      ],
+      [
+       "ERROR",
+       "string"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
     "charlson_concepts": {
      "columns": [
       [
@@ -57568,6 +57634,29 @@
      "managed": true,
      "type": "Redshift"
     },
+    "comparison_requests": {
+     "columns": [
+      [
+       "request_timestamp",
+       "string"
+      ],
+      [
+       "cohort_definition_id",
+       "bigint"
+      ],
+      [
+       "comparator_id",
+       "bigint"
+      ],
+      [
+       "requested_by",
+       "string"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
     "concept": {
      "columns": [
       [
@@ -57779,6 +57868,170 @@
       ],
       [
        "VISIT_DETAIL_ID",
+       "int"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
+    "covariate": {
+     "columns": [
+      [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "SUM_VALUE",
+       "bigint"
+      ],
+      [
+       "AVERAGE_VALUE",
+       "double"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
+    "covariate_balance": {
+     "columns": [
+      [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "COMPARATOR_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_NAME",
+       "string"
+      ],
+      [
+       "ANALYSIS_ID",
+       "int"
+      ],
+      [
+       "IS_BINARY",
+       "string"
+      ],
+      [
+       "COHORT_MEAN",
+       "double"
+      ],
+      [
+       "COHORT_SD",
+       "double"
+      ],
+      [
+       "COMPARATOR_MEAN",
+       "double"
+      ],
+      [
+       "COMPARATOR_SD",
+       "double"
+      ],
+      [
+       "STD_DIFF",
+       "double"
+      ],
+      [
+       "ABS_STD_DIFF",
+       "double"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
+    "covariate_continuous": {
+     "columns": [
+      [
+       "COHORT_DEFINITION_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "COUNT_VALUE",
+       "bigint"
+      ],
+      [
+       "MIN_VALUE",
+       "double"
+      ],
+      [
+       "MAX_VALUE",
+       "double"
+      ],
+      [
+       "AVERAGE_VALUE",
+       "double"
+      ],
+      [
+       "STANDARD_DEVIATION",
+       "double"
+      ],
+      [
+       "MEDIAN_VALUE",
+       "double"
+      ],
+      [
+       "P10_VALUE",
+       "double"
+      ],
+      [
+       "P25_VALUE",
+       "double"
+      ],
+      [
+       "P75_VALUE",
+       "double"
+      ],
+      [
+       "P90_VALUE",
+       "double"
+      ]
+     ],
+     "connection": "redshift-solutions",
+     "managed": true,
+     "type": "Redshift"
+    },
+    "covariate_ref": {
+     "columns": [
+      [
+       "COVARIATE_ID",
+       "bigint"
+      ],
+      [
+       "COVARIATE_NAME",
+       "string"
+      ],
+      [
+       "ANALYSIS_ID",
+       "int"
+      ],
+      [
+       "CONCEPT_ID",
+       "int"
+      ],
+      [
+       "VALUE_AS_CONCEPT_ID",
+       "int"
+      ],
+      [
+       "COLLISIONS",
        "int"
       ]
      ],
@@ -59122,7 +59375,7 @@
     }
    },
    "exists": true,
-   "fetched_at": "2026-11-24T14:30Z",
+   "fetched_at": "2026-11-27T11:32Z",
    "flow_sources": [
     "PREP_RWD_RS_1K.concept_ancestor_rs",
     "PREP_RWD_RS_1K.concept_rs",
@@ -59139,7 +59392,8 @@
     "PREP_RWD_RS_1K.person_rs",
     "PREP_RWD_RS_1K.procedure_occurrence_rs",
     "PREP_RWD_RS_1K.visit_occurrence_rs",
-    "charlson_scoring"
+    "charlson_scoring",
+    "comparison_requests"
    ],
    "git_references": {
     "preview": {
@@ -59154,12 +59408,12 @@
     },
     "python/solution": {
      "checkout": "solution-revision-v1-2",
-     "hash": "ba93630a79138725105d7e04a632659e65cd7294",
+     "hash": "8d4d282abd625ab20c43626914e0a16195a235c8",
      "remote": "https://github.com/lhfudataiku/bs-rwe-assets.git"
     }
    },
    "name": "TMP RWD solution v1.1.2 test",
-   "probed_at": "2026-11-24T14:31Z",
+   "probed_at": "2026-11-27T11:32Z",
    "variables": {
     "local": {
      "cohort_build_error": 0,
