@@ -29,9 +29,8 @@ def create_cohort_sql_script(
     replacement = create_cdm_table_paths(
         key_map, script_cdm_table_names
     )
-    # Create replacement for temporary table names in cohort scripts from Atlas
-    temp_map = create_temp_table_map(sql_code)
-    replacement.update(temp_map)
+    # Atlas temporary tables (@temp_database_schema.<name>) stay as placeholders: build_cohorts renders
+    # them per dialect at run time (R6).
     # Replace cohort sql variables
     new_script = replace_sql_script_variables(sql_code, replacement)
     # Replace cohort id variables
@@ -68,22 +67,15 @@ def create_cohort_definition_table_script(cohort_ids, row_values, uploaded_row_v
     return replace_sql_script_variables(cohort_definition_script, replacement)
 
 
-def create_cohort_log_script(row_values):
-    cohort_log_script = get_script_by_connection_type("cohort_log_script")
-    row_values = ",\n".join(row_values)
-    replacement = {
-        "@cohort_building_log": get_sql_path("cohort_building_log"),
-        "@cohort_log": row_values,
-    }
-    return replace_sql_script_variables(cohort_log_script, replacement)
+
+def cohort_connection_type():
+    """Connection type of the `cohort` dataset, which sits on the project's main connection."""
+    _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, "cohort")
+    return dataset_settings_dict.get("type", "")
 
 
 def get_script_by_connection_type(script_name):
-    # Connection type = project main connection
-    _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, "cohort")
-    connection_type = dataset_settings_dict.get("type", "")
-    script = SQL_SCRIPT[connection_type][script_name]
-    return script
+    return SQL_SCRIPT[cohort_connection_type()][script_name]
 
 
 def create_cdm_table_map(key_map):
@@ -93,13 +85,6 @@ def create_cdm_table_map(key_map):
             cdm_standard_table[v] = k
     return cdm_standard_table
 
-
-def create_temp_table_map(sql_code):
-    replacement = {}
-    pattern = re.compile(r"@temp_database_schema\.\w*", re.IGNORECASE)
-    for table_name in set(pattern.findall(sql_code)):
-        replacement[table_name.lower()] = table_name.split(".")[1]
-    return replacement
 
 
 def return_script_cdm_tables(sql_code, key_map):
@@ -133,59 +118,27 @@ def return_script_cdm_tables(sql_code, key_map):
 
 
 def get_sql_path(table):
+    """Return the table's SQL name exactly as DSS writes it in its own recipes.
+
+    DSS resolves the catalog or database, the schema, variables such as ${projectKey} and the
+    quoting of each dialect (spike 2026-11-20, solution-revision-plan.md R4). Works in recipes that do
+    not declare the dataset as an input or output. Only the connection
+    types in SQL_SCRIPT are supported; any other raises before SQL is built.
+    """
     _, dataset_settings_dict = get_dataset_settings_and_dictionary(PROJECT, table)
     connection_type = dataset_settings_dict.get("type", "")
-    dataset_params = dataset_settings_dict.get("params", {})
-    return set_table_variables(connection_type, dataset_params)
-
-
-# Check if all connection types are included here !!!
-def set_table_variables(connection_type, dataset_params):
-    custom_variables = dataiku.get_custom_variables()
-    table_name = dataset_params.get("table", "")
-
-    if connection_type == "Snowflake":
-        schema = dataset_params.get("schema", "")
-        replacement = {
-            "${TENANT}": custom_variables.get("TENANT", ""),
-            "${NODE}": custom_variables.get("NODE", ""),
-            "${projectKey}": custom_variables.get("projectKey", ""),
-        }
-
-        def replace_match(match):
-            return replacement[match.group(0)]
-
-        pattern = re.compile("|".join(re.escape(key) for key in replacement.keys()))
-        table_name = pattern.sub(replace_match, table_name)
-        table_path = f'"{table_name}"' if not schema else f'"{schema}"."{table_name}"'
-        return table_path
-
-    elif connection_type == "Databricks":
-        schema = dataset_params.get("schema", "")
-        replacement = {
-            "${catalog}": custom_variables.get("catalog", ""),
-            "${projectKey}": custom_variables.get("projectKey", ""),
-        }
-
-        def replace_match(match):
-            return replacement[match.group(0)]
-
-        pattern = re.compile("|".join(re.escape(key) for key in replacement.keys()))
-        table_name = pattern.sub(replace_match, table_name)
-        table_path = f"`{table_name}`" if not schema else f"`{schema}`.`{table_name}`"
-        return table_path
-    
-    elif connection_type == "Redshift":
-        replacement = {
-            "${projectKey}": custom_variables.get("projectKey", ""),
-        }
-
-        def replace_match(match):
-            return replacement[match.group(0)]
-
-        pattern = re.compile("|".join(re.escape(key) for key in replacement.keys()))
-        table_name = pattern.sub(replace_match, table_name)
-    return table_name
+    if connection_type not in SQL_SCRIPT:
+        raise ValueError(
+            f"Dataset '{table}' is on a {connection_type or 'unknown'} connection; the solution supports "
+            f"{', '.join(sorted(SQL_SCRIPT))}. Run 'Reconfigure' in Project Setup on a supported connection."
+        )
+    # ignore_flow: the mapping runs inside a Python recipe that does not declare the CDM and cohort
+    # tables, and dataiku.Dataset refuses undeclared datasets there (E4 rerun, 2026-11-23).
+    info = dataiku.Dataset(table, ignore_flow=True).get_location_info().get("info", {})
+    table_path = info.get("quotedResolvedTableName")
+    if not table_path:
+        raise ValueError(f"DSS returned no resolved table name for dataset '{table}' ({connection_type})")
+    return table_path
 
 
 def create_cdm_table_paths(key_map, script_cdm_table_names):
@@ -212,34 +165,6 @@ def replace_sql_script_variables(sql_script, replacement):
     return new_script
 
 
-def create_clear_temp_tables_script(sql_script):
-    clear_temp_tables_script = ""
-
-    pattern = re.compile(r"(DROP TABLE) (\W?\w*;)", re.IGNORECASE)
-    for table_name in set(pattern.findall(sql_script)):
-        clear_temp_tables_script += " IF EXISTS ".join(table_name)
-        clear_temp_tables_script += "\n"
-    return clear_temp_tables_script
-
-
-def create_sql_script_scenario_step(connection_type, sql_script):    
-    scenario_steps = [
-        {'id': 'sql_null',
-        'type': 'exec_sql',
-        'name': 'Step #1',
-        'enabled': True,
-        'runConditionType': 'RUN_IF_STATUS_MATCH',
-        'runConditionStatuses': ['SUCCESS', 'WARNING'],
-        'runConditionExpression': '',
-        'resetScenarioStatus': False,
-        'delayBetweenRetries': 10,
-        'maxRetriesOnFail': 0,
-        'params': {'connection': connection_type,
-        'sql': sql_script,
-        'overrideDefaultLimit': False,
-        'extraConf': [],
-        'proceedOnFailure': False}}]
-    return scenario_steps
 
 
 def validate_cdm_tables(script_cdm_table_names, project, cohort_info=None):
@@ -256,7 +181,8 @@ def validate_cdm_tables(script_cdm_table_names, project, cohort_info=None):
     logger.info(f"Validating {len(script_cdm_table_names)} CDM tables for cohort {cohort_info['id'] if cohort_info else 'unknown'}")
     
     if not script_cdm_table_names:
-        error_msg = "No OMOP tables were mapped from the script! Please verify the OMOP table names from your scripts and adjust the setting in the previous step, 'OMOP CDM Custom Table Name Mapping,' accordingly."
+        error_msg = ("No OMOP table was found in the script. Check that 'Cohort Script Table Naming' in "
+                     "Project Setup matches how the script names OMOP tables.")
         if cohort_info:
             error_msg = f"Cohort {cohort_info['id']} ({cohort_info['name']}): {error_msg}"
         logger.error(error_msg)

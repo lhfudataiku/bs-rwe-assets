@@ -1,0 +1,11 @@
+.rwd-compare { font-family: inherit; font-size: 13px; padding: 8px 12px; color: #222; }
+.rwd-compare h4 { margin: 0 0 4px; }
+.rwd-muted { color: #666; margin: 0 0 8px; }
+.rwd-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.rwd-row label { display: flex; flex-direction: column; gap: 2px; min-width: 200px; flex: 1 1 200px; }
+.rwd-row select { padding: 4px; max-width: 100%; }
+.rwd-row button { padding: 5px 16px; }
+.rwd-message { margin: 10px 0 0; min-height: 1.4em; }
+.rwd-done, .rwd-cached { color: #2e7d32; }
+.rwd-failed, .rwd-invalid, .rwd-forbidden { color: #c62828; }
+.rwd-running { color: #555; }

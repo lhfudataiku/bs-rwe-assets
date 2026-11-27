@@ -9,62 +9,62 @@ SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_rs	Redshift	redshift-solutions	yes	6			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CARE_SITE_sf	Snowflake	managed-snowflake	yes	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA	UploadedFiles	dataiku-managed-storage	no	6			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_1k	S3	dataiku-managed-storage	yes	6	s3	condition_era	yes	121386	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	yes	121386	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_rs	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_ERA_sf	Snowflake	managed-snowflake	yes	6	snowflake	condition_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	13			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	16	s3	condition_occurrence	yes	160322	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	yes	160322	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_rs	Redshift	redshift-solutions	yes	16	redshift	condition_occurrence	yes	160322	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_CONDITION_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	16	snowflake	condition_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH	UploadedFiles	dataiku-managed-storage	no	7			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_1k	S3	dataiku-managed-storage	yes	7	s3	death	yes	45	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	yes	45	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_rs	Redshift	redshift-solutions	yes	7	redshift	death	yes	45	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEATH_sf	Snowflake	managed-snowflake	yes	7	snowflake	death	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	14			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_1k	S3	dataiku-managed-storage	yes	15	s3	device_exposure	yes	1622	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	yes	1622	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_rs	Redshift	redshift-solutions	yes	15	redshift	device_exposure	yes	1622	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DEVICE_EXPOSURE_sf	Snowflake	managed-snowflake	yes	15	snowflake	device_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA	UploadedFiles	dataiku-managed-storage	no	7			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_1k	S3	dataiku-managed-storage	yes	7	s3	drug_era	yes	52714	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	yes	52714	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_rs	Redshift	redshift-solutions	yes	7	redshift	drug_era	yes	52714	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_ERA_sf	Snowflake	managed-snowflake	yes	7	snowflake	drug_era	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE	UploadedFiles	dataiku-managed-storage	no	21			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_1k	S3	dataiku-managed-storage	yes	23	s3	drug_exposure	yes	49542	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	yes	49542	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_rs	Redshift	redshift-solutions	yes	23	redshift	drug_exposure	yes	49542	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_DRUG_EXPOSURE_sf	Snowflake	managed-snowflake	yes	23	snowflake	drug_exposure	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION	UploadedFiles	dataiku-managed-storage	no	8			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_1k	S3	dataiku-managed-storage	yes	10	s3	location	yes	626	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	yes	626	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_rs	Redshift	redshift-solutions	yes	10	redshift	location	yes	626	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_LOCATION_sf	Snowflake	managed-snowflake	yes	10	snowflake	location	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT	UploadedFiles	dataiku-managed-storage	no	18			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_1k	S3	dataiku-managed-storage	yes	20	s3	measurement	yes	2858	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	yes	2858	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_rs	Redshift	redshift-solutions	yes	20	redshift	measurement	yes	2858	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_MEASUREMENT_sf	Snowflake	managed-snowflake	yes	20	snowflake	measurement	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION	UploadedFiles	dataiku-managed-storage	no	17			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_1k	S3	dataiku-managed-storage	yes	18	s3	observation	yes	13481	metric	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD531	UploadedFiles	dataiku-managed-storage	no	5			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_1k	S3	dataiku-managed-storage	yes	5	s3	observation_period	yes	1048	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	yes	1048	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_rs	Redshift	redshift-solutions	yes	5	redshift	observation_period	yes	1048	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_PERIOD_sf	Snowflake	managed-snowflake	yes	5	snowflake	observation_period	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	yes	13481	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_rs	Redshift	redshift-solutions	yes	18	redshift	observation	yes	13481	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_OBSERVATION_sf	Snowflake	managed-snowflake	yes	18	snowflake	observation	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON	UploadedFiles	dataiku-managed-storage	no	18			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_1k	S3	dataiku-managed-storage	yes	19	s3	person	yes	1000	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	yes	1000	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_rs	Redshift	redshift-solutions	yes	19	redshift	person	yes	1000	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PERSON_sf	Snowflake	managed-snowflake	yes	19	snowflake	person	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE531	UploadedFiles	dataiku-managed-storage	no	14			-			
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_1k	S3	dataiku-managed-storage	yes	14	s3	procedure_occurrence	yes	62189	metric	
-SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	unknown		sql	timeout after 240s
+SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	yes	62189	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_rs	Redshift	redshift-solutions	yes	14	redshift	procedure_occurrence	yes	62189	sql	
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_PROCEDURE_OCCURRENCE_sf	Snowflake	managed-snowflake	yes	14	snowflake	procedure_occurrence	no		sql	ce-1953178d-int2_node-f67415e3_SYNPUFOMOP1KDATAPREPRWDV11"' does not exist or not authorized. Your primary role BS_PLATFORM_DESIGN or one of
 SYNPUFOMOP1KDATAPREPRWDV11	CDM_VISIT_OCCURRENCE	UploadedFiles	dataiku-managed-storage	no	12			-			
@@ -454,72 +454,56 @@ DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_2	Snowflake	managed-snowflake	ye
 DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_3	Snowflake	managed-snowflake	yes	12			-			
 DEMO_SF_OMOP2M_DATAPREP	visit_occurrence_2_3_pc_db	Snowflake	managed-snowflake	yes	17			-			
 DEMO_SF_OMOP2M_DATAPREP	vocabulary_db	Snowflake	managed-snowflake	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	charlson_concepts	Filesystem	filesystem_managed	yes	2			-			
-SOL_RWD_COHORT_DISCOVERY	charlson_score_occurrence	Filesystem	filesystem_managed	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	analysis_ref	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	characterization_latest	Snowflake	bs-snowflake	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	characterization_log	Snowflake	bs-snowflake	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_concepts	Snowflake	bs-snowflake	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_score_occurrence	Snowflake	bs-snowflake	yes	9			-			
 SOL_RWD_COHORT_DISCOVERY	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
-SOL_RWD_COHORT_DISCOVERY	charlson_scoring_copy	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	cohort	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_building_log	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_count	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_events	Filesystem	filesystem_managed	yes	10			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_joint	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_prevalence	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_condition_group_prevalence_prepared	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_count	Filesystem	filesystem_managed	yes	2			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_definition	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_definition_filtered	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_demographics	Filesystem	filesystem_managed	yes	17			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_count	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_events	Filesystem	filesystem_managed	yes	10			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_joined	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_prevalence	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_drug_group_prevalence_prepared	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_filtered	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_filtered_exploded_by_quarter	Filesystem	filesystem_managed	yes	6			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_location	Filesystem	filesystem_managed	yes	6			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_location_prepared	Filesystem	filesystem_managed	yes	6			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_metadata_copy	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_observation	Filesystem	filesystem_managed	yes	9			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_prevalence	Filesystem	filesystem_managed	yes	8			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_visit_events	Filesystem	filesystem_managed	yes	9			-			
-SOL_RWD_COHORT_DISCOVERY	cohort_visit_joined	Filesystem	filesystem_managed	yes	9			-			
-SOL_RWD_COHORT_DISCOVERY	concept	Filesystem	filesystem_managed	yes	10			-			
-SOL_RWD_COHORT_DISCOVERY	concept_ancestor	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	condition_era	Filesystem	filesystem_managed	yes	6			-			
-SOL_RWD_COHORT_DISCOVERY	condition_group_occurrence	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	condition_groups	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	condition_occurrence	Filesystem	filesystem_managed	yes	16			-			
-SOL_RWD_COHORT_DISCOVERY	death	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	demographic_covariates	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	device_exposure	Filesystem	filesystem_managed	yes	15			-			
-SOL_RWD_COHORT_DISCOVERY	drug_class_exposure	Filesystem	filesystem_managed	yes	6			-			
-SOL_RWD_COHORT_DISCOVERY	drug_era	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	drug_exposure	Filesystem	filesystem_managed	yes	23			-			
-SOL_RWD_COHORT_DISCOVERY	drug_groups	Filesystem	filesystem_managed	yes	9			-			
-SOL_RWD_COHORT_DISCOVERY	location	Filesystem	filesystem_managed	yes	10			-			
-SOL_RWD_COHORT_DISCOVERY	measurement	Filesystem	filesystem_managed	yes	20			-			
-SOL_RWD_COHORT_DISCOVERY	observation	Filesystem	filesystem_managed	yes	18			-			
-SOL_RWD_COHORT_DISCOVERY	observation_period	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	observation_period_joined	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	observation_period_quarter_exploded	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	observation_period_quarter_exploded_by_QUARTER	Filesystem	filesystem_managed	yes	2			-			
-SOL_RWD_COHORT_DISCOVERY	person	Filesystem	filesystem_managed	yes	19			-			
-SOL_RWD_COHORT_DISCOVERY	person_location_joined	Filesystem	filesystem_managed	yes	13			-			
-SOL_RWD_COHORT_DISCOVERY	popoulation_cohort_charlson_score	Filesystem	filesystem_managed	yes	3			-			
-SOL_RWD_COHORT_DISCOVERY	population_cohort_charlson_event_count	Filesystem	filesystem_managed	yes	7			-			
-SOL_RWD_COHORT_DISCOVERY	population_cohort_charlson_score_joined	Filesystem	filesystem_managed	yes	8			-			
-SOL_RWD_COHORT_DISCOVERY	population_cohort_charlson_score_prepared	Filesystem	filesystem_managed	yes	9			-			
-SOL_RWD_COHORT_DISCOVERY	population_cohort_demographic_prepared	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	population_cohort_race	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	population_cohort_sex	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	population_w_cohort_first_occurrence	Filesystem	filesystem_managed	yes	12			-			
-SOL_RWD_COHORT_DISCOVERY	population_w_cohort_prepared	Filesystem	filesystem_managed	yes	11			-			
-SOL_RWD_COHORT_DISCOVERY	procedure_occurrence	Filesystem	filesystem_managed	yes	14			-			
-SOL_RWD_COHORT_DISCOVERY	snomed_clinical	Filesystem	filesystem_managed	yes	4			-			
-SOL_RWD_COHORT_DISCOVERY	uploaded_cohort_definition	Filesystem	filesystem_managed	yes	5			-			
-SOL_RWD_COHORT_DISCOVERY	visit_occurrence	Filesystem	filesystem_managed	yes	17			-			
-SOL_RWD_COHORT_DISCOVERY	visit_occurrence_labeled	Filesystem	filesystem_managed	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	charlson_scoring_copy	Snowflake	bs-snowflake	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	cohort	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_building_log	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_definition	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_filter	Snowflake	bs-snowflake	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_label	Snowflake	bs-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	cohort_summary	Snowflake	bs-snowflake	yes	8			-			
+SOL_RWD_COHORT_DISCOVERY	comparison_filter	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	comparison_requests	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	concept	Snowflake	bs-snowflake	yes	10			-			
+SOL_RWD_COHORT_DISCOVERY	concept_ancestor	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	condition_era	Snowflake	bs-snowflake	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	condition_group_occurrence	Snowflake	bs-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	condition_groups	Snowflake	bs-snowflake	yes	3			-			
+SOL_RWD_COHORT_DISCOVERY	condition_occurrence	Snowflake	bs-snowflake	yes	16			-			
+SOL_RWD_COHORT_DISCOVERY	covariate	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_balance	Snowflake	bs-snowflake	yes	12			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_balance_display	Snowflake	bs-snowflake	yes	17			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_censored	Snowflake	bs-snowflake	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_continuous	Snowflake	bs-snowflake	yes	12			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_continuous_display	Snowflake	bs-snowflake	yes	17			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_ref	Snowflake	bs-snowflake	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	covariate_ref_display	Snowflake	bs-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	death	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	demographic_covariates	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	device_exposure	Snowflake	bs-snowflake	yes	15			-			
+SOL_RWD_COHORT_DISCOVERY	drug_class_exposure	Snowflake	bs-snowflake	yes	6			-			
+SOL_RWD_COHORT_DISCOVERY	drug_era	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	drug_exposure	Snowflake	bs-snowflake	yes	23			-			
+SOL_RWD_COHORT_DISCOVERY	drug_groups	Snowflake	bs-snowflake	yes	9			-			
+SOL_RWD_COHORT_DISCOVERY	location	Snowflake	bs-snowflake	yes	10			-			
+SOL_RWD_COHORT_DISCOVERY	measurement	Snowflake	bs-snowflake	yes	20			-			
+SOL_RWD_COHORT_DISCOVERY	observation	Snowflake	bs-snowflake	yes	18			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period	Snowflake	bs-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period_joined	Snowflake	bs-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period_quarter_exploded	Snowflake	bs-snowflake	yes	7			-			
+SOL_RWD_COHORT_DISCOVERY	observation_period_quarter_exploded_by_QUARTER	Snowflake	bs-snowflake	yes	2			-			
+SOL_RWD_COHORT_DISCOVERY	person	Snowflake	bs-snowflake	yes	19			-			
+SOL_RWD_COHORT_DISCOVERY	person_location_joined	Snowflake	bs-snowflake	yes	13			-			
+SOL_RWD_COHORT_DISCOVERY	procedure_occurrence	Snowflake	bs-snowflake	yes	14			-			
+SOL_RWD_COHORT_DISCOVERY	snomed_clinical	Snowflake	bs-snowflake	yes	4			-			
+SOL_RWD_COHORT_DISCOVERY	uploaded_cohort_definition	Snowflake	bs-snowflake	yes	5			-			
+SOL_RWD_COHORT_DISCOVERY	visit_occurrence	Snowflake	bs-snowflake	yes	17			-			
+SOL_RWD_COHORT_DISCOVERY	visit_occurrence_labeled	Snowflake	bs-snowflake	yes	6			-			
 DEMO_SF_RWD	charlson_concepts	Snowflake	managed-snowflake	yes	2			-			
 DEMO_SF_RWD	charlson_score_occurrence	Snowflake	bs-snowflake	yes	9			-			
 DEMO_SF_RWD	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
@@ -703,72 +687,78 @@ TMP_RWD_SF_COLCASE_TEST	cohort_upper	Snowflake	bs-snowflake	no	1			-
 TMP_RWD_SF_COLCASE_TEST	lower_sf	Snowflake	bs-snowflake	yes	3			-			
 TMP_RWD_SF_COLCASE_TEST	persons	UploadedFiles		no	3			-			
 TMP_RWD_SF_COLCASE_TEST	upper_sf	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	charlson_concepts	Snowflake	bs-snowflake	yes	2			-			
-TMP_RWD_SOL_V112_TEST	charlson_score_occurrence	Snowflake	bs-snowflake	yes	9			-			
+TMP_RWD_SOL_V112_TEST	analysis_ref	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	characterization_log	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	charlson_concepts	Redshift	redshift-solutions	yes	2			-			
+TMP_RWD_SOL_V112_TEST	charlson_score_occurrence	Redshift	redshift-solutions	yes	9			-			
 TMP_RWD_SOL_V112_TEST	charlson_scoring	UploadedFiles	filesystem_managed	no	3			-			
-TMP_RWD_SOL_V112_TEST	charlson_scoring_copy	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	cohort	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_building_log	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	cohort_condition_group_count	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	cohort_condition_group_events	Snowflake	bs-snowflake	yes	10			-			
-TMP_RWD_SOL_V112_TEST	cohort_condition_group_joint	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	cohort_condition_group_prevalence	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_condition_group_prevalence_prepared	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	cohort_count	Snowflake	bs-snowflake	yes	2			-			
-TMP_RWD_SOL_V112_TEST	cohort_definition	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	cohort_definition_filtered	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	cohort_demographics	Snowflake	bs-snowflake	yes	17			-			
-TMP_RWD_SOL_V112_TEST	cohort_drug_group_count	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	cohort_drug_group_events	Snowflake	bs-snowflake	yes	10			-			
-TMP_RWD_SOL_V112_TEST	cohort_drug_group_joined	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	cohort_drug_group_prevalence	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_drug_group_prevalence_prepared	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	cohort_filtered	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_filtered_exploded_by_quarter	Snowflake	bs-snowflake	yes	6			-			
-TMP_RWD_SOL_V112_TEST	cohort_location	Snowflake	bs-snowflake	yes	6			-			
-TMP_RWD_SOL_V112_TEST	cohort_location_prepared	Snowflake	bs-snowflake	yes	6			-			
-TMP_RWD_SOL_V112_TEST	cohort_metadata	UploadedFiles	filesystem_managed	no	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_metadata_copy	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	cohort_observation	Snowflake	bs-snowflake	yes	9			-			
-TMP_RWD_SOL_V112_TEST	cohort_prevalence	Snowflake	bs-snowflake	yes	8			-			
-TMP_RWD_SOL_V112_TEST	cohort_visit_events	Snowflake	bs-snowflake	yes	9			-			
-TMP_RWD_SOL_V112_TEST	cohort_visit_joined	Snowflake	bs-snowflake	yes	9			-			
-TMP_RWD_SOL_V112_TEST	concept	Snowflake	bs-snowflake	yes	10			-			
-TMP_RWD_SOL_V112_TEST	concept_ancestor	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	condition_era	Snowflake	bs-snowflake	yes	6			-			
-TMP_RWD_SOL_V112_TEST	condition_group_occurrence	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	condition_groups	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	condition_occurrence	Snowflake	bs-snowflake	yes	16			-			
-TMP_RWD_SOL_V112_TEST	death	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	demographic_covariates	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	device_exposure	Snowflake	bs-snowflake	yes	15			-			
-TMP_RWD_SOL_V112_TEST	drug_class_exposure	Snowflake	bs-snowflake	yes	6			-			
-TMP_RWD_SOL_V112_TEST	drug_era	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	drug_exposure	Snowflake	bs-snowflake	yes	23			-			
-TMP_RWD_SOL_V112_TEST	drug_groups	Snowflake	bs-snowflake	yes	9			-			
-TMP_RWD_SOL_V112_TEST	location	Snowflake	bs-snowflake	yes	10			-			
-TMP_RWD_SOL_V112_TEST	measurement	Snowflake	bs-snowflake	yes	20			-			
-TMP_RWD_SOL_V112_TEST	observation	Snowflake	bs-snowflake	yes	18			-			
-TMP_RWD_SOL_V112_TEST	observation_period	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	observation_period_joined	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	observation_period_quarter_exploded	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	observation_period_quarter_exploded_by_QUARTER	Snowflake	bs-snowflake	yes	2			-			
-TMP_RWD_SOL_V112_TEST	person	Snowflake	bs-snowflake	yes	19			-			
-TMP_RWD_SOL_V112_TEST	person_location_joined	Snowflake	bs-snowflake	yes	13			-			
-TMP_RWD_SOL_V112_TEST	popoulation_cohort_charlson_score	Snowflake	bs-snowflake	yes	3			-			
-TMP_RWD_SOL_V112_TEST	population_cohort_charlson_event_count	Snowflake	bs-snowflake	yes	7			-			
-TMP_RWD_SOL_V112_TEST	population_cohort_charlson_score_joined	Snowflake	bs-snowflake	yes	8			-			
-TMP_RWD_SOL_V112_TEST	population_cohort_charlson_score_prepared	Snowflake	bs-snowflake	yes	9			-			
-TMP_RWD_SOL_V112_TEST	population_cohort_demographic_prepared	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	population_cohort_race	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	population_cohort_sex	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	population_w_cohort_first_occurrence	Snowflake	bs-snowflake	yes	12			-			
-TMP_RWD_SOL_V112_TEST	population_w_cohort_prepared	Snowflake	bs-snowflake	yes	11			-			
-TMP_RWD_SOL_V112_TEST	procedure_occurrence	Snowflake	bs-snowflake	yes	14			-			
-TMP_RWD_SOL_V112_TEST	snomed_clinical	Snowflake	bs-snowflake	yes	4			-			
-TMP_RWD_SOL_V112_TEST	uploaded_cohort_definition	Snowflake	bs-snowflake	yes	5			-			
-TMP_RWD_SOL_V112_TEST	visit_occurrence	Snowflake	bs-snowflake	yes	17			-			
-TMP_RWD_SOL_V112_TEST	visit_occurrence_labeled	Snowflake	bs-snowflake	yes	6			-			
+TMP_RWD_SOL_V112_TEST	charlson_scoring_copy	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	cohort	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	cohort_building_log	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	cohort_condition_group_count	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	cohort_condition_group_events	Redshift	redshift-solutions	yes	10			-			
+TMP_RWD_SOL_V112_TEST	cohort_condition_group_joint	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	cohort_condition_group_prevalence	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	cohort_condition_group_prevalence_prepared	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	cohort_count	Redshift	redshift-solutions	yes	2			-			
+TMP_RWD_SOL_V112_TEST	cohort_definition	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	cohort_definition_filtered	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	cohort_demographics	Redshift	redshift-solutions	yes	17			-			
+TMP_RWD_SOL_V112_TEST	cohort_drug_group_count	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	cohort_drug_group_events	Redshift	redshift-solutions	yes	10			-			
+TMP_RWD_SOL_V112_TEST	cohort_drug_group_joined	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	cohort_drug_group_prevalence	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	cohort_drug_group_prevalence_prepared	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	cohort_filtered	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	cohort_filtered_exploded_by_quarter	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	cohort_location	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	cohort_location_prepared	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	cohort_observation	Redshift	redshift-solutions	yes	9			-			
+TMP_RWD_SOL_V112_TEST	cohort_prevalence	Redshift	redshift-solutions	yes	8			-			
+TMP_RWD_SOL_V112_TEST	cohort_visit_events	Redshift	redshift-solutions	yes	9			-			
+TMP_RWD_SOL_V112_TEST	cohort_visit_joined	Redshift	redshift-solutions	yes	9			-			
+TMP_RWD_SOL_V112_TEST	comparison_requests	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	concept	Redshift	redshift-solutions	yes	10			-			
+TMP_RWD_SOL_V112_TEST	concept_ancestor	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	condition_era	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	condition_group_occurrence	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	condition_groups	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	condition_occurrence	Redshift	redshift-solutions	yes	16			-			
+TMP_RWD_SOL_V112_TEST	covariate	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	covariate_balance	Redshift	redshift-solutions	yes	12			-			
+TMP_RWD_SOL_V112_TEST	covariate_censored	Redshift	redshift-solutions	yes	2			-			
+TMP_RWD_SOL_V112_TEST	covariate_continuous	Redshift	redshift-solutions	yes	12			-			
+TMP_RWD_SOL_V112_TEST	covariate_ref	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	death	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	demographic_covariates	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	device_exposure	Redshift	redshift-solutions	yes	15			-			
+TMP_RWD_SOL_V112_TEST	drug_class_exposure	Redshift	redshift-solutions	yes	6			-			
+TMP_RWD_SOL_V112_TEST	drug_era	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	drug_exposure	Redshift	redshift-solutions	yes	23			-			
+TMP_RWD_SOL_V112_TEST	drug_groups	Redshift	redshift-solutions	yes	9			-			
+TMP_RWD_SOL_V112_TEST	location	Redshift	redshift-solutions	yes	10			-			
+TMP_RWD_SOL_V112_TEST	measurement	Redshift	redshift-solutions	yes	20			-			
+TMP_RWD_SOL_V112_TEST	observation	Redshift	redshift-solutions	yes	18			-			
+TMP_RWD_SOL_V112_TEST	observation_period	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	observation_period_joined	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	observation_period_quarter_exploded	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	observation_period_quarter_exploded_by_QUARTER	Redshift	redshift-solutions	yes	2			-			
+TMP_RWD_SOL_V112_TEST	person	Redshift	redshift-solutions	yes	19			-			
+TMP_RWD_SOL_V112_TEST	person_location_joined	Redshift	redshift-solutions	yes	13			-			
+TMP_RWD_SOL_V112_TEST	popoulation_cohort_charlson_score	Redshift	redshift-solutions	yes	3			-			
+TMP_RWD_SOL_V112_TEST	population_cohort_charlson_event_count	Redshift	redshift-solutions	yes	7			-			
+TMP_RWD_SOL_V112_TEST	population_cohort_charlson_score_joined	Redshift	redshift-solutions	yes	8			-			
+TMP_RWD_SOL_V112_TEST	population_cohort_charlson_score_prepared	Redshift	redshift-solutions	yes	9			-			
+TMP_RWD_SOL_V112_TEST	population_cohort_demographic_prepared	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	population_cohort_race	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	population_cohort_sex	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	population_w_cohort_first_occurrence	Redshift	redshift-solutions	yes	12			-			
+TMP_RWD_SOL_V112_TEST	population_w_cohort_prepared	Redshift	redshift-solutions	yes	11			-			
+TMP_RWD_SOL_V112_TEST	procedure_occurrence	Redshift	redshift-solutions	yes	14			-			
+TMP_RWD_SOL_V112_TEST	snomed_clinical	Redshift	redshift-solutions	yes	4			-			
+TMP_RWD_SOL_V112_TEST	uploaded_cohort_definition	Redshift	redshift-solutions	yes	5			-			
+TMP_RWD_SOL_V112_TEST	visit_occurrence	Redshift	redshift-solutions	yes	17			-			
+TMP_RWD_SOL_V112_TEST	visit_occurrence_labeled	Redshift	redshift-solutions	yes	6			-			
 PREP_RWD_S3_1K	ATHENA_CONCEPT	S3	hls-synth-patient	no	10			-			
 PREP_RWD_S3_1K	ATHENA_CONCEPT_ANCESTOR	S3	hls-synth-patient	no	4			-			
 PREP_RWD_S3_1K	ATHENA_CONCEPT_RELATIONSHIP	S3	hls-synth-patient	no	6			-			
@@ -962,21 +952,21 @@ PREP_RWD_SF_1K	observation_sf	Snowflake	bs-snowflake	yes	18	snowflake	observatio
 PREP_RWD_SF_1K	person_sf	Snowflake	bs-snowflake	yes	19	snowflake	person	yes	1000	sql	
 PREP_RWD_SF_1K	procedure_occurrence_sf	Snowflake	bs-snowflake	yes	14	snowflake	procedure_occurrence	yes	62189	sql	
 PREP_RWD_SF_1K	visit_occurrence_sf	Snowflake	bs-snowflake	yes	17	snowflake	visit_occurrence	yes	17904	sql	
-PREP_RWD_DB_1K	concept_ancestor_db	Databricks	bs-databricks	yes	4	databricks	concept_ancestor	yes	72374967	sql	
-PREP_RWD_DB_1K	concept_db	Databricks	bs-databricks	yes	10	databricks	concept	yes	6088813	sql	
-PREP_RWD_DB_1K	condition_era_db	Databricks	bs-databricks	yes	6	databricks	condition_era	yes	121386	sql	
-PREP_RWD_DB_1K	condition_occurrence_db	Databricks	bs-databricks	yes	16	databricks	condition_occurrence	unknown		sql	rence_db`': [Databricks][JDBCDriver](500157) Socket timeout expired when executing query: SELECT COUNT(*) AS n FROM `se-sandbox`.`business_s
-PREP_RWD_DB_1K	death_db	Databricks	bs-databricks	yes	7	databricks	death	yes	45	sql	
-PREP_RWD_DB_1K	device_exposure_db	Databricks	bs-databricks	yes	15	databricks	device_exposure	yes	1622	sql	
-PREP_RWD_DB_1K	drug_era_db	Databricks	bs-databricks	yes	7	databricks	drug_era	yes	52714	sql	
-PREP_RWD_DB_1K	drug_exposure_db	Databricks	bs-databricks	yes	23	databricks	drug_exposure	yes	49542	sql	
-PREP_RWD_DB_1K	location_db	Databricks	bs-databricks	yes	10	databricks	location	yes	626	sql	
-PREP_RWD_DB_1K	measurement_db	Databricks	bs-databricks	yes	20	databricks	measurement	yes	2858	sql	
-PREP_RWD_DB_1K	observation_db	Databricks	bs-databricks	yes	18	databricks	observation	yes	13481	sql	
-PREP_RWD_DB_1K	observation_period_db	Databricks	bs-databricks	yes	5	databricks	observation_period	yes	1048	sql	
-PREP_RWD_DB_1K	person_db	Databricks	bs-databricks	yes	19	databricks	person	yes	1000	sql	
-PREP_RWD_DB_1K	procedure_occurrence_db	Databricks	bs-databricks	yes	14	databricks	procedure_occurrence	yes	62189	sql	
-PREP_RWD_DB_1K	visit_occurrence_db	Databricks	bs-databricks	yes	17	databricks	visit_occurrence	yes	17904	sql	
+PREP_RWD_DB_1K	concept_ancestor_db	Databricks	bs-databricks-per-user	yes	4	databricks	concept_ancestor	yes	72374967	sql	
+PREP_RWD_DB_1K	concept_db	Databricks	bs-databricks-per-user	yes	10	databricks	concept	yes	6088813	sql	
+PREP_RWD_DB_1K	condition_era_db	Databricks	bs-databricks-per-user	yes	6	databricks	condition_era	yes	121386	sql	
+PREP_RWD_DB_1K	condition_occurrence_db	Databricks	bs-databricks-per-user	yes	16	databricks	condition_occurrence	yes	160322	sql	
+PREP_RWD_DB_1K	death_db	Databricks	bs-databricks-per-user	yes	7	databricks	death	yes	45	sql	
+PREP_RWD_DB_1K	device_exposure_db	Databricks	bs-databricks-per-user	yes	15	databricks	device_exposure	yes	1622	sql	
+PREP_RWD_DB_1K	drug_era_db	Databricks	bs-databricks-per-user	yes	7	databricks	drug_era	yes	52714	sql	
+PREP_RWD_DB_1K	drug_exposure_db	Databricks	bs-databricks-per-user	yes	23	databricks	drug_exposure	yes	49542	sql	
+PREP_RWD_DB_1K	location_db	Databricks	bs-databricks-per-user	yes	10	databricks	location	yes	626	sql	
+PREP_RWD_DB_1K	measurement_db	Databricks	bs-databricks-per-user	yes	20	databricks	measurement	yes	2858	sql	
+PREP_RWD_DB_1K	observation_db	Databricks	bs-databricks-per-user	yes	18	databricks	observation	yes	13481	sql	
+PREP_RWD_DB_1K	observation_period_db	Databricks	bs-databricks-per-user	yes	5	databricks	observation_period	yes	1048	sql	
+PREP_RWD_DB_1K	person_db	Databricks	bs-databricks-per-user	yes	19	databricks	person	yes	1000	sql	
+PREP_RWD_DB_1K	procedure_occurrence_db	Databricks	bs-databricks-per-user	yes	14	databricks	procedure_occurrence	yes	62189	sql	
+PREP_RWD_DB_1K	visit_occurrence_db	Databricks	bs-databricks-per-user	yes	17	databricks	visit_occurrence	yes	17904	sql	
 PREP_RWD_RS_1K	concept_ancestor_rs	Redshift	redshift-solutions	yes	4	redshift	concept_ancestor	yes	72374967	sql	
 PREP_RWD_RS_1K	concept_rs	Redshift	redshift-solutions	yes	10	redshift	concept	yes	6088813	sql	
 PREP_RWD_RS_1K	condition_era_rs	Redshift	redshift-solutions	yes	6	redshift	condition_era	yes	121386	sql	

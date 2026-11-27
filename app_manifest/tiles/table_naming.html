@@ -1,0 +1,34 @@
+<div ng-controller="TableNamingController" class="rwd-table-naming">
+    <p ng-if="loading">Reading the current setting&hellip;</p>
+    <div ng-if="!loading">
+        <div ng-repeat="choice in choices" style="margin-bottom: 6px">
+            <label style="font-weight: normal; display: block">
+                <input type="radio" name="rwd_table_naming" ng-value="choice.value" ng-model="s.naming" ng-change="changed()">
+                <strong>{{choice.label}}</strong>
+                <span style="color: #666">&mdash; {{examples[choice.value]}}</span>
+            </label>
+        </div>
+        <div ng-if="s.naming === 'prefix'" style="margin: 8px 0 0 22px">
+            <label>Prefix
+                <input type="text" ng-model="s.prefix" ng-change="changed()" placeholder="cdm." style="width: 16em">
+            </label>
+            <p style="color: #666">Written before every table name: with <code>cdm.</code>, the scripts use <code>cdm.person</code>, <code>cdm.concept</code>, <code>cdm.cohort</code>.</p>
+        </div>
+        <div ng-if="s.naming === 'mapping'" style="margin: 8px 0 0 22px">
+            <p style="color: #666">Type each table's name exactly as your scripts write it. It starts from the Atlas names; leave a row blank if your scripts do not use that table.</p>
+            <table class="table table-condensed" style="width: 100%; max-width: 46em; table-layout: fixed">
+                <colgroup><col style="width: 35%"><col style="width: 65%"></colgroup>
+                <thead><tr><th>OMOP table</th><th>Name in your scripts</th></tr></thead>
+                <tbody ng-repeat="group in groups">
+                    <tr><td colspan="2" style="font-weight: bold; padding-top: 10px">{{group.label}}</td></tr>
+                    <tr ng-repeat="table in group.tables">
+                        <td style="word-break: break-all">{{table}}</td>
+                        <td><input type="text" ng-model="s.mapping[table]" ng-change="changed()" style="width: 100%; box-sizing: border-box"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <ul class="text-error" ng-if="errors.length"><li ng-repeat="e in errors">{{e}}</li></ul>
+    <p ng-if="status" style="color: #666">{{status}}</p>
+</div>

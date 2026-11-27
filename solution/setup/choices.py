@@ -8,6 +8,8 @@ instead of an error.
 """
 import logging
 
+from solution.utils.variables import get_setting
+
 logger = logging.getLogger(__name__)
 
 NO_PREP_PROJECT = {"value": "", "label": "Select a data preparation project first"}
@@ -25,19 +27,6 @@ def _client(client):
 
 def _current_project_key(project_key):
     return project_key or _dataiku().get_custom_variables()["projectKey"]
-
-
-def scoped_variable(variables, name):
-    """Return a project variable from the `local` scope, falling back to `standard`.
-
-    Project Setup writes `local`, which the solution code reads; `standard` may still hold an older
-    value. Missing and empty values both return None.
-    """
-    for scope in ("local", "standard"):
-        value = (variables.get(scope) or {}).get(name)
-        if value:
-            return value
-    return None
 
 
 def _options(values):
@@ -58,11 +47,11 @@ def omop_table_choices(client=None, project_key=None):
     client = _client(client)
     variables = client.get_project(_current_project_key(project_key)).get_variables()
 
-    prep_key = scoped_variable(variables, "data_preparation_project_key")
+    prep_key = get_setting("data_preparation_project_key", variables)
     if not prep_key or prep_key not in set(client.list_project_keys()):
         return {"choices": [NO_PREP_PROJECT]}
 
-    main_connection = scoped_variable(variables, "main_connection")
+    main_connection = get_setting("main_connection", variables)
     if not main_connection:
         return {"choices": [NO_MAIN_CONNECTION]}
     try:
@@ -73,25 +62,3 @@ def omop_table_choices(client=None, project_key=None):
 
     datasets = client.get_project(prep_key).list_datasets()
     return _options(d["name"] for d in datasets if d.get("type") == connection_type)
-
-
-def cohort_definition_choices(dataset=None):
-    """Cohorts in `cohort_definition`, matched on column names in any case.
-
-    Returns no choices while the dataset is unbuilt or unreadable.
-    """
-    if dataset is None:
-        dataset = _dataiku().Dataset("cohort_definition")
-    try:
-        names = [c["name"] for c in dataset.read_schema()]
-        index = {n.upper(): i for i, n in enumerate(names)}
-        id_col, name_col = index["COHORT_DEFINITION_ID"], index.get("COHORT_DEFINITION_NAME")
-        choices = []
-        for row in dataset.iter_tuples():
-            label = row[name_col] if name_col is not None else row[id_col]
-            choices.append({"value": row[id_col], "label": label})
-    except Exception as exc:  # unbuilt, unreadable, or without the id column
-        logger.warning("cohort_definition has no readable cohorts: %s", exc)
-        return {"choices": []}
-    choices.sort(key=lambda c: str(c["value"]))
-    return {"choices": choices}

@@ -1,0 +1,37 @@
+<div ng-controller="[[controller]]" class="[[css_class]]" ng-mouseenter="refresh()">
+    <div style="margin-bottom: 8px">
+        <button class="btn btn--secondary" ng-click="load(true)" ng-disabled="busy">Refresh list</button>
+        <span style="color: #666; margin-left: 8px" ng-if="busy">Reading the cohorts&hellip;</span>
+        <span style="color: #666; margin-left: 8px" ng-if="!busy">{{refreshNote || 'Just built cohorts? The list refreshes when you come back to it; click Refresh list if they are missing.'}}</span>
+    </div>
+    <p ng-if="!loading && cohortCount() === 0 && errors.length === 0">No cohort built yet. Build cohorts above first.</p>
+    <p ng-if="rows.length" style="color: #666; margin: 0 0 4px">{{cohortCount()}} cohort(s), {{batchCount()}} in batch.{{populationNote()}}</p>
+    <div style="width: 100%; max-height: 480px; overflow: auto; border: 1px solid #ddd" ng-if="rows.length">
+        <table class="table table-condensed" style="width: 100%; table-layout: fixed; margin-bottom: 0">
+            <!-- Percentages only: with fixed widths in em, the name column had no room left and its
+                 text ran under the next column. -->
+            <colgroup>
+                <col style="width: 8%"><col style="width: 21%"><col style="width: 10%"><col style="width: 13%">
+                <col style="width: 14%"><col style="width: 15%"><col style="width: 9%"><col style="width: 10%">
+            </colgroup>
+            <thead>
+                <tr><th style="position: sticky; top: 0; background: #fff; z-index: 1">Cohort id</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Name</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Subjects</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Built</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Status</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">[[done_header]]</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">In batch</th><th style="position: sticky; top: 0; background: #fff; z-index: 1">Replace</th></tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in rows track by row.id" ng-style="row.population ? {'background': '#f7f7f7'} : {}">
+                    <td style="vertical-align: top">{{row.population ? '' : row.id}}</td>
+                    <td style="vertical-align: top; overflow-wrap: anywhere">{{row.name}}</td>
+                    <td style="vertical-align: top">{{row.subjects === null || row.subjects === undefined ? '' : row.subjects}}</td>
+                    <td style="vertical-align: top">{{when(row.built)}}</td>
+                    <td style="vertical-align: top">{{labels[row.status] || row.status}}</td>
+                    <td style="vertical-align: top">{{when(row.[[done_field]])}}</td>
+                    <td style="vertical-align: top; text-align: center"><input type="checkbox" ng-model="row.submit" ng-change="row.dirty = true" ng-disabled="row.population" title="[[population_title]]"></td>
+                    <td style="vertical-align: top; text-align: center"><input type="checkbox" ng-model="row.replace" ng-change="row.dirty = true" ng-if="!row.population && row.submit && [[is_done]](row.id)" title="[[redo_verb]] cohort {{row.id}} again"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <ul class="text-error" ng-if="errors.length"><li ng-repeat="e in errors">{{e}}</li></ul>
+    <p class="text-success" ng-if="message">{{message}}</p>
+    <button class="btn btn--primary" ng-click="save()" ng-disabled="busy || !rows.length">Save batch</button>
+</div>

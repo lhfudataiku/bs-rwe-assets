@@ -1,7 +1,4 @@
-"""Offline tests for the Project Setup choices (E2) and the manifest patch tool."""
-import copy
-import importlib.util
-import os
+"""Offline tests for the Project Setup choices (E2). The manifest tool is in test_app_manifest.py."""
 import unittest
 from unittest import mock
 
@@ -24,15 +21,6 @@ def client(local=None, standard=None, projects=("SOL", PREP), conn_type="Snowfla
     cl.get_project.side_effect = lambda key: sol if key == "SOL" else prep
     cl.get_connection.return_value.get_info.return_value = {"type": conn_type}
     return cl, prep
-
-
-class ScopedVariable(unittest.TestCase):
-    def test_local_wins_then_standard_then_none(self):
-        v = {"local": {"a": "L", "b": ""}, "standard": {"a": "S", "b": "S", "c": "S"}}
-        self.assertEqual([c.scoped_variable(v, k) for k in "abcd"], ["L", "S", "S", None])
-
-    def test_missing_scopes(self):
-        self.assertIsNone(c.scoped_variable({}, "a"))
 
 
 class OmopTableChoices(unittest.TestCase):
@@ -62,75 +50,3 @@ class OmopTableChoices(unittest.TestCase):
         cl.get_connection.return_value.get_info.side_effect = Exception("not found")
         self.assertEqual(c.omop_table_choices(cl, "SOL"), {"choices": [c.NO_MAIN_CONNECTION]})
 
-
-class CohortDefinitionChoices(unittest.TestCase):
-    def dataset(self, names, rows):
-        ds = mock.MagicMock()
-        ds.read_schema.return_value = [{"name": n} for n in names]
-        ds.iter_tuples.return_value = iter(rows)
-        return ds
-
-    def test_reads_columns_in_any_case(self):
-        ds = self.dataset(["cohort_definition_id", "Cohort_Definition_Name"], [(2, "Stroke"), (1, "HF")])
-        self.assertEqual(c.cohort_definition_choices(ds), {"choices": [
-            {"value": 1, "label": "HF"}, {"value": 2, "label": "Stroke"}]})
-
-    def test_unbuilt_dataset_gives_no_choices(self):
-        ds = self.dataset(["COHORT_DEFINITION_ID"], [])
-        ds.iter_tuples.side_effect = Exception("dataset is not built")
-        self.assertEqual(c.cohort_definition_choices(ds), {"choices": []})
-
-
-def load_tool():
-    path = os.path.join(stubs.ROOT, "tools", "app_manifest.py")
-    spec = importlib.util.spec_from_file_location("app_manifest", path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
-class ManifestTool(unittest.TestCase):
-    MANIFEST = {"homepageSections": [
-        {"tiles": []}, {"tiles": []},
-        {"tiles": [{"module": "input_data_source_project_selectbox", "python": "old"}, {}, {},
-                   {"params": [{"name": "person"}], "python": "old"}, {},
-                   {"params": [{"name": "concept"}], "python": "old"}]},
-        {}, {}, {}, {}, {},
-        {"tiles": [{}, {"params": [{"name": "cohort_definition_id"}], "python": "old"}]}]}
-
-    def test_replaces_the_four_tiles_and_nothing_else(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        self.assertEqual(len(tool.patch(m, inline=False)), 4)
-        self.assertIn("omop_table_choices()", m["homepageSections"][2]["tiles"][3]["python"])
-        self.assertEqual(tool.patch(m, inline=False), [])  # idempotent
-
-    def test_refuses_a_reordered_manifest(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        m["homepageSections"][2]["tiles"][3]["params"][0]["name"] = "concept"
-        with self.assertRaises(SystemExit):
-            tool.patch(m)
-
-    def test_inline_tiles_run_without_the_library(self):
-        tool, m = load_tool(), copy.deepcopy(self.MANIFEST)
-        tool.patch(m)  # inline is the default
-        code = m["homepageSections"][8]["tiles"][1]["python"]
-        self.assertNotIn("from solution.setup", code)
-        ns = {}
-        exec(compile(code, "tile", "exec"), ns)
-        ds = mock.MagicMock()
-        ds.read_schema.return_value = [{"name": "COHORT_DEFINITION_ID"}]
-        ds.iter_tuples.return_value = iter([(3,)])
-        with mock.patch.dict(ns, {"_dataiku": lambda: mock.MagicMock(Dataset=lambda name: ds)}):
-            self.assertEqual(ns["do"]({}, {}, {}, []), {"choices": [{"value": 3, "label": 3}]})
-
-    def test_wrappers_compile_and_name_real_functions(self):
-        tiles = os.path.join(stubs.ROOT, "app_manifest", "tiles")
-        for fname in os.listdir(tiles):
-            ns = {}
-            with open(os.path.join(tiles, fname)) as fh:
-                exec(compile(fh.read(), fname, "exec"), ns)
-            self.assertTrue(callable(ns["do"]), fname)
-
-
-if __name__ == "__main__":
-    unittest.main()
