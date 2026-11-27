@@ -1722,7 +1722,8 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
      (`p2_cohort`). They now carry DSS-style ids. If the tables still do not follow, the filters are
      re-created in the dashboard editor (Edit → page filters), as page 1's was. With DSS-style ids
      they follow (owner, 2026-11-27): hand-written filter ids must have DSS's form.
-   - **Webapp follows and sets the page (owner, 2026-11-27; repo, uncommitted).** The rebuild is
+   - **Webapp follows and sets the page (owner, 2026-11-27; `b89f27e`, on SOL: library reset,
+     webapp HTML, JS and backend replaced from the repo, restarted without errors).** The rebuild is
      done by the backend through the API (two forced, non-recursive dataset builds), not a scenario.
      DSS 15 documents two hooks this uses:
      - a standard webapp in a dashboard receives the page filters as `message` events
@@ -1737,6 +1738,15 @@ The repo part comes first, with offline tests. The DSS part follows, with the ow
        no longer say "select … in the page filters".
      - The message schema is not documented, so the tile accepts any object naming the column
        with one selected value. Tests: 162 offline; the two browser helpers were run in node.
+
+   **Stage 4 gate passed (owner, 2026-11-27).** Both pages accepted visually. From page 2 the tile
+   follows the page filters, a pair is requested, computed, added to the dashboard and selected by
+   the page reload; with cohort B at "Population" nothing runs. The old dashboard `4OpJPy0` is
+   unchanged (version 390, 45 tiles). Left for stage 6 (retirement, from an approved list): the
+   insights replaced during this stage (`IiqXkfk`, `3tuEGAn`, `la2qdJ1`, `iszrTW6`, `uEYMBcb`,
+   `x37NrzF`, `nJkGql3`, `OSezm7a`, `mIgsl1z`, `ps9exwQ`, `vBKBS8Y`, `31npsjI`, `Tuy4BOP`, and the
+   tiles dropped from page 1: `bQK6isp`, `B7pTaIj`, `U9D7ap3`). Next: stage 5, the TMP round trip on
+   Redshift and Databricks.
    - **`Tuy4BOP`**: a "keep comparator_id = −1" step in its table script and a sort by
      `abs_std_diff` descending (`dku`), so cached pairs do not appear on page 1.
 
